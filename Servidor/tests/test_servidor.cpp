@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     // Crear servidor
     XmlRpcServer server;
 
-    // Registrar metodos
+    // Registrar metodos (Relacion de Agregacion)
     logger.info("Registrando servicios");
 
     ServicioPrueba servicioPrueba(&server);
@@ -39,11 +39,15 @@ int main(int argc, char** argv) {
     }
     logger.info("Enlace realizado con exito");
 
-    // Habilitar introspección
+    // Habilitar introspección. Permite:
+    // - .listMethods() para obtener la lista de metodos disponibles
+    // - .methodHelp() para obtener informacion de un metodo en particular
+    // - .methodSignature() para obtener la firma de un metodo en particular
     server.enableIntrospection(true);
     logger.info("Introspeccion habilitada");
 
     // Escuchar y atender clientes
+    // Implementa patron accept-process-respond
     server.work(-1.0); // -1.0 = esperar indefinidamente
     
     logger.info(" === SERVIDOR XML-RPC FINALIZADO ===");
