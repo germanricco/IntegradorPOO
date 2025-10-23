@@ -1,109 +1,110 @@
-# Makefile para compilación de tests
-CXX := g++
-CXXFLAGS := -std=c++17 -g -Wall -Iinclude -Ilib/xmlrpc
-LIBS := -lpthread
+# ==========================================
+#  Proyecto: Integrador POO (Servidor)
+#  Ruta: Servidor/
+# ==========================================
 
-# Directorios
-BIN_DIR := bin
-SRC_DIR := src
-TESTS_DIR := tests
-INCLUDE_DIR := include
-LIB_DIR := lib
+# --- toolchain ---
+CXX      := g++
+CXXFLAGS := -std=c++17 -O2 -Wall
+INCLUDES := -Iinclude -Ilib/xmlrpc
 
-# Archivos fuente del proyecto
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+# ==========================================
+#  Fuentes comunes del servidor
+# ==========================================
+# Librería XML-RPC (todos los .cpp dentro de lib/xmlrpc)
+XMLRPC_SRCS := $(wildcard lib/xmlrpc/*.cpp)
 
-# Archivos de test
-TEST_SERIAL_FILE := $(TESTS_DIR)/test_serial_com.cpp
-TEST_SERVER_FILE := $(TESTS_DIR)/test_servidor.cpp
-TEST_ARDUINO_FILE := $(TESTS_DIR)/test_arduino_service.cpp
+# Núcleo del servidor y módulos auth/user/session
+CORE_SRCS := \
+  src/PALogger.cpp \
+  src/ServiciosBasicos.cpp \
+  src/session/SessionManager.cpp \
+  src/user/UserEntity.cpp \
+  src/user/UsersRepoCsv.cpp \
+  src/auth/AuthLogin.cpp \
+  src/auth/AuthMe.cpp \
+  src/auth/AuthLogout.cpp \
+  src/user/UserRegister.cpp \
+  src/user/UserUpdate.cpp \
+  src/user/UserChangePassword.cpp \
+  src/user/UserList.cpp
 
-# Archivos de XmlRpc++ (desde tu directorio lib/xmlrpc)
-XMLRPC_SRC_FILES := $(wildcard $(LIB_DIR)/xmlrpc/*.cpp)
-XMLRPC_OBJ_FILES := $(patsubst $(LIB_DIR)/xmlrpc/%.cpp,$(BIN_DIR)/xmlrpc_%.o,$(XMLRPC_SRC_FILES))
+# ==========================================
+#  Ejecutable del servidor
+#  (usa SOLO un main: tests/test_servidor.cpp)
+# ==========================================
+SERVER_MAIN := tests/test_servidor.cpp
+SERVER_SRCS := $(CORE_SRCS) $(XMLRPC_SRCS) $(SERVER_MAIN)
+SERVER_OBJS := $(SERVER_SRCS:.cpp=.o)
+TARGET      := servidor_min
 
-# Ejecutables finales
-TEST_SERIAL_BIN := $(BIN_DIR)/test_serial_com
-TEST_SERVER_BIN := $(BIN_DIR)/test_servidor
-TEST_ARDUINO_BIN := $(BIN_DIR)/test_arduino_service
+# ==========================================
+#  Ejecutables de tests (doctest)
+#  Cada test lleva su propio main (DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN)
+#  Por eso: un binario por archivo de test.
+# ==========================================
+# Módulos que necesitan los tests
+SERIAL_SRCS  := src/SerialCom.cpp
+ARDUINO_SRCS := src/ArduinoService.cpp
 
-# Target principal - compila todo
-all: $(TEST_SERIAL_BIN) $(TEST_SERVER_BIN) $(TEST_ARDUINO_BIN)
-	@echo "✅ Todos los tests compilados"
+TESTS := test_serial_com test_arduino_service
 
-# =============================================
-# COMPILACIÓN DE XMLRPC++
-# =============================================
+# test_serial_com
+TEST_serial_com_SRCS := $(CORE_SRCS) $(XMLRPC_SRCS) $(SERIAL_SRCS) tests/test_serial_com.cpp
+TEST_serial_com_OBJS := $(TEST_serial_com_SRCS:.cpp=.o)
 
-# Compilar objetos de XmlRpc++
-$(BIN_DIR)/xmlrpc_%.o: $(LIB_DIR)/xmlrpc/%.cpp
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+# test_arduino_service
+TEST_arduino_service_SRCS := $(CORE_SRCS) $(XMLRPC_SRCS) $(SERIAL_SRCS) $(ARDUINO_SRCS) tests/test_arduino_service.cpp
+TEST_arduino_service_OBJS := $(TEST_arduino_service_SRCS:.cpp=.o)
 
-# =============================================
-# COMPILACIÓN DE TESTS INDIVIDUALES
-# =============================================
+# ==========================================
+#  Targets por defecto
+# ==========================================
+.PHONY: all tests clean mrproper info help
 
-# Test de SerialCom con doctest
-$(TEST_SERIAL_BIN): $(SRC_FILES) $(TEST_SERIAL_FILE) $(XMLRPC_OBJ_FILES)
-	@echo "🧪 Compilando test de SerialCom..."
-	$(CXX) $(CXXFLAGS) $(SRC_FILES) $(TEST_SERIAL_FILE) $(XMLRPC_OBJ_FILES) -o $@ $(LIBS)
-	@echo "✅ Test SerialCom compilado: $@"
+all: $(TARGET)
 
-# Test del servidor XML-RPC
-$(TEST_SERVER_BIN): $(SRC_FILES) $(TEST_SERVER_FILE) $(XMLRPC_OBJ_FILES)
-	@echo "🌐 Compilando test del servidor..."
-	$(CXX) $(CXXFLAGS) $(SRC_FILES) $(TEST_SERVER_FILE) $(XMLRPC_OBJ_FILES) -o $@ $(LIBS)
-	@echo "✅ Test Servidor compilado: $@"
+tests: $(TESTS)
 
-$(TEST_ARDUINO_BIN): $(SRC_FILES) $(TEST_ARDUINO_FILE) $(XMLRPC_OBJ_FILES)
-	@echo "🤖 Compilando test de ArduinoService..."
-	$(CXX) $(CXXFLAGS) $(SRC_FILES) $(TEST_ARDUINO_FILE) $(XMLRPC_OBJ_FILES) -o $@ $(LIBS)
-	@echo "✅ Test ArduinoService compilado: $@"
+# Servidor
+$(TARGET): $(SERVER_OBJS)
+	@echo "🔧 Enlazando $(TARGET)..."
+	$(CXX) $(CXXFLAGS) -o $@ $(SERVER_OBJS)
 
-# =============================================
-# REGLAS DE EJECUCIÓN
-# =============================================
+# Tests
+test_serial_com: $(TEST_serial_com_OBJS)
+	@echo "🔧 Enlazando $@..."
+	$(CXX) $(CXXFLAGS) -o $@ $(TEST_serial_com_OBJS)
 
-# Ejecutar test de SerialCom
-test-serial: $(TEST_SERIAL_BIN)
-	@echo "🚀 Ejecutando test de SerialCom..."
-	./$(TEST_SERIAL_BIN)
+test_arduino_service: $(TEST_arduino_service_OBJS)
+	@echo "🔧 Enlazando $@..."
+	$(CXX) $(CXXFLAGS) -o $@ $(TEST_arduino_service_OBJS)
 
-# Ejecutar test del servidor (necesita puerto)
-test-servidor: $(TEST_SERVER_BIN)
-	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
-	./$(TEST_SERVER_BIN) 8080
+# Compilación genérica
+%.o: %.cpp
+	@echo "🧩 Compilando $<..."
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-test-arduino: $(TEST_ARDUINO_BIN)
-	@echo "🚀 Ejecutando test de ArduinoService..."
-	./$(TEST_ARDUINO_BIN)
+# Silenciar warnings de -Waddress SOLO en archivos de tests (no en el resto)
+tests/%.o: CXXFLAGS += -Wno-address
 
-# Ejecutar todos los tests
-test: test-serial test-arduino #test-servidor
-	@echo "⏳ Esperando para test del servidor..."
-	@sleep 2
-	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
-	@./$(TEST_SERVER_BIN) 8080
-
-# =============================================
-# HERRAMIENTAS DE DESARROLLO
-# =============================================
-
-# Limpiar binarios
+# Limpieza
 clean:
-	rm -rf $(BIN_DIR)/*
-	@echo "🧹 Binarios eliminados"
+	@echo "🧹 Limpiando objetos..."
+	rm -f $(SERVER_OBJS) $(TEST_serial_com_OBJS) $(TEST_arduino_service_OBJS)
 
-# Ayuda
+mrproper: clean
+	@echo "🗑️  Borrando ejecutables..."
+	rm -f $(TARGET) $(TESTS)
+
+# Info / ayuda
+info:
+	@echo "Servidor fuentes: $(words $(SERVER_SRCS)) archivos"
+	@echo "Tests: $(TESTS)"
+
 help:
-	@echo "🎯 COMANDOS DISPONIBLES:"
-	@echo "   make all        - Compila todos los tests"
-	@echo "   make test-serial - Compila y ejecuta test de SerialCom"
-	@echo "   make test-servidor - Compila y ejecuta test del servidor"
-	@echo "   make test-arduino - Compila y ejecuta test de ArduinoService"
-	@echo "   make test       - Ejecuta todos los tests"
-	@echo "   make clean      - Limpia binarios"
-	@echo "   make info       - Muestra información del proyecto"
+	@echo "make            -> compila servidor_min"
+	@echo "make tests      -> compila todos los tests (binarios separados)"
+	@echo "make clean      -> borra .o"
+	@echo "make mrproper   -> borra .o y ejecutables"
 
-.PHONY: all test test-serial test-server clean info help

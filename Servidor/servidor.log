@@ -1,18 +1,50 @@
-[2025-10-22 18:36:44] [INFO]  === INICIANDO SERVIDOR XML-RPC ===
-[2025-10-22 18:36:44] [INFO] Iniciando servidor en puerto 8080
-[2025-10-22 18:36:44] [INFO] Registrando servicios
-[2025-10-22 18:36:44] [INFO] Enlazando servidor al puerto 8080
-[2025-10-22 18:36:44] [INFO] Enlace realizado con exito
-[2025-10-22 18:36:44] [INFO] Introspeccion habilitada
-[2025-10-22 21:04:06] [INFO]  === INICIANDO SERVIDOR XML-RPC ===
-[2025-10-22 21:04:06] [INFO] Iniciando servidor en puerto 8080
-[2025-10-22 21:04:06] [INFO] Registrando servicios
-[2025-10-22 21:04:06] [INFO] Enlazando servidor al puerto 8080
-[2025-10-22 21:04:06] [INFO] Enlace realizado con exito
-[2025-10-22 21:04:06] [INFO] Introspeccion habilitada
-[2025-10-22 21:05:05] [INFO]  === INICIANDO SERVIDOR XML-RPC ===
-[2025-10-22 21:05:05] [INFO] Iniciando servidor en puerto 8080
-[2025-10-22 21:05:05] [INFO] Registrando servicios
-[2025-10-22 21:05:05] [INFO] Enlazando servidor al puerto 8080
-[2025-10-22 21:05:05] [INFO] Enlace realizado con exito
-[2025-10-22 21:05:05] [INFO] Introspeccion habilitada
+[2025-10-23 11:49:55] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-23 11:49:55] [INFO] [system] puerto=8080
+[2025-10-23 11:49:55] [INFO] [system] users.csv=users.csv
+[2025-10-23 11:49:55] [INFO] [system] ServicioPrueba registrado
+[2025-10-23 11:49:55] [INFO] [system] auth.* registrados
+[2025-10-23 11:49:55] [INFO] [system] user.* registrados
+[2025-10-23 11:49:55] [INFO] [system] introspección habilitada
+[2025-10-23 11:49:55] [INFO] [system] escuchando… (work loop)
+[2025-10-23 11:50:36] [INFO] [auth] login OK — user=admin
+[2025-10-23 11:50:42] [INFO] [user] list OK — actor=admin, count=1
+[2025-10-23 11:51:03] [INFO] [user] register OK — actor=admin, new=jose, priv=op
+[2025-10-23 11:51:06] [INFO] [user] list OK — actor=admin, count=2
+[2025-10-23 11:51:23] [INFO] [user] register OK — actor=admin, new=luisito, priv=viewer
+[2025-10-23 11:51:42] [INFO] [user] register OK — actor=admin, new=carlitos, priv=op
+[2025-10-23 11:52:26] [INFO] [user] update OK — actor=admin, target=carlitos (hab=0; )
+[2025-10-23 11:52:30] [INFO] [user] list OK — actor=admin, count=4
+[2025-10-23 11:52:38] [INFO] [auth] logout OK
+[2025-10-23 11:52:45] [INFO] [auth] login OK — user=jose
+[2025-10-23 12:12:10] [INFO] [auth] login OK — user=jose
+[2025-10-23 12:12:20] [WARNING] [auth] login FAIL — user=carlitos (usuario deshabilitado)
+[2025-10-23 12:12:33] [INFO] [auth] login OK — user=luisito
+[2025-10-23 12:13:12] [INFO] [system] signal recibido — SIGINT
+[2025-10-23 12:13:12] [INFO] [system] apagando…
+[2025-10-23 12:13:12] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-23 14:12:01] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-23 14:12:01] [INFO] [system] puerto=8080
+[2025-10-23 14:12:01] [INFO] [system] users.csv=users.csv
+[2025-10-23 14:12:01] [INFO] [system] ServicioPrueba registrado
+[2025-10-23 14:12:01] [INFO] [system] auth.* registrados
+[2025-10-23 14:12:01] [INFO] [system] user.* registrados
+[2025-10-23 14:12:01] [INFO] [system] introspección habilitada
+[2025-10-23 14:12:01] [INFO] [system] escuchando… (work loop)
+[2025-10-23 14:13:37] [WARNING] [auth] login FAIL — user=admin (credenciales inválidas)
+[2025-10-23 14:13:43] [INFO] [auth] login OK — user=admin
+[2025-10-23 14:13:45] [INFO] [user] list OK — actor=admin, count=4
+[2025-10-23 14:14:03] [INFO] [system] signal recibido — SIGINT
+[2025-10-23 14:14:03] [INFO] [system] apagando…
+[2025-10-23 14:14:03] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-23 14:30:36] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-23 14:30:36] [INFO] [system] puerto=8080
+[2025-10-23 14:30:36] [INFO] [system] users.csv=users.csv
+[2025-10-23 14:30:36] [INFO] [system] ServicioPrueba registrado
+[2025-10-23 14:30:36] [INFO] [system] auth.* registrados
+[2025-10-23 14:30:36] [INFO] [system] user.* registrados
+[2025-10-23 14:30:36] [INFO] [system] introspección habilitada
+[2025-10-23 14:30:36] [INFO] [system] escuchando… (work loop)
+[2025-10-23 14:31:02] [WARNING] [auth] login FAIL — user=sffs (credenciales inválidas)
+[2025-10-23 14:31:14] [INFO] [system] signal recibido — SIGINT
+[2025-10-23 14:31:14] [INFO] [system] apagando…
+[2025-10-23 14:31:14] [INFO] === SERVIDOR DETENIDO ===
