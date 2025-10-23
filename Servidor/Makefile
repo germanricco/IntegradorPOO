@@ -12,9 +12,11 @@ LIB_DIR := lib
 
 # Archivos fuente del proyecto
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+
 # Archivos de test
 TEST_SERIAL_FILE := $(TESTS_DIR)/test_serial_com.cpp
 TEST_SERVER_FILE := $(TESTS_DIR)/test_servidor.cpp
+TEST_ARDUINO_FILE := $(TESTS_DIR)/test_arduino_service.cpp
 
 # Archivos de XmlRpc++ (desde tu directorio lib/xmlrpc)
 XMLRPC_SRC_FILES := $(wildcard $(LIB_DIR)/xmlrpc/*.cpp)
@@ -23,9 +25,10 @@ XMLRPC_OBJ_FILES := $(patsubst $(LIB_DIR)/xmlrpc/%.cpp,$(BIN_DIR)/xmlrpc_%.o,$(X
 # Ejecutables finales
 TEST_SERIAL_BIN := $(BIN_DIR)/test_serial_com
 TEST_SERVER_BIN := $(BIN_DIR)/test_servidor
+TEST_ARDUINO_BIN := $(BIN_DIR)/test_arduino_service
 
 # Target principal - compila todo
-all: $(TEST_SERIAL_BIN) $(TEST_SERVER_BIN)
+all: $(TEST_SERIAL_BIN) $(TEST_SERVER_BIN) $(TEST_ARDUINO_BIN)
 	@echo "✅ Todos los tests compilados"
 
 # =============================================
@@ -53,6 +56,11 @@ $(TEST_SERVER_BIN): $(SRC_FILES) $(TEST_SERVER_FILE) $(XMLRPC_OBJ_FILES)
 	$(CXX) $(CXXFLAGS) $(SRC_FILES) $(TEST_SERVER_FILE) $(XMLRPC_OBJ_FILES) -o $@ $(LIBS)
 	@echo "✅ Test Servidor compilado: $@"
 
+$(TEST_ARDUINO_BIN): $(SRC_FILES) $(TEST_ARDUINO_FILE) $(XMLRPC_OBJ_FILES)
+	@echo "🤖 Compilando test de ArduinoService..."
+	$(CXX) $(CXXFLAGS) $(SRC_FILES) $(TEST_ARDUINO_FILE) $(XMLRPC_OBJ_FILES) -o $@ $(LIBS)
+	@echo "✅ Test ArduinoService compilado: $@"
+
 # =============================================
 # REGLAS DE EJECUCIÓN
 # =============================================
@@ -63,12 +71,20 @@ test-serial: $(TEST_SERIAL_BIN)
 	./$(TEST_SERIAL_BIN)
 
 # Ejecutar test del servidor (necesita puerto)
-test-server: $(TEST_SERVER_BIN)
+test-servidor: $(TEST_SERVER_BIN)
 	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
 	./$(TEST_SERVER_BIN) 8080
 
+test-arduino: $(TEST_ARDUINO_BIN)
+	@echo "🚀 Ejecutando test de ArduinoService..."
+	./$(TEST_ARDUINO_BIN)
+
 # Ejecutar todos los tests
-test: test-serial test-server
+test: test-serial test-arduino #test-servidor
+	@echo "⏳ Esperando para test del servidor..."
+	@sleep 2
+	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
+	@./$(TEST_SERVER_BIN) 8080
 
 # =============================================
 # HERRAMIENTAS DE DESARROLLO
@@ -79,20 +95,13 @@ clean:
 	rm -rf $(BIN_DIR)/*
 	@echo "🧹 Binarios eliminados"
 
-# Mostrar información del proyecto
-info:
-	@echo "📊 INFORMACIÓN DEL PROYECTO:"
-	@echo "   Archivos fuente: $(words $(SRC_FILES))"
-	@echo "   - $(SRC_FILES)"
-	@echo "   Archivos XmlRpc++: $(words $(XMLRPC_SRC_FILES))"
-	@echo "   - $(XMLRPC_SRC_FILES)"
-
 # Ayuda
 help:
 	@echo "🎯 COMANDOS DISPONIBLES:"
 	@echo "   make all        - Compila todos los tests"
 	@echo "   make test-serial - Compila y ejecuta test de SerialCom"
-	@echo "   make test-server - Compila y ejecuta test del servidor"
+	@echo "   make test-servidor - Compila y ejecuta test del servidor"
+	@echo "   make test-arduino - Compila y ejecuta test de ArduinoService"
 	@echo "   make test       - Ejecuta todos los tests"
 	@echo "   make clean      - Limpia binarios"
 	@echo "   make info       - Muestra información del proyecto"
