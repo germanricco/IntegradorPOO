@@ -11,6 +11,7 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
+#include <stdexcept>
 
 using namespace std;
 
@@ -43,8 +44,9 @@ class RobotService {
                     PALogger& logger,
                     const string& directorioTrayectorias = "data/trayectorias/");
 
-        //? Porque destructor virtual?    
-        virtual ~RobotService() = default;
+        //? Porque destructor virtual? 
+        virtual ~RobotService() = default;   
+        //~RobotService();
 
         // Eliminar operaciones de copia
         RobotService(const RobotService&) = delete;
@@ -57,17 +59,19 @@ class RobotService {
         
         // Comando Basicos del Robot
         string homing();
-        string mover(double x, double y, double z, double velocidad = 0);
-        string mover(double x, double y, double z); // Sobrecarga con vel por defecto
+        string mover(double x, double y, double z, double velocidad = 100.0);
         
         // Efector Final
         string activarEfector();
         string desactivarEfector();
 
-        // Motores
+        // Control de Motores
         string activarMotores();
         string desactivarMotores();
         
+        // Reportes
+        std::string obtenerEstado();
+
         // Gestión de modos
         bool setModoOperacion(ModoOperacion modo);
         bool setModoCoordenadas(ModoCoordenadas modo);
@@ -75,9 +79,6 @@ class RobotService {
         ModoCoordenadas getModoCoordenadas() const;
         ModoEjecucion getModoEjecucion() const;
         
-        // Reportes
-        std::string obtenerEstado();
-
     private:
         shared_ptr<ArduinoService> arduinoService_;
         PALogger& logger_;
@@ -87,10 +88,19 @@ class RobotService {
         ModoOperacion modoOperacion_;
         ModoCoordenadas modoCoordenadas_;
         ModoEjecucion modoEjecucion_;
-
+        
         // Métodos privados de ayuda
         string formatearComandoG1(double x, double y, double z, double vel = 0);
         bool validarPosicion(double x, double y, double z);
+
+        // Procesamiento de respuestas
+        string procesarRespuesta(const string& respuestaCompleta);
+        void logRespuestaCompleta(const string& respuestaCompleta, const string& comando);
+
+        // Constantes para parsing
+        static const string PREFIX_INFO;
+        static const string PREFIX_ERROR;
+        static const string SUFFIX_OK;
 };
 
 #endif // ROBOTSERVICE_H

@@ -37,7 +37,8 @@ CORE_SRCS := \
   $(SRC_DIR)/user/UserList.cpp \
   $(SRC_DIR)/SerialCom.cpp \
   $(SRC_DIR)/ArduinoService.cpp \
-  $(SRC_DIR)/File.cpp
+  $(SRC_DIR)/File.cpp \
+  $(SRC_DIR)/RobotService.cpp
 
 CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CORE_SRCS))
 
@@ -54,6 +55,7 @@ SERVER_BIN := $(BIN_DIR)/servidor_min
 TEST_SERIAL_BIN := $(BIN_DIR)/test_serial_com
 TEST_ARDUINO_BIN := $(BIN_DIR)/test_arduino_service
 TEST_FILE_BIN := $(BIN_DIR)/test_file
+TEST_ROBOT_BIN := $(BIN_DIR)/test_robot_service
 
 # ==========================================
 # REGLAS DE COMPILACIÓN
@@ -72,7 +74,7 @@ $(SERVER_BIN): $(SERVER_OBJS)
 	@echo "✅ Servidor compilado: $@"
 
 # Compilar Tests
-tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN)
+tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN) $(TEST_ROBOT_BIN)
 	@echo "✅ Todos los tests compilados"
 
 # =============================================
@@ -89,6 +91,10 @@ $(TEST_ARDUINO_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_arduino_service
 
 $(TEST_FILE_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_file.o
 	@echo "📁 Enlazando test de Archivos..."
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+$(TEST_ROBOT_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_robot_service.o
+	@echo "🤖 Enlazando test de RobotService..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 
@@ -130,12 +136,15 @@ test-servidor: $(SERVER_BIN)
 	@echo "🚀 Ejecutando servidor en puerto 8080..."
 	./$(SERVER_BIN) 8080
 
-# Ejecutar test de File
 test-file: $(TEST_FILE_BIN)
 	@echo "🚀 Ejecutando test de File..."
 	./$(TEST_FILE_BIN)
 
-test: test-serial test-arduino test-file
+test-robot: $(TEST_ROBOT_BIN)
+	@echo "🚀 Ejecutando test de RobotService..."
+	./$(TEST_ROBOT_BIN)
+
+test: test-serial test-arduino test-file test-robot
 	@echo "⏳ Esperando para test del servidor..."
 	@sleep 2
 	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
@@ -156,6 +165,7 @@ help:
 	@echo "   make test-serial 		- Compila y ejecuta test de SerialCom"
 	@echo "   make test-arduino 	- Compila y ejecuta test de ArduinoService"
 	@echo "   make test-file 		- Compila y ejecuta test de Archivos"
+	@echo "   make test-robot 		- Compila y ejecuta test de RobotService"
 	@echo "   make test-servidor 	- Compila y ejecuta el servidor"
 	@echo "   make test        		- Ejecuta todos los tests"
 	@echo "   make clean       		- Limpia completamente el directorio bin"

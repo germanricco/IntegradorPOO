@@ -1,0 +1,158 @@
+[2025-10-28 20:26:00] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-10-28 20:26:00] [INFO] Inicializando servicios...
+[2025-10-28 20:26:00] [INFO] RobotService Inicializado
+[2025-10-28 20:26:00] [INFO] Conectando al Arduino...
+[2025-10-28 20:26:03] [INFO] Configurando modo de coordenadas: ABSOLUTO
+[2025-10-28 20:26:03] [INFO] Ejecutando comando: G90
+
+[2025-10-28 20:26:03] [INFO] FIRMWARE: ABSOLUTE MODE
+[2025-10-28 20:26:03] [INFO] FIRMWARE: 
+[2025-10-28 20:26:03] [INFO] FIRMWARE: MOTORS DISABLED
+[2025-10-28 20:26:03] [INFO] FIRMWARE: FAN DISABLED
+[2025-10-28 20:26:03] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:03] [INFO] Modo de coordenadas configurado exitosamente: ABSOLUTO
+[2025-10-28 20:26:03] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-28 20:26:03] [INFO] ✅ CONEXIÓN GLOBAL ESTABLECIDA
+[2025-10-28 20:26:03] [INFO] Configurando robot inicialmente...
+[2025-10-28 20:26:03] [INFO] Configurando modo de coordenadas: ABSOLUTO
+[2025-10-28 20:26:03] [INFO] Ejecutando comando: G90
+
+[2025-10-28 20:26:03] [INFO] FIRMWARE: ABSOLUTE MODE ON
+[2025-10-28 20:26:03] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:03] [INFO] Modo de coordenadas configurado exitosamente: ABSOLUTO
+[2025-10-28 20:26:03] [INFO] Activando motores
+[2025-10-28 20:26:04] [INFO] Ejecutando comando: M17
+[2025-10-28 20:26:04] [INFO] FIRMWARE: MOTORS ENABLED
+[2025-10-28 20:26:04] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:04] [INFO] Motores activados exitosamente
+[2025-10-28 20:26:04] [INFO] ✅ Conexión verificada exitosamente
+[2025-10-28 20:26:04] [INFO] 🧪 TEST: Comando G28 - Homing
+[2025-10-28 20:26:04] [INFO] Ejecutando homing
+[2025-10-28 20:26:07] [INFO] Ejecutando comando: G28
+[2025-10-28 20:26:07] [INFO] FIRMWARE: HOMING COMPLETE
+[2025-10-28 20:26:07] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:07] [INFO] Homing completado exitosamente
+[2025-10-28 20:26:07] [INFO] ✅ TEST G28 COMPLETADO: HOMING COMPLETE
+[2025-10-28 20:26:07] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-10-28 20:26:07] [INFO] Ejecutando movimiento
+[2025-10-28 20:26:07] [INFO] Ejecutando comando: G1 X100.00 Y50.00 Z20.00 F300
+
+[2025-10-28 20:26:07] [INFO] FIRMWARE: LINEAR MOVE: [X:100.00 Y:50.00 Z:20.00 E:0.00]
+[2025-10-28 20:26:07] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:07] [INFO] ✅ Movimiento con velocidad: LINEAR MOVE: [X:100.00 Y:50.00 Z:20.00 E:0.00]
+[2025-10-28 20:26:07] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-10-28 20:26:07] [INFO] Ejecutando movimiento
+[2025-10-28 20:26:07] [INFO] Ejecutando comando: G1 X50.00 Y25.00 Z10.00 F100
+
+[2025-10-28 20:26:07] [ERROR] FIRMWARE: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:07] [INFO] FIRMWARE: LINEAR MOVE: [X:50.00 Y:25.00 Z:10.00 E:0.00]
+[2025-10-28 20:26:07] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:07] [ERROR] Error en movimiento: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:07] [INFO] ✅ Movimiento sin velocidad: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:07] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-10-28 20:26:07] [WARNING] Posición fuera de límites: X=500.000000 Y=500.000000 Z=500.000000
+[2025-10-28 20:26:07] [INFO] ✅ Movimiento inválido detectado: ERROR: Posición fuera de límites
+[2025-10-28 20:26:07] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-10-28 20:26:07] [INFO] Activando efector final
+[2025-10-28 20:26:07] [INFO] Ejecutando comando: M3
+[2025-10-28 20:26:07] [ERROR] FIRMWARE: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:07] [ERROR] Error activando efector: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:07] [INFO] ✅ Efector activado: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:07] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-10-28 20:26:07] [INFO] Desactivando efector final
+[2025-10-28 20:26:08] [INFO] Ejecutando comando: M5
+[2025-10-28 20:26:08] [INFO] FIRMWARE: GRIPPER ON
+[2025-10-28 20:26:08] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:08] [INFO] ✅ Efector desactivado: GRIPPER ON
+[2025-10-28 20:26:08] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-10-28 20:26:08] [INFO] Desactivando motores
+[2025-10-28 20:26:09] [INFO] Ejecutando comando: M18
+[2025-10-28 20:26:09] [INFO] FIRMWARE: GRIPPER OFF
+[2025-10-28 20:26:09] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:09] [INFO] FIRMWARE: MOTORS DISABLED
+[2025-10-28 20:26:09] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:09] [INFO] Motores desactivados exitosamente
+[2025-10-28 20:26:09] [INFO] ✅ Motores desactivados: MOTORS DISABLED
+[2025-10-28 20:26:09] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-10-28 20:26:09] [INFO] Activando motores
+[2025-10-28 20:26:10] [INFO] Ejecutando comando: M17
+[2025-10-28 20:26:10] [INFO] FIRMWARE: MOTORS ENABLED
+[2025-10-28 20:26:10] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:10] [INFO] Motores activados exitosamente
+[2025-10-28 20:26:10] [INFO] ✅ Motores activados: MOTORS ENABLED
+[2025-10-28 20:26:10] [INFO] 🧪 TEST: Comando M114 - Estado del Robot
+[2025-10-28 20:26:10] [INFO] Solicitando estado del robot
+[2025-10-28 20:26:10] [INFO] Ejecutando comando: M114
+[2025-10-28 20:26:10] [INFO] FIRMWARE: ABSOLUTE MODE
+[2025-10-28 20:26:10] [INFO] FIRMWARE: CURRENT POSITION: [X:71.32 Y:84.27 Z:48.58 E:0.00]
+[2025-10-28 20:26:10] [INFO] FIRMWARE: MOTORS ENABLED
+[2025-10-28 20:26:10] [INFO] FIRMWARE: FAN ENABLED
+[2025-10-28 20:26:10] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:10] [INFO] Estado obtenido exitosamente
+[2025-10-28 20:26:10] [INFO] ✅ Estado obtenido: FAN ENABLED
+[2025-10-28 20:26:10] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-10-28 20:26:10] [INFO] Configurando modo de coordenadas: RELATIVO
+[2025-10-28 20:26:10] [INFO] Ejecutando comando: G91
+
+[2025-10-28 20:26:10] [INFO] FIRMWARE: RELATIVE MODE ON
+[2025-10-28 20:26:10] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:10] [INFO] Modo de coordenadas configurado exitosamente: RELATIVO
+[2025-10-28 20:26:10] [INFO] ✅ Modo relativo configurado
+[2025-10-28 20:26:10] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-10-28 20:26:10] [INFO] Configurando modo de coordenadas: ABSOLUTO
+[2025-10-28 20:26:10] [INFO] Ejecutando comando: G90
+
+[2025-10-28 20:26:10] [INFO] FIRMWARE: ABSOLUTE MODE ON
+[2025-10-28 20:26:10] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:10] [INFO] Modo de coordenadas configurado exitosamente: ABSOLUTO
+[2025-10-28 20:26:10] [INFO] ✅ Modo absoluto configurado
+[2025-10-28 20:26:10] [INFO] 🧪 TEST: Secuencia Completa de Operación
+[2025-10-28 20:26:10] [INFO] 🔧 INICIANDO SECUENCIA COMPLETA...
+[2025-10-28 20:26:10] [INFO] Ejecutando homing
+[2025-10-28 20:26:13] [INFO] Ejecutando comando: G28
+[2025-10-28 20:26:13] [INFO] FIRMWARE: HOMING COMPLETE
+[2025-10-28 20:26:13] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:13] [INFO] Homing completado exitosamente
+[2025-10-28 20:26:13] [INFO] ✅ Paso 1/7 - Homing completado
+[2025-10-28 20:26:13] [INFO] Activando motores
+[2025-10-28 20:26:13] [INFO] Ejecutando comando: M17
+[2025-10-28 20:26:13] [INFO] FIRMWARE: MOTORS ENABLED
+[2025-10-28 20:26:13] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:13] [INFO] Motores activados exitosamente
+[2025-10-28 20:26:13] [INFO] ✅ Paso 2/7 - Motores activados
+[2025-10-28 20:26:13] [INFO] Ejecutando movimiento
+[2025-10-28 20:26:14] [INFO] Ejecutando comando: G1 X50.00 Y50.00 Z50.00 F200
+
+[2025-10-28 20:26:14] [INFO] FIRMWARE: LINEAR MOVE: [X:50.00 Y:50.00 Z:50.00 E:0.00]
+[2025-10-28 20:26:14] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:14] [INFO] ✅ Paso 3/7 - Movimiento a posición inicial
+[2025-10-28 20:26:14] [INFO] Activando efector final
+[2025-10-28 20:26:14] [INFO] Ejecutando comando: M3
+[2025-10-28 20:26:14] [ERROR] FIRMWARE: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:14] [ERROR] Error activando efector: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:14] [INFO] ✅ Paso 4/7 - Efector activado
+[2025-10-28 20:26:14] [INFO] Ejecutando movimiento
+[2025-10-28 20:26:15] [INFO] Ejecutando comando: G1 X100.00 Y100.00 Z30.00 F100
+
+[2025-10-28 20:26:15] [INFO] FIRMWARE: GRIPPER ON
+[2025-10-28 20:26:15] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:15] [INFO] ✅ Paso 5/7 - Movimiento con efector activado
+[2025-10-28 20:26:15] [INFO] Desactivando efector final
+[2025-10-28 20:26:15] [INFO] Ejecutando comando: M5
+[2025-10-28 20:26:15] [INFO] FIRMWARE: LINEAR MOVE: [X:100.00 Y:100.00 Z:30.00 E:0.00]
+[2025-10-28 20:26:15] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:15] [ERROR] FIRMWARE: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:15] [ERROR] Error desactivando efector: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-28 20:26:15] [INFO] ✅ Paso 6/7 - Efector desactivado
+[2025-10-28 20:26:15] [INFO] Solicitando estado del robot
+[2025-10-28 20:26:17] [INFO] Ejecutando comando: M114
+[2025-10-28 20:26:17] [INFO] FIRMWARE: GRIPPER OFF
+[2025-10-28 20:26:17] [INFO] FIRMWARE: OK - Comando completado
+[2025-10-28 20:26:17] [INFO] FIRMWARE: ABSOLUTE MODE
+[2025-10-28 20:26:17] [INFO] FIRMWARE: CU
+[2025-10-28 20:26:17] [INFO] Estado obtenido exitosamente
+[2025-10-28 20:26:17] [INFO] ✅ Paso 7/7 - Estado final obtenido
+[2025-10-28 20:26:17] [INFO] 🎉 SECUENCIA COMPLETA FINALIZADA EXITOSAMENTE
+[2025-10-28 20:26:17] [INFO] === FIN TESTS ROBOTSERVICE ===
+[2025-10-28 20:26:17] [INFO] Desconectando robot...
+[2025-10-28 20:26:17] [INFO] Robot desconectado
