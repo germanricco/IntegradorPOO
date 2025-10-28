@@ -36,7 +36,8 @@ CORE_SRCS := \
   $(SRC_DIR)/user/UserChangePassword.cpp \
   $(SRC_DIR)/user/UserList.cpp \
   $(SRC_DIR)/SerialCom.cpp \
-  $(SRC_DIR)/ArduinoService.cpp
+  $(SRC_DIR)/ArduinoService.cpp \
+  $(SRC_DIR)/File.cpp
 
 CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CORE_SRCS))
 
@@ -52,6 +53,7 @@ SERVER_BIN := $(BIN_DIR)/servidor_min
 # Tests individuales
 TEST_SERIAL_BIN := $(BIN_DIR)/test_serial_com
 TEST_ARDUINO_BIN := $(BIN_DIR)/test_arduino_service
+TEST_FILE_BIN := $(BIN_DIR)/test_file
 
 # ==========================================
 # REGLAS DE COMPILACIÓN
@@ -69,9 +71,13 @@ $(SERVER_BIN): $(SERVER_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 	@echo "✅ Servidor compilado: $@"
 
-# Tests
-tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN)
-	@echo "✅ Tests compilados"
+# Compilar Tests
+tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN)
+	@echo "✅ Todos los tests compilados"
+
+# =============================================
+# COMPILACIÓN DE TESTS INDIVIDUALES
+# =============================================
 
 $(TEST_SERIAL_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_serial_com.o
 	@echo "🧪 Enlazando test de SerialCom..."
@@ -80,6 +86,11 @@ $(TEST_SERIAL_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_serial_com.o
 $(TEST_ARDUINO_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_arduino_service.o
 	@echo "🤖 Enlazando test de ArduinoService..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+$(TEST_FILE_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_file.o
+	@echo "📁 Enlazando test de Archivos..."
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
 
 # ==========================================
 # REGLAS DE PATRÓN PARA COMPILACIÓN
@@ -119,7 +130,12 @@ test-servidor: $(SERVER_BIN)
 	@echo "🚀 Ejecutando servidor en puerto 8080..."
 	./$(SERVER_BIN) 8080
 
-test: test-serial test-arduino
+# Ejecutar test de File
+test-file: $(TEST_FILE_BIN)
+	@echo "🚀 Ejecutando test de File..."
+	./$(TEST_FILE_BIN)
+
+test: test-serial test-arduino test-file
 	@echo "⏳ Esperando para test del servidor..."
 	@sleep 2
 	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
@@ -135,12 +151,13 @@ clean:
 
 help:
 	@echo "🎯 COMANDOS DISPONIBLES:"
-	@echo "   make all         - Compila servidor y todos los tests"
-	@echo "   make tests       - Compila solo los tests"
-	@echo "   make test-serial - Compila y ejecuta test de SerialCom"
-	@echo "   make test-arduino - Compila y ejecuta test de ArduinoService"
-	@echo "   make test-servidor - Compila y ejecuta el servidor"
-	@echo "   make test        - Ejecuta todos los tests"
-	@echo "   make clean       - Limpia completamente el directorio bin"
-	@echo "   make help        - Muestra esta ayuda"
+	@echo "   make all         		- Compila servidor y todos los tests"
+	@echo "   make tests       		- Compila solo los tests"
+	@echo "   make test-serial 		- Compila y ejecuta test de SerialCom"
+	@echo "   make test-arduino 	- Compila y ejecuta test de ArduinoService"
+	@echo "   make test-file 		- Compila y ejecuta test de Archivos"
+	@echo "   make test-servidor 	- Compila y ejecuta el servidor"
+	@echo "   make test        		- Ejecuta todos los tests"
+	@echo "   make clean       		- Limpia completamente el directorio bin"
+	@echo "   make help        		- Muestra esta ayuda"
 

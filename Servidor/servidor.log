@@ -9,3 +9,17 @@
 [2025-10-27 13:20:12] [WARNING] [auth] login FAIL — user=german (credenciales inválidas)
 [2025-10-27 13:22:10] [INFO] [auth] login OK — user=admin
 [2025-10-27 13:22:38] [INFO] [user] list OK — actor=admin, count=4
+[2025-10-27 13:26:37] [INFO] [system] signal recibido — SIGINT
+[2025-10-27 13:26:37] [INFO] [system] apagando…
+[2025-10-27 13:26:37] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-27 20:53:43] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-27 20:53:43] [INFO] [system] puerto=8080
+[2025-10-27 20:53:43] [INFO] [system] users.csv=users
+[2025-10-27 20:53:43] [INFO] [system] ServicioPrueba registrado
+[2025-10-27 20:53:43] [INFO] [system] auth.* registrados
+[2025-10-27 20:53:43] [INFO] [system] user.* registrados
+[2025-10-27 20:53:43] [INFO] [system] introspección habilitada
+[2025-10-27 20:53:43] [INFO] [system] escuchando… (work loop)
+[2025-10-27 20:53:45] [INFO] [system] signal recibido — SIGINT
+[2025-10-27 20:53:45] [INFO] [system] apagando…
+[2025-10-27 20:53:45] [INFO] === SERVIDOR DETENIDO ===
