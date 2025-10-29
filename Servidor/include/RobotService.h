@@ -59,7 +59,8 @@ class RobotService {
         
         // Comando Basicos del Robot
         string homing();
-        string mover(double x, double y, double z, double velocidad = 100.0);
+        string mover(double x, double y, double z, double velocidad);
+        string mover(double x, double y, double z);
         
         // Efector Final
         string activarEfector();
@@ -90,9 +91,7 @@ class RobotService {
         ModoEjecucion modoEjecucion_;
         
         // Métodos privados de ayuda
-        string formatearComandoG1(double x, double y, double z, double vel = 0);
-        bool validarPosicion(double x, double y, double z);
-
+        string formatearComandoG1(double x, double y, double z, double vel = 1);
         // Procesamiento de respuestas
         string procesarRespuesta(const string& respuestaCompleta);
         void logRespuestaCompleta(const string& respuestaCompleta, const string& comando);

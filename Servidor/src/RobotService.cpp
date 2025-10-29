@@ -63,10 +63,9 @@ std::string RobotService::homing(){
     }
 
     try {
-        logger_.info("Ejecutando homing");
         modoEjecucion_ = ModoEjecucion::EJECUTANDO;
 
-        std::string respuestaCompleta = arduinoService_->enviarComando("G28\r\n", 5000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("G28\r\n", 6000ms);
         
         logRespuestaCompleta(respuestaCompleta, "G28");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -82,26 +81,20 @@ std::string RobotService::homing(){
     }
 }
 
-/**
- * @brief Mover el robot a las coordenadas x, y, z
- */
-std::string RobotService:: mover(double x, double y, double z, double velocidad) {
+
+// G1 - MOVIMIENTO
+std::string RobotService::mover(double x, double y, double z, double velocidad) {
     if (!estaConectado()) {
         return "ERROR: Robot no conectado";
-    }
-    
-    if (!validarPosicion(x, y, z)) {
-        return "ERROR: Posición fuera de límites";
     }
     
     try {
         // Parsear a GCode   
         std::string comando = formatearComandoG1(x, y, z, velocidad);
-        logger_.info("Ejecutando movimiento");
         modoEjecucion_ = ModoEjecucion::EJECUTANDO;
 
         // Enviar comando a Firmware y recibir rta.
-        std::string respuestaCompleta = arduinoService_->enviarComando(comando, 2000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando(comando, 3000ms);
         
         logRespuestaCompleta(respuestaCompleta, comando);
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -111,9 +104,13 @@ std::string RobotService:: mover(double x, double y, double z, double velocidad)
 
     } catch (const std::exception& e) {
         modoEjecucion_ = ModoEjecucion::DETENIDO;
-        logger_.error("Error en movimiento: " + std::string(e.what()));
+        logger_.error("ERROR en mover :" + std::string(e.what()));
         return "ERROR: " + std::string(e.what());
     }
+}
+
+std::string RobotService::mover(double x, double y, double z) {
+    return mover(x, y, z, 50.0);
 }
 
 
@@ -123,8 +120,6 @@ std::string RobotService::activarEfector() {
     }
     
     try {
-        logger_.info("Activando efector final");
-
         std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", 5000ms);
 
         logRespuestaCompleta(respuestaCompleta, "M3");
@@ -145,8 +140,6 @@ std::string RobotService::desactivarEfector() {
     }
     
     try {
-        logger_.info("Desactivando efector final");
-
         std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", 5000ms);
 
         logRespuestaCompleta(respuestaCompleta, "M5");
@@ -165,16 +158,12 @@ std::string RobotService::activarMotores() {
         return "ERROR: Robot no conectado";
     }
     
-    try {
-        logger_.info("Activando motores");
-        
+    try { 
         std::string respuestaCompleta = arduinoService_->enviarComando("M17\r\n", 3000ms);
         
         logRespuestaCompleta(respuestaCompleta, "M17");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
         
-        //! OJO
-        logger_.info("Motores activados exitosamente");
         return respuestaCliente;
         
     } catch (const std::exception& e) {
@@ -188,16 +177,12 @@ std::string RobotService::desactivarMotores() {
         return "ERROR: Robot no conectado";
     }
     
-    try {
-        logger_.info("Desactivando motores");
-        
+    try {   
         std::string respuestaCompleta = arduinoService_->enviarComando("M18\r\n", 3000ms);
         
         logRespuestaCompleta(respuestaCompleta, "M18");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
         
-        //! OJO
-        logger_.info("Motores desactivados exitosamente");
         return respuestaCliente;
         
     } catch (const std::exception& e) {
@@ -214,14 +199,11 @@ std::string RobotService::obtenerEstado() {
     }
     
     try {
-        logger_.info("Solicitando estado del robot");
-        
         std::string respuestaCompleta = arduinoService_->enviarComando("M114\r\n", 3000ms);
         
         logRespuestaCompleta(respuestaCompleta, "M114");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
-        
-        logger_.info("Estado obtenido exitosamente");
+    
         return respuestaCliente;
         
     } catch (const std::exception& e) {
@@ -239,16 +221,13 @@ bool RobotService::setModoCoordenadas(ModoCoordenadas modo) {
     try {
         std::string comando = (modo == ModoCoordenadas::ABSOLUTO) ? "G90\r\n" : "G91\r\n";
         std::string nombreModo = (modo == ModoCoordenadas::ABSOLUTO) ? "ABSOLUTO" : "RELATIVO";
-        
-        logger_.info("Configurando modo de coordenadas: " + nombreModo);
-        
+
         std::string respuestaCompleta = arduinoService_->enviarComando(comando);
         
         logRespuestaCompleta(respuestaCompleta, comando);
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
         
         modoCoordenadas_ = modo;
-        logger_.info("Modo de coordenadas configurado exitosamente: " + nombreModo);
         return true;
         
     } catch (const std::exception& e) {
@@ -283,37 +262,32 @@ std::string RobotService::formatearComandoG1(double x, double y, double z, doubl
     std::ostringstream comando;
     comando << "G1";
     
-    if (x != 0.0) comando << " X" << std::fixed << std::setprecision(2) << x;
-    if (y != 0.0) comando << " Y" << std::fixed << std::setprecision(2) << y;
-    if (z != 0.0) comando << " Z" << std::fixed << std::setprecision(2) << z;
-    if (velocidad > 0) comando << " F" << std::fixed << std::setprecision(0) << velocidad;
+    comando << " X" << std::fixed << std::setprecision(2) << x;
+    comando << " Y" << std::fixed << std::setprecision(2) << y;
+    comando << " Z" << std::fixed << std::setprecision(2) << z;
+
+
+    if (velocidad > 0) {
+        comando << " F" << std::fixed << std::setprecision(0) << velocidad;
+    }
     
     comando << "\r\n";
     return comando.str();
 }
 
-bool RobotService::validarPosicion(double x, double y, double z) {
-    // Límites de trabajo del robot (ajustar según tu hardware)
-    const double X_MAX = 300.0, Y_MAX = 300.0, Z_MAX = 200.0;
-    
-    if (x < 0 || x > X_MAX || y < 0 || y > Y_MAX || z < 0 || z > Z_MAX) {
-        logger_.warning("Posición fuera de límites: X=" + std::to_string(x) + 
-                          " Y=" + std::to_string(y) + " Z=" + std::to_string(z));
-        return false;
-    }
-    return true;
-}
-
 
 // ==============================================================================
 
-
 std::string RobotService::procesarRespuesta(const std::string& respuestaCompleta) {
+    
     // Inicializar variables
     std::istringstream stream(respuestaCompleta);
     std::string linea;
-    std::string mensajeParaCliente;
+    std::vector<std::string> mensajes;
+
     bool comandoExitoso = false;
+    bool tieneError = false;
+    std::string mensajeError;
 
     while (std::getline(stream, linea)) {
         // Limpiar espacios y saltos de línea
@@ -330,37 +304,63 @@ std::string RobotService::procesarRespuesta(const std::string& respuestaCompleta
             continue;
         }
 
-        // Extraer mensaje de INFO o ERROR para el cliente
+        // Procesar mensajes INFO
         if (linea.find(PREFIX_INFO) == 0) {
-            mensajeParaCliente = linea.substr(PREFIX_INFO.length());
-            mensajeParaCliente.erase(0, mensajeParaCliente.find_first_not_of(" \t"));
-        } else if (linea.find(PREFIX_ERROR) == 0) {
-            mensajeParaCliente = linea.substr(PREFIX_ERROR.length());
-            mensajeParaCliente.erase(0, mensajeParaCliente.find_first_not_of(" \t"));
-            // Si encontramos ERROR, lanzamos excepción
-            throw std::runtime_error(mensajeParaCliente);
+            std::string mensaje = linea.substr(PREFIX_INFO.length());
+            mensaje.erase(0, mensaje.find_first_not_of(" \t"));
+            if (!mensaje.empty()) {
+                mensajes.push_back(mensaje);
+            }
+            continue;
         }
+
+        // Procesar mensajes ERROR
+        if (linea.find(PREFIX_ERROR) == 0) {
+            std::string mensaje = linea.substr(PREFIX_ERROR.length());
+            mensaje.erase(0, mensaje.find_first_not_of(" \t"));
+            if (!mensaje.empty()) {
+                tieneError = true;
+                mensajeError = mensaje;
+            }
+            continue;
+        }
+
+        // Si no tiene prefijo conocido, asumir que es mensaje informativo
+        mensajes.push_back(linea);
     }
 
+    // Si hay error, lanzar excepción
+    if (tieneError) {
+        throw std::runtime_error(mensajeError);
+    }
+
+    // Si no se recibió OK, lanzar excepción
     if (!comandoExitoso) {
         throw std::runtime_error("No se recibió confirmación OK del Arduino");
     }
 
-    // Si no se encontró mensaje específico, usar uno genérico
-    if (mensajeParaCliente.empty()) {
-        mensajeParaCliente = "Comando ejecutado correctamente";
+    // Combinar mensajes para el cliente
+    if (mensajes.empty()) {
+        return "Movimiento completado";
     }
 
-    return mensajeParaCliente;
+    std::string resultado;
+    for (size_t i = 0; i < mensajes.size(); ++i) {
+        if (i > 0) resultado += " | ";
+        resultado += mensajes[i];
+    }
+
+    return resultado;
 }
 
 
 void RobotService::logRespuestaCompleta(const std::string& respuestaCompleta, const std::string& comando) {
     std::istringstream stream(respuestaCompleta);
     std::string linea;
+    bool tieneError = false;
+    std::vector<std::string> lineasImportantes;
     
-    logger_.info("Ejecutando comando: " + comando);
-    
+    // Filtrar lineas importantes
     while (std::getline(stream, linea)) {
         linea.erase(0, linea.find_first_not_of(" \t\r\n"));
         linea.erase(linea.find_last_not_of(" \t\r\n") + 1);
@@ -368,17 +368,39 @@ void RobotService::logRespuestaCompleta(const std::string& respuestaCompleta, co
         if (linea.empty()) continue;
         
         if (linea.find(PREFIX_INFO) == 0) {
-            std::string mensaje = linea.substr(PREFIX_INFO.length());
-            mensaje.erase(0, mensaje.find_first_not_of(" \t"));
-            logger_.info("FIRMWARE: " + mensaje);
+            lineasImportantes.push_back(linea);
+
         } else if (linea.find(PREFIX_ERROR) == 0) {
-            std::string mensaje = linea.substr(PREFIX_ERROR.length());
-            mensaje.erase(0, mensaje.find_first_not_of(" \t"));
-            logger_.error("FIRMWARE: " + mensaje);
-        } else if (linea == SUFFIX_OK) {
-            logger_.info("FIRMWARE: OK - Comando completado");
-        } else {
-            logger_.info("FIRMWARE: " + linea);
+            tieneError = true;
+            lineasImportantes.push_back(linea);
         }
+    }
+
+    // Loggear de forma condensada
+    if (lineasImportantes.empty()) {
+        logger_.info("Comando '" + comando + "' - Sin respuesta específica");
+        return;
+    }
+
+    std::string mensajeLog = "Respuesta '" + comando + "': ";
+    for (size_t i = 0; i < lineasImportantes.size(); ++i) {
+        if (i > 0) mensajeLog += " | ";
+        
+        std::string linea = lineasImportantes[i];
+        if (linea.find(PREFIX_INFO) == 0) {
+            mensajeLog += linea.substr(PREFIX_INFO.length());
+        } else if (linea.find(PREFIX_ERROR) == 0) {
+            mensajeLog += linea.substr(PREFIX_ERROR.length());
+        } else if (linea.find(SUFFIX_OK) == 0) {
+            mensajeLog += "OK";
+        } else {
+            mensajeLog += linea;
+        }
+    }
+
+    if (tieneError) {
+        logger_.error(mensajeLog);
+    } else {
+        logger_.info(mensajeLog);
     }
 }
