@@ -406,7 +406,7 @@ class CLI:
 
 
 if __name__ == "__main__":
-    cli = CLI("http://127.0.0.1:8081")
+    cli = CLI("http://127.0.0.1:8080")
     print("CLI RPC. Escribí 'help'. Ctrl+C para salir.")
     while True:
         if not cli.do(input("> ")):

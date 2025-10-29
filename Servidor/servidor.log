@@ -80,3 +80,47 @@
 [2025-10-29 13:04:39] [INFO] [system] signal recibido — SIGINT
 [2025-10-29 13:04:39] [INFO] [system] apagando servidor…
 [2025-10-29 13:04:39] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 13:20:29] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 13:20:29] [INFO] [system] puerto=8080
+[2025-10-29 13:20:29] [INFO] [system] users.csv=users.csv
+[2025-10-29 13:20:29] [INFO] RobotService Inicializado
+[2025-10-29 13:20:29] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 13:20:31] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-29 13:20:31] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 13:20:31] [INFO] [system] auth.* registrados
+[2025-10-29 13:20:31] [INFO] [system] user.* registrados
+[2025-10-29 13:20:31] [INFO] [system] robot.homing registrado
+[2025-10-29 13:20:31] [INFO] [system] introspección habilitada
+[2025-10-29 13:20:31] [INFO] [system] escuchando… (work loop)
+[2025-10-29 13:28:38] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 13:28:38] [INFO] [system] apagando servidor…
+[2025-10-29 13:28:38] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 13:28:50] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 13:28:50] [INFO] [system] puerto=8080
+[2025-10-29 13:28:50] [INFO] [system] users.csv=users.csv
+[2025-10-29 13:28:50] [INFO] RobotService Inicializado
+[2025-10-29 13:28:50] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 13:28:52] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-29 13:28:52] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 13:28:52] [INFO] [system] auth.* registrados
+[2025-10-29 13:28:52] [INFO] [system] user.* registrados
+[2025-10-29 13:28:52] [INFO] [system] robot.homing registrado
+[2025-10-29 13:28:52] [INFO] [system] introspección habilitada
+[2025-10-29 13:28:52] [INFO] [system] escuchando… (work loop)
+[2025-10-29 13:29:40] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 13:29:40] [INFO] [system] apagando servidor…
+[2025-10-29 13:29:40] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 13:30:57] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 13:30:57] [INFO] [system] puerto=8080
+[2025-10-29 13:30:57] [INFO] [system] users.csv=users.csv
+[2025-10-29 13:30:57] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 13:30:57] [INFO] [system] auth.* registrados
+[2025-10-29 13:30:57] [INFO] [system] user.* registrados
+[2025-10-29 13:30:57] [INFO] [system] introspección habilitada
+[2025-10-29 13:30:57] [INFO] [system] escuchando… (work loop)
+[2025-10-29 13:31:50] [INFO] [auth] login OK — user=admin
+[2025-10-29 13:33:47] [WARNING] [auth] login FAIL — user=lucho (credenciales inválidas)
+[2025-10-29 13:33:59] [INFO] [auth] login OK — user=admin
+[2025-10-29 13:35:02] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 13:35:02] [INFO] [system] apagando…
+[2025-10-29 13:35:02] [INFO] === SERVIDOR DETENIDO ===

@@ -150,7 +150,7 @@ test-arduino: $(TEST_ARDUINO_BIN)
 
 test-servidor: $(SERVER_BIN)
 	@echo "🚀 Ejecutando servidor en puerto 8080..."
-	@./$(SERVER_BIN) 8080
+	@./$(SERVER_BIN) 8080 users.csv
 
 test-file: $(TEST_FILE_BIN)
 	@echo "🚀 Ejecutando test de File..."
