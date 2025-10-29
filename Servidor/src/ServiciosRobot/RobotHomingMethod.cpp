@@ -26,7 +26,7 @@ void RobotHomingMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue
 
         // 2. Validar Sesión y Permisos (Op o Admin)
         // Primero, validamos que el token exista y sea válido
-        const SessionView& session = auth::guardSession(METHOD_NAME, sessions_, token, logger_);
+        const SessionView& session = guardSession(METHOD_NAME, sessions_, token, logger_);
         // Luego, verificamos el privilegio manualmente
         if (session.privilegio != "admin" && session.privilegio != "op") {
             logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - Se requiere Op o Admin. Usuario: " + session.user);

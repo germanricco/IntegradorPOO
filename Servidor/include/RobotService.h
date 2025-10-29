@@ -3,7 +3,7 @@
 
 #include "ArduinoService.h"
 #include "PALogger.h"
-#include "TrayectoryManager.h"
+#include "TrajectoryManager.h"
 
 #include <memory>
 #include <string>

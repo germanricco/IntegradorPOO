@@ -1,5 +1,5 @@
-#ifndef TRAYECTORYMANAGER_H
-#define TRAYECTORYMANAGER_H
+#ifndef TRAJECTORYMANAGER_H
+#define TRAJECTORYMANAGER_H
 
 #include "File.h"
 #include <string>
@@ -8,10 +8,10 @@
 
 using namespace std;
 
-class TrayectoryManager {
+class TrajectoryManager {
     public:
         // Constructor
-        TrayectoryManager(const string& directorioBase = "data/trayectorias/");
+        TrajectoryManager(const string& directorioBase = "data/trayectorias/");
 
         // Gestion de Archivos de trayectorias
         bool existeTrayectoria(const string& nombreTrayectoria) const;
@@ -42,4 +42,4 @@ class TrayectoryManager {
         string normalizarNombreArchivo(const string& nombreTrayectoria) const;
 };
 
-#endif // TRAYECTORYMANAGER_H
+#endif // TRAJECTORYMANAGER_H

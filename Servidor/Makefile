@@ -11,7 +11,7 @@ INCLUDE_DIR := include
 LIB_DIR := lib
 
 # Crear directorios necesarios
-$(shell mkdir -p $(BIN_DIR) $(OBJ_DIR))
+$(shell mkdir -p $(BIN_DIR) $(OBJ_DIR) $(OBJ_DIR)/auth $(OBJ_DIR)/session $(OBJ_DIR)/user $(OBJ_DIR)/db $(OBJ_DIR)/storage $(OBJ_DIR)/services $(OBJ_DIR)/ServiciosRobot)
 
 # ==========================================
 # FUENTES DEL PROYECTO
@@ -21,7 +21,7 @@ $(shell mkdir -p $(BIN_DIR) $(OBJ_DIR))
 XMLRPC_SRCS := $(wildcard $(LIB_DIR)/xmlrpc/*.cpp)
 XMLRPC_OBJS := $(patsubst $(LIB_DIR)/xmlrpc/%.cpp,$(OBJ_DIR)/xmlrpc_%.o,$(XMLRPC_SRCS))
 
-# Core del servidor (sin main)
+# Core del servidor (sin main) - con rutas corregidas
 CORE_SRCS := \
   $(SRC_DIR)/PALogger.cpp \
   $(SRC_DIR)/ServiciosBasicos.cpp \
@@ -40,6 +40,7 @@ CORE_SRCS := \
   $(SRC_DIR)/File.cpp \
   $(SRC_DIR)/RobotService.cpp
 
+# Generar objetos manteniendo estructura de directorios
 CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CORE_SRCS))
 
 # ==========================================
@@ -47,8 +48,6 @@ CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CORE_SRCS))
 # ==========================================
 
 # Servidor principal
-SERVER_MAIN := $(TESTS_DIR)/test_servidor.cpp
-SERVER_OBJS := $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_servidor.o
 SERVER_BIN := $(BIN_DIR)/servidor_min
 
 # Tests individuales
@@ -61,14 +60,14 @@ TEST_ROBOT_BIN := $(BIN_DIR)/test_robot_service
 # REGLAS DE COMPILACIÓN
 # ==========================================
 
-.PHONY: all tests test-serial test-arduino test-servidor clean help
+.PHONY: all tests test-serial test-arduino test-servidor clean help run-tests
 
 # Target principal
 all: $(SERVER_BIN) tests
 	@echo "✅ Todos los objetivos compilados"
 
 # Compilar servidor principal
-$(SERVER_BIN): $(SERVER_OBJS)
+$(SERVER_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_servidor.o
 	@echo "🔧 Enlazando servidor..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 	@echo "✅ Servidor compilado: $@"
@@ -97,12 +96,11 @@ $(TEST_ROBOT_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_robot_service.o
 	@echo "🤖 Enlazando test de RobotService..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-
 # ==========================================
 # REGLAS DE PATRÓN PARA COMPILACIÓN
 # ==========================================
 
-# Objetos del core (src/)
+# Objetos del core (src/) - manteniendo estructura de directorios
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	@echo "🧩 Compilando $<..."
@@ -126,29 +124,38 @@ $(OBJ_DIR)/%.o: $(TESTS_DIR)/%.cpp
 
 test-serial: $(TEST_SERIAL_BIN)
 	@echo "🚀 Ejecutando test de SerialCom..."
-	./$(TEST_SERIAL_BIN)
+	@./$(TEST_SERIAL_BIN)
 
 test-arduino: $(TEST_ARDUINO_BIN)
 	@echo "🚀 Ejecutando test de ArduinoService..."
-	./$(TEST_ARDUINO_BIN)
+	@./$(TEST_ARDUINO_BIN)
 
 test-servidor: $(SERVER_BIN)
 	@echo "🚀 Ejecutando servidor en puerto 8080..."
-	./$(SERVER_BIN) 8080
+	@./$(SERVER_BIN) 8080
 
 test-file: $(TEST_FILE_BIN)
 	@echo "🚀 Ejecutando test de File..."
-	./$(TEST_FILE_BIN)
+	@./$(TEST_FILE_BIN)
 
 test-robot: $(TEST_ROBOT_BIN)
 	@echo "🚀 Ejecutando test de RobotService..."
-	./$(TEST_ROBOT_BIN)
+	@./$(TEST_ROBOT_BIN)
 
-test: test-serial test-arduino test-file test-robot
-	@echo "⏳ Esperando para test del servidor..."
-	@sleep 2
-	@echo "🚀 Ejecutando test del servidor en puerto 8080..."
-	@./$(SERVER_BIN) 8080
+# Ejecutar todos los tests (sin el servidor)
+run-tests: test-serial test-arduino test-file test-robot
+	@echo "✅ Todos los tests ejecutados"
+
+# Verificar que los archivos existen antes de compilar
+check-files:
+	@echo "🔍 Verificando archivos fuente..."
+	@for file in $(CORE_SRCS); do \
+		if [ ! -f "$$file" ]; then \
+			echo "❌ Archivo no encontrado: $$file"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "✅ Todos los archivos fuente encontrados"
 
 # ==========================================
 # LIMPIEZA Y AYUDA
@@ -158,16 +165,36 @@ clean:
 	rm -rf $(BIN_DIR)
 	@echo "🧹 Directorio bin eliminado completamente"
 
+# Limpieza parcial (solo objetos)
+clean-obj:
+	rm -rf $(OBJ_DIR)
+	@echo "🧹 Objetos eliminados"
+
+# Recompilar todo desde cero
+rebuild: clean all
+	@echo "🔄 Recompilación completa terminada"
+
 help:
 	@echo "🎯 COMANDOS DISPONIBLES:"
-	@echo "   make all         		- Compila servidor y todos los tests"
-	@echo "   make tests       		- Compila solo los tests"
-	@echo "   make test-serial 		- Compila y ejecuta test de SerialCom"
-	@echo "   make test-arduino 	- Compila y ejecuta test de ArduinoService"
-	@echo "   make test-file 		- Compila y ejecuta test de Archivos"
-	@echo "   make test-robot 		- Compila y ejecuta test de RobotService"
-	@echo "   make test-servidor 	- Compila y ejecuta el servidor"
-	@echo "   make test        		- Ejecuta todos los tests"
-	@echo "   make clean       		- Limpia completamente el directorio bin"
-	@echo "   make help        		- Muestra esta ayuda"
+	@echo "   make all           - Compila servidor y todos los tests"
+	@echo "   make tests         - Compila solo los tests"
+	@echo "   make test-serial   - Compila y ejecuta test de SerialCom"
+	@echo "   make test-arduino  - Compila y ejecuta test de ArduinoService"
+	@echo "   make test-file     - Compila y ejecuta test de Archivos"
+	@echo "   make test-robot    - Compila y ejecuta test de RobotService"
+	@echo "   make test-servidor - Compila y ejecuta el servidor"
+	@echo "   make run-tests     - Ejecuta todos los tests (sin servidor)"
+	@echo "   make check-files   - Verifica que existen los archivos fuente"
+	@echo "   make clean         - Limpia completamente el directorio bin"
+	@echo "   make clean-obj     - Limpia solo los objetos compilados"
+	@echo "   make rebuild       - Limpia y recompila todo"
+	@echo "   make help          - Muestra esta ayuda"
+
+# ==========================================
+# DEPENDENCIAS AUTOMÁTICAS
+# ==========================================
+
+# Incluir dependencias automáticas si existen
+-include $(CORE_OBJS:.o=.d)
+-include $(XMLRPC_OBJS:.o=.d)
 
