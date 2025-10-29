@@ -23,3 +23,60 @@
 [2025-10-27 20:53:45] [INFO] [system] signal recibido — SIGINT
 [2025-10-27 20:53:45] [INFO] [system] apagando…
 [2025-10-27 20:53:45] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 12:41:06] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 12:41:06] [INFO] [system] puerto=8080
+[2025-10-29 12:41:06] [INFO] [system] users.csv=users.csv
+[2025-10-29 12:41:06] [INFO] RobotService Inicializado
+[2025-10-29 12:41:06] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 12:41:08] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-29 12:41:08] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 12:41:08] [INFO] [system] auth.* registrados
+[2025-10-29 12:41:08] [INFO] [system] user.* registrados
+[2025-10-29 12:41:08] [INFO] [system] robot.homing registrado
+[2025-10-29 12:41:08] [INFO] [system] introspección habilitada
+[2025-10-29 12:41:08] [INFO] [system] escuchando… (work loop)
+[2025-10-29 12:55:06] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 12:55:06] [INFO] [system] puerto=8080
+[2025-10-29 12:55:06] [INFO] [system] users.csv=users.csv
+[2025-10-29 12:55:06] [INFO] RobotService Inicializado
+[2025-10-29 12:55:06] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 12:55:08] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-29 12:55:08] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 12:55:08] [INFO] [system] auth.* registrados
+[2025-10-29 12:55:08] [INFO] [system] user.* registrados
+[2025-10-29 12:55:08] [INFO] [system] robot.homing registrado
+[2025-10-29 12:55:08] [INFO] [system] introspección habilitada
+[2025-10-29 12:55:08] [INFO] [system] escuchando… (work loop)
+[2025-10-29 12:55:23] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 12:55:23] [INFO] [system] apagando servidor…
+[2025-10-29 12:55:23] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 12:57:54] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 12:57:54] [INFO] [system] puerto=8080
+[2025-10-29 12:57:54] [INFO] [system] users.csv=users.csv
+[2025-10-29 12:57:54] [INFO] RobotService Inicializado
+[2025-10-29 12:57:54] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 12:57:56] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-29 12:57:56] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 12:57:56] [INFO] [system] auth.* registrados
+[2025-10-29 12:57:56] [INFO] [system] user.* registrados
+[2025-10-29 12:57:56] [INFO] [system] robot.homing registrado
+[2025-10-29 12:57:56] [INFO] [system] introspección habilitada
+[2025-10-29 12:57:56] [INFO] [system] escuchando… (work loop)
+[2025-10-29 13:03:10] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 13:03:10] [INFO] [system] apagando servidor…
+[2025-10-29 13:03:10] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 13:04:03] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 13:04:03] [INFO] [system] puerto=8080
+[2025-10-29 13:04:03] [INFO] [system] users.csv=users.csv
+[2025-10-29 13:04:03] [INFO] RobotService Inicializado
+[2025-10-29 13:04:03] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 13:04:05] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-29 13:04:05] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 13:04:05] [INFO] [system] auth.* registrados
+[2025-10-29 13:04:05] [INFO] [system] user.* registrados
+[2025-10-29 13:04:05] [INFO] [system] robot.homing registrado
+[2025-10-29 13:04:05] [INFO] [system] introspección habilitada
+[2025-10-29 13:04:05] [INFO] [system] escuchando… (work loop)
+[2025-10-29 13:04:39] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 13:04:39] [INFO] [system] apagando servidor…
+[2025-10-29 13:04:39] [INFO] === SERVIDOR DETENIDO ===
