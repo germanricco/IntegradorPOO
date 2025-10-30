@@ -28,6 +28,13 @@
 
 // Servicios Robot
 #include "../include/ServiciosRobot/RobotHomingMethod.h" // <-- NUESTRO PRIMER SERVICIO DE ROBOT
+#include "../include/ServiciosRobot/RobotMoveMethod.h"
+#include "../include/ServiciosRobot/RobotMotorsMethod.h"
+#include "../include/ServiciosRobot/RobotGripperMethod.h"
+#include "../include/ServiciosRobot/RobotModeMethod.h"
+#include "../include/ServiciosRobot/RobotStatusMethod.h"
+#include "../include/ServiciosRobot/RobotConnectMethod.h"
+#include "../include/ServiciosRobot/RobotDisconnectMethod.h"
 
 // Otros servicios básicos
 #include "../include/ServiciosBasicos.h"
@@ -120,9 +127,24 @@ int main(int argc, char** argv){
         logger.info("[system] user.* registrados");
 
         // Servicios del Robot (robot.*)   //ESTAS DOS LÍNEAS SON NUEVAS ==================================
-        robot_service_methods::RobotHomingMethod mRH(&server, sessions, logger, robotSvc); // <-- ¡REGISTRADO!
+        robot_service_methods::RobotHomingMethod mRHome(&server, sessions, logger, robotSvc); // <-- ¡REGISTRADO!
         logger.info("[system] robot.homing registrado");
         // ... (Aquí irían las instancias de RobotMoveMethod, RobotConnectMethod, etc.) ...
+        robot_service_methods::RobotMoveMethod mRMove(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.move registrado"); // (¡Es bueno loguear esto!)
+        robot_service_methods::RobotMotorsMethod mRMotor(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.setMotors registrado"); 
+        robot_service_methods::RobotGripperMethod mRGripper(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.setGripper registrado");
+        robot_service_methods::RobotModeMethod mRMode(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.setMode registrado");
+        robot_service_methods::RobotStatusMethod mRStatus(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.getStatus registrado");
+        robot_service_methods::RobotConnectMethod mRConnect(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.connect registrado");
+        robot_service_methods::RobotDisconnectMethod mRDisconnect(&server, sessions, logger, robotSvc);
+        logger.info("[system] robot.disconnect registrado");
+
 
         // --- Enlace, Escucha y Bucle Principal ---
         server.bindAndListen(port);

@@ -186,3 +186,608 @@
 [2025-10-29 22:58:01] [INFO] [RobotService] Desconectando robot al finalizar...
 [2025-10-29 22:58:01] [INFO] Robot desconectado
 [2025-10-29 22:58:01] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 23:06:53] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 23:06:53] [INFO] [system] puerto=8080
+[2025-10-29 23:06:53] [INFO] [system] users.csv=users.csv
+[2025-10-29 23:06:53] [INFO] RobotService Inicializado
+[2025-10-29 23:06:53] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 23:06:58] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-29 23:06:58] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-29 23:06:58] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-29 23:06:58] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 23:06:58] [INFO] [system] auth.* registrados
+[2025-10-29 23:06:58] [INFO] [system] user.* registrados
+[2025-10-29 23:06:58] [INFO] [system] robot.homing registrado
+[2025-10-29 23:06:58] [INFO] [system] introspección habilitada
+[2025-10-29 23:06:58] [INFO] [system] escuchando… (work loop)
+[2025-10-29 23:10:16] [WARNING] [auth] login FAIL — user=lucho (credenciales inválidas)
+[2025-10-29 23:10:25] [INFO] [auth] login OK — user=admin
+[2025-10-29 23:12:32] [WARNING] [auth] login FAIL — user=lucho (credenciales inválidas)
+[2025-10-29 23:12:39] [INFO] [auth] login OK — user=admin
+[2025-10-29 23:12:52] [INFO] [robot.homing] Solicitud de homing por usuario: admin
+[2025-10-29 23:12:55] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-10-29 23:12:55] [INFO] Homing completado exitosamente
+[2025-10-29 23:12:55] [INFO] [robot.homing] Éxito para admin. Respuesta: HOMING COMPLETE
+[2025-10-29 23:15:53] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 23:15:53] [INFO] [system] apagando servidor…
+[2025-10-29 23:15:53] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-29 23:15:53] [INFO] Robot desconectado
+[2025-10-29 23:15:53] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 10:43:28] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 10:43:28] [INFO] [system] puerto=8080
+[2025-10-30 10:43:28] [INFO] [system] users.csv=users.csv
+[2025-10-30 10:43:28] [INFO] RobotService Inicializado
+[2025-10-30 10:43:28] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 10:43:31] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 10:43:31] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 10:43:31] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 10:43:31] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 10:43:31] [INFO] [system] auth.* registrados
+[2025-10-30 10:43:31] [INFO] [system] user.* registrados
+[2025-10-30 10:43:31] [INFO] [system] robot.homing registrado
+[2025-10-30 10:43:31] [INFO] [system] robot.move registrado
+[2025-10-30 10:43:31] [INFO] [system] introspección habilitada
+[2025-10-30 10:43:31] [INFO] [system] escuchando… (work loop)
+[2025-10-30 10:43:56] [WARNING] [auth] login FAIL — user=lucho (credenciales inválidas)
+[2025-10-30 10:44:02] [INFO] [auth] login OK — user=admin
+[2025-10-30 10:44:16] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 10:44:16] [INFO] Respuesta 'G1 X10.00 Y10.00 Z10.00 F100
+': 
+[2025-10-30 10:44:16] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 10:46:11] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 10:46:12] [ERROR] Respuesta 'G1 X100.00 Y100.00 Z100.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE | 
+[2025-10-30 10:46:12] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:46:12] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:46:32] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 10:46:32] [INFO] Comando 'G1 X1.00 Y1.00 Z1.00 F100
+' - Sin respuesta específica
+[2025-10-30 10:46:32] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 10:46:44] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 10:46:44] [ERROR] Respuesta 'G1 X-1.00 Y0.00 Z0.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:46:44] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:46:44] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:47:00] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 10:47:01] [ERROR] Respuesta 'G1 X10.00 Y10.00 Z0.00 F100
+':  |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:47:01] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:47:01] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 10:48:56] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 10:48:56] [INFO] [system] apagando servidor…
+[2025-10-30 10:48:56] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 10:48:56] [INFO] Robot desconectado
+[2025-10-30 10:48:56] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 11:43:27] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 11:43:27] [INFO] [system] puerto=8080
+[2025-10-30 11:43:27] [INFO] [system] users.csv=users.csv
+[2025-10-30 11:43:27] [INFO] RobotService Inicializado
+[2025-10-30 11:43:27] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 11:43:29] [WARNING] [RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.
+[2025-10-30 11:43:29] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 11:43:29] [INFO] [system] auth.* registrados
+[2025-10-30 11:43:29] [INFO] [system] user.* registrados
+[2025-10-30 11:43:29] [INFO] [system] robot.homing registrado
+[2025-10-30 11:43:29] [INFO] [system] robot.move registrado
+[2025-10-30 11:43:29] [INFO] [system] robot.setMotors registrado
+[2025-10-30 11:43:29] [INFO] [system] introspección habilitada
+[2025-10-30 11:43:29] [INFO] [system] escuchando… (work loop)
+[2025-10-30 11:43:40] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 11:43:40] [INFO] [system] apagando servidor…
+[2025-10-30 11:43:40] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 11:44:01] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 11:44:01] [INFO] [system] puerto=8080
+[2025-10-30 11:44:01] [INFO] [system] users.csv=users.csv
+[2025-10-30 11:44:01] [INFO] RobotService Inicializado
+[2025-10-30 11:44:01] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 11:44:06] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 11:44:06] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 11:44:06] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 11:44:06] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 11:44:06] [INFO] [system] auth.* registrados
+[2025-10-30 11:44:06] [INFO] [system] user.* registrados
+[2025-10-30 11:44:06] [INFO] [system] robot.homing registrado
+[2025-10-30 11:44:06] [INFO] [system] robot.move registrado
+[2025-10-30 11:44:06] [INFO] [system] robot.setMotors registrado
+[2025-10-30 11:44:06] [INFO] [system] introspección habilitada
+[2025-10-30 11:44:06] [INFO] [system] escuchando… (work loop)
+[2025-10-30 11:44:27] [INFO] [auth] login OK — user=admin
+[2025-10-30 11:45:43] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 11:45:43] [INFO] [system] apagando servidor…
+[2025-10-30 11:45:43] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 11:45:43] [INFO] Robot desconectado
+[2025-10-30 11:45:43] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 11:48:57] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 11:48:57] [INFO] [system] puerto=8080
+[2025-10-30 11:48:57] [INFO] [system] users.csv=users.csv
+[2025-10-30 11:48:57] [INFO] RobotService Inicializado
+[2025-10-30 11:48:57] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 11:49:02] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 11:49:02] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 11:49:02] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 11:49:02] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 11:49:02] [INFO] [system] auth.* registrados
+[2025-10-30 11:49:02] [INFO] [system] user.* registrados
+[2025-10-30 11:49:02] [INFO] [system] robot.homing registrado
+[2025-10-30 11:49:02] [INFO] [system] robot.move registrado
+[2025-10-30 11:49:02] [INFO] [system] robot.setMotors registrado
+[2025-10-30 11:49:02] [INFO] [system] introspección habilitada
+[2025-10-30 11:49:02] [INFO] [system] escuchando… (work loop)
+[2025-10-30 11:49:20] [INFO] [auth] login OK — user=admin
+[2025-10-30 11:50:42] [INFO] [robot.homing] Solicitud de homing por usuario: admin
+[2025-10-30 11:50:45] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-10-30 11:50:45] [INFO] Homing completado exitosamente
+[2025-10-30 11:50:45] [INFO] [robot.homing] Éxito para admin. Respuesta: HOMING COMPLETE
+[2025-10-30 12:01:44] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:01:44] [INFO] [system] apagando servidor…
+[2025-10-30 12:01:44] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:01:44] [INFO] Robot desconectado
+[2025-10-30 12:01:44] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:03:21] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:03:21] [INFO] [system] puerto=8080
+[2025-10-30 12:03:21] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:03:21] [INFO] RobotService Inicializado
+[2025-10-30 12:03:21] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:03:26] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:03:26] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:03:26] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:03:26] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:03:26] [INFO] [system] auth.* registrados
+[2025-10-30 12:03:26] [INFO] [system] user.* registrados
+[2025-10-30 12:03:26] [INFO] [system] robot.homing registrado
+[2025-10-30 12:03:26] [INFO] [system] robot.move registrado
+[2025-10-30 12:03:26] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:03:26] [INFO] [system] introspección habilitada
+[2025-10-30 12:03:26] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:04:07] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:04:18] [INFO] [robot.setMotors] Solicitud de motores (ON) por: admin
+[2025-10-30 12:04:18] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-10-30 12:04:18] [INFO] [robot.setMotors] Éxito para admin. Respuesta: MOTORS ENABLED
+[2025-10-30 12:04:29] [INFO] [robot.setMotors] Solicitud de motores (OFF) por: admin
+[2025-10-30 12:04:29] [INFO] Respuesta 'M18':  MOTORS DISABLED
+[2025-10-30 12:04:29] [INFO] [robot.setMotors] Éxito para admin. Respuesta: MOTORS DISABLED
+[2025-10-30 12:04:38] [INFO] [robot.setMotors] Solicitud de motores (ON) por: admin
+[2025-10-30 12:04:38] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-10-30 12:04:38] [INFO] [robot.setMotors] Éxito para admin. Respuesta: MOTORS ENABLED
+[2025-10-30 12:05:09] [INFO] [robot.homing] Solicitud de homing por usuario: admin
+[2025-10-30 12:05:12] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-10-30 12:05:12] [INFO] Homing completado exitosamente
+[2025-10-30 12:05:12] [INFO] [robot.homing] Éxito para admin. Respuesta: HOMING COMPLETE
+[2025-10-30 12:05:30] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:05:30] [INFO] [system] apagando servidor…
+[2025-10-30 12:05:30] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:05:30] [INFO] Robot desconectado
+[2025-10-30 12:05:30] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:12:27] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:12:27] [INFO] [system] puerto=8080
+[2025-10-30 12:12:27] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:12:27] [INFO] RobotService Inicializado
+[2025-10-30 12:12:27] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:12:33] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:12:33] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:12:33] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:12:33] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:12:33] [INFO] [system] auth.* registrados
+[2025-10-30 12:12:33] [INFO] [system] user.* registrados
+[2025-10-30 12:12:33] [INFO] [system] robot.homing registrado
+[2025-10-30 12:12:33] [INFO] [system] robot.move registrado
+[2025-10-30 12:12:33] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:12:33] [INFO] [system] introspección habilitada
+[2025-10-30 12:12:33] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:12:50] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:13:29] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:13:29] [INFO] [system] apagando servidor…
+[2025-10-30 12:13:29] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:13:29] [INFO] Robot desconectado
+[2025-10-30 12:13:29] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:18:06] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:18:06] [INFO] [system] puerto=8080
+[2025-10-30 12:18:06] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:18:06] [INFO] RobotService Inicializado
+[2025-10-30 12:18:06] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:18:09] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:18:09] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:18:09] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:18:09] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:18:09] [INFO] [system] auth.* registrados
+[2025-10-30 12:18:09] [INFO] [system] user.* registrados
+[2025-10-30 12:18:09] [INFO] [system] robot.homing registrado
+[2025-10-30 12:18:09] [INFO] [system] robot.move registrado
+[2025-10-30 12:18:09] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:18:09] [INFO] [system] robot.setGripper registrado
+[2025-10-30 12:18:09] [INFO] [system] introspección habilitada
+[2025-10-30 12:18:09] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:18:26] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:18:55] [INFO] [robot.setGripper] Solicitud de gripper (ON) por: admin
+[2025-10-30 12:18:56] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-10-30 12:18:56] [INFO] [robot.setGripper] Éxito para admin. Respuesta: GRIPPER ON
+[2025-10-30 12:19:02] [INFO] [robot.setGripper] Solicitud de gripper (OFF) por: admin
+[2025-10-30 12:19:03] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-10-30 12:19:03] [INFO] [robot.setGripper] Éxito para admin. Respuesta: GRIPPER OFF
+[2025-10-30 12:19:25] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:19:25] [INFO] [system] apagando servidor…
+[2025-10-30 12:19:25] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:19:25] [INFO] Robot desconectado
+[2025-10-30 12:19:25] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:28:39] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:28:39] [INFO] [system] puerto=8080
+[2025-10-30 12:28:39] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:28:39] [INFO] RobotService Inicializado
+[2025-10-30 12:28:39] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:28:43] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:28:43] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:28:43] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:28:43] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:28:43] [INFO] [system] auth.* registrados
+[2025-10-30 12:28:43] [INFO] [system] user.* registrados
+[2025-10-30 12:28:43] [INFO] [system] robot.homing registrado
+[2025-10-30 12:28:43] [INFO] [system] robot.move registrado
+[2025-10-30 12:28:43] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:28:43] [INFO] [system] robot.setGripper registrado
+[2025-10-30 12:28:43] [INFO] [system] robot.setMode registrado
+[2025-10-30 12:28:43] [INFO] [system] introspección habilitada
+[2025-10-30 12:28:43] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:29:10] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:29:19] [INFO] [robot.setMode] Solicitud de cambio de modo (abs) por: admin
+[2025-10-30 12:29:20] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-10-30 12:29:20] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a abs
+[2025-10-30 12:29:36] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:29:37] [INFO] Respuesta 'G1 X50.00 Y50.00 Z50.00 F100
+': 
+[2025-10-30 12:29:37] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:29:42] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 12:29:42] [ERROR] Respuesta 'G91
+':  POINT IS OUTSIDE OF WORKSPACE |  RELATIVE MODE ON
+[2025-10-30 12:29:42] [ERROR] Error cambiando modo coordenadas: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:29:42] [WARNING] [robot.setMode] Falló para admin. Robot dijo: ERROR: No se pudo setear el modo
+[2025-10-30 12:30:06] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:30:06] [INFO] Respuesta 'G1 X0.00 Y0.00 Z0.00 F100
+': 
+[2025-10-30 12:30:06] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:30:11] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 12:30:11] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 12:30:11] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 12:30:35] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:30:35] [INFO] Respuesta 'G1 X50.00 Y50.00 Z50.00 F100
+': 
+[2025-10-30 12:30:35] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:30:54] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:30:54] [INFO] Respuesta 'G1 X-20.00 Y10.00 Z10.00 F100
+': 
+[2025-10-30 12:30:54] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:31:22] [INFO] [robot.setMode] Solicitud de cambio de modo (abs) por: admin
+[2025-10-30 12:31:23] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-10-30 12:31:23] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a abs
+[2025-10-30 12:31:32] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 12:31:32] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 12:31:32] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 12:32:10] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:32:10] [INFO] Respuesta 'G1 X50.00 Y50.00 Z50.00 F100
+': 
+[2025-10-30 12:32:10] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:32:18] [INFO] [robot.setMode] Solicitud de cambio de modo (abs) por: admin
+[2025-10-30 12:32:18] [ERROR] Respuesta 'G90
+':  POINT IS OUTSIDE OF WORKSPACE |  ABSOLUTE MODE ON
+[2025-10-30 12:32:18] [ERROR] Error cambiando modo coordenadas: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:32:18] [WARNING] [robot.setMode] Falló para admin. Robot dijo: ERROR: No se pudo setear el modo
+[2025-10-30 12:33:39] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:33:39] [INFO] [system] apagando servidor…
+[2025-10-30 12:33:39] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:33:39] [INFO] Robot desconectado
+[2025-10-30 12:33:39] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:34:39] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:34:39] [INFO] [system] puerto=8080
+[2025-10-30 12:34:39] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:34:39] [INFO] RobotService Inicializado
+[2025-10-30 12:34:39] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:34:42] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:34:42] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:34:42] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:34:42] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:34:42] [INFO] [system] auth.* registrados
+[2025-10-30 12:34:42] [INFO] [system] user.* registrados
+[2025-10-30 12:34:42] [INFO] [system] robot.homing registrado
+[2025-10-30 12:34:42] [INFO] [system] robot.move registrado
+[2025-10-30 12:34:42] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:34:42] [INFO] [system] robot.setGripper registrado
+[2025-10-30 12:34:42] [INFO] [system] robot.setMode registrado
+[2025-10-30 12:34:42] [INFO] [system] introspección habilitada
+[2025-10-30 12:34:42] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:34:54] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:35:49] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 12:35:49] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 12:35:49] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 12:35:59] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:35:59] [INFO] Respuesta 'G1 X50.00 Y50.00 Z50.00 F100
+': 
+[2025-10-30 12:35:59] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:36:22] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:36:22] [ERROR] Respuesta 'G1 X-50.00 Y-50.00 Z-50.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE | 
+[2025-10-30 12:36:22] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:36:22] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:38:47] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:38:47] [INFO] [system] apagando servidor…
+[2025-10-30 12:38:47] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:38:47] [INFO] Robot desconectado
+[2025-10-30 12:38:47] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:49:41] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:49:41] [INFO] [system] puerto=8080
+[2025-10-30 12:49:41] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:49:41] [INFO] RobotService Inicializado
+[2025-10-30 12:49:41] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:49:46] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:49:46] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:49:46] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:49:46] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:49:46] [INFO] [system] auth.* registrados
+[2025-10-30 12:49:46] [INFO] [system] user.* registrados
+[2025-10-30 12:49:46] [INFO] [system] robot.homing registrado
+[2025-10-30 12:49:46] [INFO] [system] robot.move registrado
+[2025-10-30 12:49:46] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:49:46] [INFO] [system] robot.setGripper registrado
+[2025-10-30 12:49:46] [INFO] [system] robot.setMode registrado
+[2025-10-30 12:49:46] [INFO] [system] robot.getStatus registrado
+[2025-10-30 12:49:46] [INFO] [system] introspección habilitada
+[2025-10-30 12:49:46] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:50:04] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:50:12] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 12:50:12] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:50:12] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 12:50:38] [INFO] [robot.setMotors] Solicitud de motores (ON) por: admin
+[2025-10-30 12:50:38] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-10-30 12:50:38] [INFO] [robot.setMotors] Éxito para admin. Respuesta: MOTORS ENABLED
+[2025-10-30 12:50:57] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 12:50:57] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-10-30 12:50:57] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 12:52:25] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 12:52:25] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-10-30 12:52:25] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 12:52:30] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 12:52:31] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 12:52:31] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 12:52:33] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 12:52:34] [INFO] Respuesta 'M114':  RELATIVE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-10-30 12:52:34] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 12:52:49] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 12:52:49] [INFO] [system] apagando servidor…
+[2025-10-30 12:52:49] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 12:52:49] [INFO] Robot desconectado
+[2025-10-30 12:52:49] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 12:57:22] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 12:57:22] [INFO] [system] puerto=8080
+[2025-10-30 12:57:22] [INFO] [system] users.csv=users.csv
+[2025-10-30 12:57:22] [INFO] RobotService Inicializado
+[2025-10-30 12:57:22] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 12:57:27] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 12:57:27] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 12:57:27] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 12:57:27] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 12:57:27] [INFO] [system] auth.* registrados
+[2025-10-30 12:57:27] [INFO] [system] user.* registrados
+[2025-10-30 12:57:27] [INFO] [system] robot.homing registrado
+[2025-10-30 12:57:27] [INFO] [system] robot.move registrado
+[2025-10-30 12:57:27] [INFO] [system] robot.setMotors registrado
+[2025-10-30 12:57:27] [INFO] [system] robot.setGripper registrado
+[2025-10-30 12:57:27] [INFO] [system] robot.setMode registrado
+[2025-10-30 12:57:27] [INFO] [system] robot.getStatus registrado
+[2025-10-30 12:57:27] [INFO] [system] introspección habilitada
+[2025-10-30 12:57:27] [INFO] [system] escuchando… (work loop)
+[2025-10-30 12:57:38] [INFO] [auth] login OK — user=admin
+[2025-10-30 12:57:47] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:57:47] [INFO] Respuesta 'G1 X10.00 Y10.00 Z10.00 F100
+': 
+[2025-10-30 12:57:47] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 12:58:04] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 12:58:04] [ERROR] Respuesta 'M114':  POINT IS OUTSIDE OF WORKSPACE |  ABSOLUTE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 12:58:04] [ERROR] Error obteniendo estado: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:04] [WARNING] [robot.getStatus] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:38] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:58:38] [ERROR] Respuesta 'G1 X1.00 Y1.00 Z1.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:38] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:38] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:50] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:58:50] [ERROR] Respuesta 'G1 X0.00 Y0.00 Z0.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:50] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:50] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:58:58] [INFO] [robot.setMode] Solicitud de cambio de modo (abs) por: admin
+[2025-10-30 12:58:58] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-10-30 12:58:58] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a abs
+[2025-10-30 12:59:03] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 12:59:03] [ERROR] Respuesta 'G1 X0.00 Y0.00 Z0.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:59:03] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:59:03] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 12:59:08] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 12:59:08] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 12:59:08] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 13:00:00] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 13:00:00] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 13:00:00] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 13:00:05] [INFO] [robot.setMode] Solicitud de cambio de modo (abs) por: admin
+[2025-10-30 13:00:05] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-10-30 13:00:05] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a abs
+[2025-10-30 13:00:13] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:00:13] [ERROR] Respuesta 'G1 X10.00 Y10.00 Z1.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:00:13] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:00:13] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:01:11] [INFO] [auth] login OK — user=admin
+[2025-10-30 13:01:21] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 13:01:21] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 13:01:21] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 13:01:35] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:01:35] [ERROR] Respuesta 'G1 X1.00 Y1.00 Z1.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:01:35] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:01:35] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:01:55] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:01:55] [ERROR] Respuesta 'G1 X1.00 Y0.00 Z0.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:01:55] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:01:55] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:17] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:02:17] [ERROR] Respuesta 'G1 X10.00 Y0.00 Z0.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:17] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:17] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:27] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:02:27] [ERROR] Respuesta 'G1 X10.00 Y10.00 Z10.00 F100
+':  |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:27] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:27] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:02:34] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 13:02:34] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 13:02:34] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 13:02:39] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:02:39] [INFO] Respuesta 'G1 X10.00 Y10.00 Z0.00 F100
+': 
+[2025-10-30 13:02:39] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:02:47] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 13:02:47] [INFO] Respuesta 'M114':  RELATIVE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 13:02:47] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 13:03:46] [INFO] [auth] logout OK
+[2025-10-30 13:03:52] [INFO] [auth] login OK — user=admin
+[2025-10-30 13:04:04] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:04:04] [INFO] Respuesta 'G1 X10.00 Y10.00 Z0.00 F100
+': 
+[2025-10-30 13:04:04] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:04:11] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 13:04:11] [INFO] Respuesta 'M114':  RELATIVE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 13:04:11] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 13:04:45] [INFO] [auth] login OK — user=admin
+[2025-10-30 13:04:56] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:04:56] [INFO] Respuesta 'G1 X10.00 Y10.00 Z0.00 F100
+': 
+[2025-10-30 13:04:56] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:05:03] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 13:05:03] [INFO] Respuesta 'M114':  RELATIVE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 13:05:03] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 13:05:11] [INFO] [robot.setMode] Solicitud de cambio de modo (abs) por: admin
+[2025-10-30 13:05:11] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-10-30 13:05:11] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a abs
+[2025-10-30 13:05:27] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:05:28] [INFO] Comando 'G1 X9.00 Y9.00 Z0.00 F100
+' - Sin respuesta específica
+[2025-10-30 13:05:28] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:05:42] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 13:05:42] [ERROR] Respuesta 'M114':  POINT IS OUTSIDE OF WORKSPACE |  ABSOLUTE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 13:05:42] [ERROR] Error obteniendo estado: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:05:42] [WARNING] [robot.getStatus] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:08:50] [INFO] [robot.setMode] Solicitud de cambio de modo (rel) por: admin
+[2025-10-30 13:08:50] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-10-30 13:08:50] [INFO] [robot.setMode] Éxito para admin. Respuesta: Modo seteado a rel
+[2025-10-30 13:08:56] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:08:56] [INFO] Respuesta 'G1 X10.00 Y10.00 Z0.00 F100
+': 
+[2025-10-30 13:08:56] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:09:01] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:09:01] [INFO] Respuesta 'G1 X50.00 Y50.00 Z50.00 F100
+': 
+[2025-10-30 13:09:01] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:09:05] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:09:05] [INFO] Respuesta 'G1 X0.00 Y0.00 Z0.00 F100
+': 
+[2025-10-30 13:09:05] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:09:08] [INFO] [robot.getStatus] Solicitud de estado por: admin
+[2025-10-30 13:09:08] [INFO] Respuesta 'M114':  RELATIVE MODE |  MOTORS DISABLED |  FAN ENABLED
+[2025-10-30 13:09:08] [INFO] [robot.getStatus] Éxito para admin
+[2025-10-30 13:09:34] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:09:34] [INFO] Respuesta 'G1 X500.00 Y500.00 Z500.00 F100
+': 
+[2025-10-30 13:09:34] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:09:49] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:09:50] [ERROR] Respuesta 'G1 X50000.00 Y5000.00 Z50000.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE | 
+[2025-10-30 13:09:50] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:09:50] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:11] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:10:11] [ERROR] Respuesta 'G1 X1000.00 Y1000.00 Z1000.00 F100
+':  POINT IS OUTSIDE OF WORKSPACE |  |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:11] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:11] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:18] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:10:18] [ERROR] Respuesta 'G1 X800.00 Y800.00 Z800.00 F100
+':  |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:18] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:18] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:26] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:10:26] [ERROR] Respuesta 'G1 X501.00 Y501.00 Z501.00 F100
+':  |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:26] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:26] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:33] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:10:33] [INFO] Respuesta 'G1 X0.00 Y0.00 Z0.00 F100
+': 
+[2025-10-30 13:10:33] [INFO] [robot.move] Éxito para admin. Respuesta: Movimiento completado
+[2025-10-30 13:10:37] [INFO] [robot.move] Solicitud de movimiento por usuario: admin
+[2025-10-30 13:10:37] [ERROR] Respuesta 'G1 X500.00 Y500.00 Z500.00 F100
+':  |  POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:37] [ERROR] ERROR en mover :POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:10:37] [WARNING] [robot.move] Falló para admin. Robot dijo: ERROR: POINT IS OUTSIDE OF WORKSPACE
+[2025-10-30 13:11:58] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 13:11:58] [INFO] [system] apagando servidor…
+[2025-10-30 13:11:58] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-30 13:11:58] [INFO] Robot desconectado
+[2025-10-30 13:11:58] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-30 13:22:30] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-30 13:22:30] [INFO] [system] puerto=8080
+[2025-10-30 13:22:30] [INFO] [system] users.csv=users.csv
+[2025-10-30 13:22:30] [INFO] RobotService Inicializado
+[2025-10-30 13:22:30] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-30 13:22:35] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-30 13:22:35] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 13:22:35] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-30 13:22:35] [INFO] [system] ServicioPrueba registrado
+[2025-10-30 13:22:35] [INFO] [system] auth.* registrados
+[2025-10-30 13:22:35] [INFO] [system] user.* registrados
+[2025-10-30 13:22:35] [INFO] [system] robot.homing registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.move registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.setMotors registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.setGripper registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.setMode registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.getStatus registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.connect registrado
+[2025-10-30 13:22:35] [INFO] [system] robot.disconnect registrado
+[2025-10-30 13:22:35] [INFO] [system] introspección habilitada
+[2025-10-30 13:22:35] [INFO] [system] escuchando… (work loop)
+[2025-10-30 13:23:24] [INFO] [auth] login OK — user=admin
+[2025-10-30 13:24:05] [INFO] [robot.connect] Solicitud de conexión por Admin: admin
+[2025-10-30 13:24:05] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-10-30 13:24:05] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-30 13:24:05] [INFO] [robot.connect] Éxito para admin
+[2025-10-30 13:24:13] [INFO] [robot.disconnect] Solicitud de desconexión por Admin: admin
+[2025-10-30 13:24:13] [INFO] Robot desconectado
+[2025-10-30 13:24:13] [INFO] [robot.disconnect] Éxito para admin
+[2025-10-30 13:24:23] [INFO] [auth] logout OK
+[2025-10-30 13:24:36] [WARNING] [auth] login FAIL — user=user (credenciales inválidas)
+[2025-10-30 13:24:56] [INFO] [system] signal recibido — SIGINT
+[2025-10-30 13:24:56] [INFO] [system] apagando servidor…
+[2025-10-30 13:24:56] [INFO] === SERVIDOR DETENIDO ===

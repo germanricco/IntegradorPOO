@@ -17,7 +17,7 @@ TEST_SUITE("ArduinoService Integration Tests") {
         TestGlobalSetup() {
             if (!conexionInicializada) {
                 std::cout << "🔄 INICIALIZACIÓN GLOBAL - Conectando al Arduino..." << std::endl;
-                arduinoService = std::make_unique<ArduinoService>("/dev/ttyACM0", 115200);
+                arduinoService = std::make_unique<ArduinoService>("/dev/ttyUSB0", 115200);
                     
                 if (arduinoService->conectar(3)) {
                     std::cout << "✅ CONEXIÓN GLOBAL ESTABLECIDA" << std::endl;
@@ -51,7 +51,7 @@ TEST_SUITE("ArduinoService Integration Tests") {
         TestGlobalSetup setup;
 
         if (conexionInicializada && arduinoService->estaConectado()) {
-            CHECK(arduinoService->getPuerto() == "/dev/ttyACM0");
+            CHECK(arduinoService->getPuerto() == "/dev/ttyUSB0");
             CHECK(arduinoService->getBaudrate() == 115200);
             CHECK(arduinoService->estaConectado());
         } else {
