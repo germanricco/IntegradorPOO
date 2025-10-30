@@ -1,204 +1,226 @@
-#include "../include/TrajectoryManager.h" // Incluir el header correspondiente
-#include <filesystem> // Para manejo de directorios y archivos
-#include <iostream>   // Para mensajes de log/error (std::cerr, std::cout)
-#include <stdexcept>  // Para lanzar excepciones (std::runtime_error)
-#include <fstream>    // Necesario para que File.cpp funcione correctamente
+#include "../include/TrajectoryManager.h"
+#include "../include/session/CurrentUser.h"  // <-- contexto de usuario (thread_local)
+#include <filesystem>
+#include <iostream>
+#include <stdexcept>
+#include <fstream>
+#include <cctype>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
 
-// Alias corto para el namespace filesystem
 namespace fs = std::filesystem;
 
-// --- Constructor ---
+// ===================== Constructor =====================
+
 TrajectoryManager::TrajectoryManager(const std::string& directorioBase)
     : directorioBase(directorioBase), grabando(false), archivoActual(nullptr) {
-    // Asegurarse de que el directorio base exista al crear el manager
     try {
         crearDirectorioSiNoExiste();
     } catch (const std::exception& e) {
-        // Si el directorio base no se puede crear, es un error crítico.
-        // Podríamos loguearlo aquí o simplemente dejar que la excepción suba.
-        std::cerr << "ERROR CRÍTICO: No se pudo crear/acceder al directorio base de trayectorias: "
+        std::cerr << "ERROR: No se pudo crear/acceder al directorio de trayectorias: "
                   << directorioBase << " - " << e.what() << std::endl;
-        throw; // Relanzar la excepción para detener la inicialización si es necesario.
+        throw;
     }
 }
 
-// --- Gestión de Archivos (Básica) ---
+// ===================== Helpers de convención =====================
+
+std::string TrajectoryManager::slugify(const std::string& s) {
+    std::string out;
+    out.reserve(s.size());
+    for (char c : s) {
+        unsigned char uc = static_cast<unsigned char>(c);
+        if (std::isalnum(uc)) out.push_back((char)std::tolower(uc));
+        else if (c==' ' || c=='-' || c=='_') out.push_back('_');
+        // otros caracteres se descartan
+    }
+    if (out.empty()) out = "traj";
+    return out;
+}
+
+std::string TrajectoryManager::timestamp() {
+    std::time_t t = std::time(nullptr);
+    std::tm tm{};
+#ifdef _WIN32
+    localtime_s(&tm, &t);
+#else
+    localtime_r(&t, &tm);
+#endif
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%Y%m%d_%H%M%S");
+    return oss.str();
+}
+
+std::string TrajectoryManager::buildNombreConvencion(int userId, const std::string& nombreLogico) const {
+    // <userId>__<slug(nombre)>__YYYYMMDD_HHMMSS.gcode
+    return std::to_string(userId) + "__" + slugify(nombreLogico) + "__" + timestamp() + ".gcode";
+}
+
+// ===================== Gestión de Archivos =====================
 
 bool TrajectoryManager::existeTrayectoria(const std::string& nombreTrayectoria) const {
     std::string nombreNorm = normalizarNombreArchivo(nombreTrayectoria);
     std::string rutaCompleta = directorioBase + "/" + nombreNorm;
-    // Usamos filesystem::exists para verificar si el archivo existe en disco
-    std::error_code ec; // Para evitar que exists lance excepción si hay problemas de permisos
+    std::error_code ec;
     return fs::exists(rutaCompleta, ec);
 }
 
 std::vector<std::string> TrajectoryManager::listarTrayectorias() const {
     std::vector<std::string> lista;
+    const int uid = CurrentUser::get(); // -1 si no hay contexto
+
     try {
-        // Iteramos sobre las entradas del directorio base
         for (const auto& entry : fs::directory_iterator(directorioBase)) {
-            // Verificamos si es un archivo regular y tiene la extensión .gcode
-            if (entry.is_regular_file() && entry.path().extension() == ".gcode") {
-                lista.push_back(entry.path().filename().string()); // Añadimos solo el nombre del archivo
+            if (!entry.is_regular_file()) continue;
+            if (entry.path().extension() != ".gcode") continue;
+
+            const std::string fname = entry.path().filename().string();
+
+            if (uid >= 0) {
+                // Con contexto: solo las del usuario actual (prefijo "<id>__")
+                const std::string pref = std::to_string(uid) + "__";
+                if (fname.rfind(pref, 0) == 0) lista.push_back(fname);
+            } else {
+                // Sin contexto: todas (útil para admin/scripts/legacy)
+                lista.push_back(fname);
             }
         }
     } catch (const std::exception& e) {
         std::cerr << "Error al listar trayectorias en " << directorioBase << ": " << e.what() << std::endl;
-        // Devolvemos lista vacía en caso de error
     }
     return lista;
 }
 
 bool TrajectoryManager::eliminarTrayectoria(const std::string& nombreTrayectoria) {
+    // No permitir borrar lo que se está grabando
     if (grabando && trayectoriaActual == normalizarNombreArchivo(nombreTrayectoria)) {
-        std::cerr << "Error: No se puede eliminar la trayectoria que se está grabando actualmente." << std::endl;
+        std::cerr << "Error: no se puede eliminar la trayectoria en grabación." << std::endl;
         return false;
     }
+
     std::string nombreNorm = normalizarNombreArchivo(nombreTrayectoria);
     std::string rutaCompleta = directorioBase + "/" + nombreNorm;
+
     std::error_code ec;
-    bool removido = fs::remove(rutaCompleta, ec);
+    bool removed = fs::remove(rutaCompleta, ec);
     if (ec) {
-        std::cerr << "Error al eliminar trayectoria " << nombreNorm << ": " << ec.message() << std::endl;
+        std::cerr << "Error al eliminar '" << nombreNorm << "': " << ec.message() << std::endl;
         return false;
     }
-    if (!removido && fs::exists(rutaCompleta)) {
-         std::cerr << "No se pudo eliminar la trayectoria " << nombreNorm << " (quizás no existía)." << std::endl;
-         return false; // El archivo no se borró (podría no existir)
+    if (!removed && fs::exists(rutaCompleta)) {
+        std::cerr << "No se pudo eliminar '" << nombreNorm << "' (¿no existía?)." << std::endl;
+        return false;
     }
-     std::cout << "Trayectoria eliminada: " << nombreNorm << std::endl;
+    std::cout << "Trayectoria eliminada: " << nombreNorm << std::endl;
     return true;
 }
 
-
-// --- Guardar Trayectoria ---
+// ===================== Flujo de grabación =====================
 
 bool TrajectoryManager::iniciarGrabacion(const std::string& nombreTrayectoria) {
     if (grabando) {
-        // Finalizar implícitamente la grabación anterior si se inicia una nueva?
-        // O devolver error? Por ahora, devolvemos error.
-        std::cerr << "Advertencia: Ya hay una grabación en curso (" << trayectoriaActual << "). Finalícela primero." << std::endl;
+        std::cerr << "Advertencia: ya hay una grabación en curso (" << trayectoriaActual << ")." << std::endl;
         return false;
     }
 
-    // Normalizamos el nombre y construimos la ruta
     trayectoriaActual = normalizarNombreArchivo(nombreTrayectoria);
-    // Nota: La clase File ya añade el directorioBase, así que solo pasamos el nombre.
-    // std::string rutaCompleta = directorioBase + "/" + trayectoriaActual;
 
     try {
-        // Creamos una nueva instancia de File. make_unique maneja la memoria.
-        // El constructor de File ya maneja la creación de directorios si es necesario.
         archivoActual = std::make_unique<File>(trayectoriaActual, directorioBase);
-        // Abrimos en modo WRITE, que trunca (borra) el archivo si ya existe.
-        archivoActual->open(FileMode::WRITE);
+        archivoActual->open(FileMode::WRITE);  // trunca si existe
         grabando = true;
         std::cout << "Iniciando grabación en: " << archivoActual->getFilePath() << std::endl;
         return true;
     } catch (const std::exception& e) {
         std::cerr << "Error al iniciar grabación para " << trayectoriaActual << ": " << e.what() << std::endl;
-        // Limpiamos el estado en caso de error
         grabando = false;
-        trayectoriaActual = "";
-        archivoActual = nullptr; // unique_ptr se resetea
+        trayectoriaActual.clear();
+        archivoActual = nullptr;
         return false;
     }
 }
 
 bool TrajectoryManager::guardarComando(const std::string& comandoGCode) {
-    if (!grabando) {
-        // No estamos grabando, no hacemos nada (o podríamos loguear/lanzar error)
-        return false; // Devolver false si no se guardó
-    }
+    if (!grabando) return false;
     if (!archivoActual) {
-        std::cerr << "Error interno: Grabando=true pero archivoActual es null." << std::endl;
+        std::cerr << "Error interno: archivoActual == nullptr con grabación activa." << std::endl;
         return false;
     }
 
     try {
-        // File::append se encarga de abrir/reabrir en modo APPEND si es necesario
         archivoActual->append(comandoGCode + "\n");
         return true;
     } catch (const std::exception& e) {
-        std::cerr << "Error al guardar comando '" << comandoGCode << "' en " << trayectoriaActual << ": " << e.what() << std::endl;
-        // Podríamos detener la grabación aquí si falla la escritura
-        // finalizarGrabacion(); // Opcional: Abortar grabación en error
+        std::cerr << "Error al guardar comando en " << trayectoriaActual << ": " << e.what() << std::endl;
         return false;
     }
 }
 
 bool TrajectoryManager::finalizarGrabacion() {
     if (!grabando) {
-        // No había grabación activa, no es un error, solo informativo.
-        std::cout << "No había ninguna grabación activa para finalizar." << std::endl;
-        return true; // Consideramos éxito ya que no había nada que hacer.
+        std::cout << "No había grabación activa para finalizar." << std::endl;
+        return true;
     }
 
-    std::cout << "Finalizando grabación de: " << trayectoriaActual << std::endl;
-    bool exito = true;
+    bool ok = true;
     try {
         if (archivoActual && archivoActual->isOpen()) {
-            archivoActual->close(); // Cerramos el archivo explícitamente
+            archivoActual->close();
         }
     } catch (const std::exception& e) {
-        std::cerr << "Error al cerrar el archivo de grabación " << trayectoriaActual << ": " << e.what() << std::endl;
-        exito = false; // Marcamos como fallo si el cierre falla
+        std::cerr << "Error al cerrar archivo " << trayectoriaActual << ": " << e.what() << std::endl;
+        ok = false;
     }
 
-    // Reseteamos el estado independientemente del éxito/fallo del cierre
     grabando = false;
-    trayectoriaActual = "";
-    archivoActual = nullptr; // Liberamos el unique_ptr
-
-    return exito;
+    trayectoriaActual.clear();
+    archivoActual = nullptr;
+    return ok;
 }
 
-// --- Cargar Trayectoria ---
+// ===================== Carga =====================
 
 std::vector<std::string> TrajectoryManager::cargarTrayectoria(const std::string& nombreTrayectoria) const {
     std::string nombreNorm = normalizarNombreArchivo(nombreTrayectoria);
-
     try {
-        // Creamos un objeto File solo para esta operación de lectura
         File archivo(nombreNorm, directorioBase);
         if (!archivo.exists()) {
-             // Lanzamos excepción si el archivo no se encuentra
-             throw std::runtime_error("El archivo de trayectoria no existe: " + nombreNorm);
+            throw std::runtime_error("El archivo de trayectoria no existe: " + nombreNorm);
         }
-        // Usamos readLines que ya maneja la apertura/cierre en modo lectura
         return archivo.readLines();
     } catch (const std::exception& e) {
         std::cerr << "Error al cargar trayectoria '" << nombreNorm << "': " << e.what() << std::endl;
-        // Devolvemos un vector vacío para señalar el error
         return {};
     }
 }
 
-// --- Métodos Privados Auxiliares ---
+// ===================== Privados =====================
 
-void TrajectoryManager::crearDirectorioSiNoExiste() {
-    // Usamos la librería filesystem para crear directorios
+void TrajectoryManager::crearDirectorioSiNoExiste() const {
     std::error_code ec;
     fs::create_directories(directorioBase, ec);
-    // create_directories no da error si el directorio ya existe
     if (ec) {
-        // Si hay otro error (ej. permisos), lanzamos una excepción
-        throw std::runtime_error("No se pudo crear el directorio base '" + directorioBase + "': " + ec.message());
+        throw std::runtime_error("No se pudo crear el directorio base '" + directorioBase +
+                                 "': " + ec.message());
     }
 }
 
 std::string TrajectoryManager::normalizarNombreArchivo(const std::string& nombreTrayectoria) const {
-    // Asegura que termine con .gcode y limpia caracteres básicos
-    // (Podría ser más robusto eliminando '/', '\', etc.)
-    std::string nombre = nombreTrayectoria;
-    std::string extension = ".gcode";
-    
-    // Si ya termina con .gcode, no lo agregamos de nuevo
-    if (nombre.length() >= extension.length() && 
-        nombre.substr(nombre.length() - extension.length()) == extension) {
-        return nombre;
+    // Si viene un nombre ya "final" con .gcode → no tocar (compatibilidad con filenames listados)
+    if (nombreTrayectoria.size() >= 6) {
+        const std::string ext = nombreTrayectoria.substr(nombreTrayectoria.size() - 6);
+        if (ext == ".gcode") {
+            return nombreTrayectoria;
+        }
     }
-    
-    // Agregar extensión .gcode si no la tiene
-    return nombre + extension;
+
+    // Intentar aplicar convención si hay usuario en contexto
+    int uid = CurrentUser::get(); // -1 si no hay contexto
+    if (uid >= 0) {
+        return buildNombreConvencion(uid, nombreTrayectoria);
+    }
+
+    // Sin contexto → legacy: solo agrega ".gcode"
+    return nombreTrayectoria + ".gcode";
 }

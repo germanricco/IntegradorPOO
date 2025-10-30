@@ -9,37 +9,42 @@
 using namespace std;
 
 class TrajectoryManager {
-    public:
-        // Constructor
-        TrajectoryManager(const string& directorioBase = "data/trayectorias/");
+public:
+    // Crea el gestor indicando el directorio base donde se guardan .gcode
+    explicit TrajectoryManager(const std::string& directorioBase = "data/trayectorias/");
 
-        // Gestion de Archivos de trayectorias
-        bool existeTrayectoria(const string& nombreTrayectoria) const;
-        std::vector<std::string> listarTrayectorias() const;
-        bool eliminarTrayectoria(const string& nombreTrayectoria);
-        
-        // Guardar trayectoria
-        bool iniciarGrabacion(const string& nombreTrayectoria);
-        bool guardarComando(const string& comandoGCode);
-        bool finalizarGrabacion();
+    // Gestión de archivos de trayectorias
+    bool existeTrayectoria(const std::string& nombreTrayectoria) const;
+    std::vector<std::string> listarTrayectorias() const;
+    bool eliminarTrayectoria(const std::string& nombreTrayectoria);
 
-        // Cargar trayectoria
-        //? Porque retorna un vector y no un queue?
-        std::vector<std::string> cargarTrayectoria(const string& nombreTrayectoria) const;
+    // Flujo de grabación
+    bool iniciarGrabacion(const std::string& nombreTrayectoria);
+    bool guardarComando(const std::string& comandoGCode);
+    bool finalizarGrabacion();
 
-        // Informacion
-        std::string getDirectorioBase() const { return directorioBase; }
-        bool estaGrabando() const { return grabando; }
-        std::string getTrayectoriaActual() const { return trayectoriaActual; }
+    // Carga completa (línea por línea) de una trayectoria
+    std::vector<std::string> cargarTrayectoria(const std::string& nombreTrayectoria) const;
 
-    private:
-        string directorioBase;
-        bool grabando;
-        string trayectoriaActual;
-        unique_ptr<File> archivoActual;
+    // Info de estado
+    std::string getDirectorioBase() const { return directorioBase; }
+    bool        estaGrabando() const { return grabando; }
+    std::string getTrayectoriaActual() const { return trayectoriaActual; }
 
-        void crearDirectorioSiNoExiste();
-        string normalizarNombreArchivo(const string& nombreTrayectoria) const;
+private:
+    std::string directorioBase;
+    bool grabando;
+    std::string trayectoriaActual;             // nombre de archivo (no ruta)
+    std::unique_ptr<File> archivoActual;
+
+    // Helpers
+    void        crearDirectorioSiNoExiste() const;
+    std::string normalizarNombreArchivo(const std::string& nombreTrayectoria) const;
+
+    // Helpers para convención de nombres
+    static std::string slugify(const std::string& s);
+    static std::string timestamp();
+    std::string buildNombreConvencion(int userId, const std::string& nombreLogico) const;
 };
 
 #endif // TRAJECTORYMANAGER_H
