@@ -26,6 +26,7 @@ CORE_SRCS := \
   $(SRC_DIR)/PALogger.cpp \
   $(SRC_DIR)/ServiciosBasicos.cpp \
   $(SRC_DIR)/session/SessionManager.cpp \
+  $(SRC_DIR)/session/CurrentUser.cpp \
   $(SRC_DIR)/user/UserEntity.cpp \
   $(SRC_DIR)/user/UsersRepoCsv.cpp \
   $(SRC_DIR)/auth/AuthLogin.cpp \
