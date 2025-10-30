@@ -1,11 +1,12 @@
 [db]
-engine = "sqlite"               # "sqlite" o "none" (fallback CSV)
+engine = "sqlite"
 path   = "data/db/poo.db"
 
 [paths]
-gcode = "data/trayectorias"     # donde van los .gcode por usuario
+gcode = "data/trayectorias"     # carpeta para archivos de trayectorias
 logs  = "data/logs/server_log.csv"
 
 [security]
-password_salt = "cambia_este_salt"   # si todavía no metés bcrypt
+password_salt = "cambia_este_salt"   # si por ahora no usás bcrypt
+
 

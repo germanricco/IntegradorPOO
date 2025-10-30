@@ -10,22 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS trajectories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  owner_user_id INTEGER NOT NULL,
-  name TEXT NOT NULL,
-  filename TEXT NOT NULL,               -- "42_pick.gcode"
-  rel_path TEXT NOT NULL,               -- "data/trayectorias/7/42_pick.gcode"
-  sha256 TEXT NOT NULL,
-  size_bytes INTEGER NOT NULL,
-  source TEXT NOT NULL CHECK (source IN ('upload','manual_recording')),
-  mode TEXT NOT NULL CHECK (mode IN ('absolute','relative')),
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME,
-  FOREIGN KEY(owner_user_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
--- opcional si querés tokens persistentes
+-- Opcional: si querés tokens persistentes (si no, validá user/pass en cada RPC)
 CREATE TABLE IF NOT EXISTS sessions (
   id TEXT PRIMARY KEY,
   user_id INTEGER NOT NULL,
@@ -35,5 +20,4 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
-CREATE INDEX IF NOT EXISTS idx_traj_owner ON trajectories(owner_user_id);
 
