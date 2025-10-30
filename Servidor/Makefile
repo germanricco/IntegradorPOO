@@ -1,6 +1,6 @@
 CXX := g++
 CXXFLAGS := -std=c++17 -O2 -Wall -Wno-address -Iinclude -Ilib/xmlrpc
-LIBS := -lpthread
+LIBS := -lpthread -lssl -lcrypto -lsqlite3
 
 # Directorios
 BIN_DIR := bin

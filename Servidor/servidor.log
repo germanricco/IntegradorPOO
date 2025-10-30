@@ -124,3 +124,65 @@
 [2025-10-29 13:35:02] [INFO] [system] signal recibido — SIGINT
 [2025-10-29 13:35:02] [INFO] [system] apagando…
 [2025-10-29 13:35:02] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 22:48:15] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 22:48:15] [INFO] [system] puerto=8080
+[2025-10-29 22:48:15] [INFO] [system] users.csv=users.csv
+[2025-10-29 22:48:15] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 22:48:15] [INFO] [system] auth.* registrados
+[2025-10-29 22:48:15] [INFO] [system] user.* registrados
+[2025-10-29 22:48:15] [INFO] [system] introspección habilitada
+[2025-10-29 22:48:15] [INFO] [system] escuchando… (work loop)
+[2025-10-29 22:48:28] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 22:48:28] [INFO] [system] apagando…
+[2025-10-29 22:48:28] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 22:48:49] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 22:48:49] [INFO] [system] puerto=8080
+[2025-10-29 22:48:49] [INFO] [system] users.csv=users.csv
+[2025-10-29 22:48:49] [INFO] RobotService Inicializado
+[2025-10-29 22:48:49] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 22:48:59] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-29 22:48:59] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-29 22:48:59] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-29 22:48:59] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 22:48:59] [INFO] [system] auth.* registrados
+[2025-10-29 22:48:59] [INFO] [system] user.* registrados
+[2025-10-29 22:48:59] [INFO] [system] robot.homing registrado
+[2025-10-29 22:48:59] [INFO] [system] introspección habilitada
+[2025-10-29 22:48:59] [INFO] [system] escuchando… (work loop)
+[2025-10-29 22:49:06] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 22:49:06] [INFO] [system] apagando servidor…
+[2025-10-29 22:49:06] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-29 22:49:06] [INFO] Robot desconectado
+[2025-10-29 22:49:06] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 22:57:35] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 22:57:35] [INFO] [system] puerto=8080
+[2025-10-29 22:57:35] [INFO] [system] users.csv=users.csv
+[2025-10-29 22:57:35] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 22:57:35] [INFO] [system] auth.* registrados
+[2025-10-29 22:57:35] [INFO] [system] user.* registrados
+[2025-10-29 22:57:35] [INFO] [system] introspección habilitada
+[2025-10-29 22:57:35] [INFO] [system] escuchando… (work loop)
+[2025-10-29 22:57:38] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 22:57:38] [INFO] [system] apagando…
+[2025-10-29 22:57:38] [INFO] === SERVIDOR DETENIDO ===
+[2025-10-29 22:57:56] [INFO] === INICIANDO SERVIDOR XML-RPC ===
+[2025-10-29 22:57:56] [INFO] [system] puerto=8080
+[2025-10-29 22:57:56] [INFO] [system] users.csv=users.csv
+[2025-10-29 22:57:56] [INFO] RobotService Inicializado
+[2025-10-29 22:57:56] [INFO] [RobotService] Intentando conectar al robot...
+[2025-10-29 22:58:00] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-10-29 22:58:00] [INFO] Robot conectado y configurado en modo absoluto
+[2025-10-29 22:58:00] [INFO] [RobotService] Conexión establecida con el robot.
+[2025-10-29 22:58:00] [INFO] [system] ServicioPrueba registrado
+[2025-10-29 22:58:00] [INFO] [system] auth.* registrados
+[2025-10-29 22:58:00] [INFO] [system] user.* registrados
+[2025-10-29 22:58:00] [INFO] [system] robot.homing registrado
+[2025-10-29 22:58:00] [INFO] [system] introspección habilitada
+[2025-10-29 22:58:00] [INFO] [system] escuchando… (work loop)
+[2025-10-29 22:58:01] [INFO] [system] signal recibido — SIGINT
+[2025-10-29 22:58:01] [INFO] [system] apagando servidor…
+[2025-10-29 22:58:01] [INFO] [RobotService] Desconectando robot al finalizar...
+[2025-10-29 22:58:01] [INFO] Robot desconectado
+[2025-10-29 22:58:01] [INFO] === SERVIDOR DETENIDO ===

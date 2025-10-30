@@ -2,8 +2,8 @@
 #define USERSREPOSQLITE_H
 
 
-#include "auth/IUsersRepo.hpp"
-#include "db/SqliteDb.hpp"
+#include "auth/IUsersRepo.h"
+#include "db/SqliteDb.h"
 
 class UsersRepoSqlite : public IUsersRepo {
 public:

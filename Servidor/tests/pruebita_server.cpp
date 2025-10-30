@@ -84,7 +84,7 @@ int main(int argc, char** argv){
         //HASTA RESGISTRO DE SERVICIOS ES TODO NUEVO
 
         // Crear e inicializar las herramientas del robot
-        arduinoService = std::make_shared<ArduinoService>("/dev/ttyACM0", 115200); // <-- USA TU PUERTO CORRECTO
+        arduinoService = std::make_shared<ArduinoService>("/dev/ttyUSB0", 115200); // <-- USA TU PUERTO CORRECTO
         TrajectoryManager trajectoryManager("data/trayectorias/"); // Crea la carpeta si no existe
         RobotService robotSvc(arduinoService, logger, "data/trayectorias/");
         pRobotService = &robotSvc; // Guardamos puntero para poder desconectar al final
