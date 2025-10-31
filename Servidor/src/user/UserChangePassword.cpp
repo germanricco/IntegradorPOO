@@ -1,68 +1,65 @@
 #include "user/UserChangePassword.h"
-#include "common/AuthZ.h"
-#include <stdexcept>
+#include "services/AuthBootstrap.h"   // auth_wiring()
+#include "session/CurrentUser.h"
 
 using namespace XmlRpc;
+
 namespace userrpc {
 
-UserChangePassword::UserChangePassword(XmlRpcServer* s, SessionManager& sm, UsersRepoCsv& r, PALogger& L)
-: XmlRpcServerMethod("user.changePassword", s), sessions_(sm), repo_(r), log_(L) {}
-
-void UserChangePassword::execute(XmlRpcValue& params, XmlRpcValue& result) {
-    try {
-        XmlRpcValue a = rpc_norm(params);
-        if (a.getType()!=XmlRpcValue::TypeStruct || !a.hasMember("token") || !a.hasMember("newPass"))
-            throw XmlRpcException("BAD_REQUEST: token,newPass obligatorios");
-
-        std::string tok     = std::string(a["token"]);
-        std::string newPass = std::string(a["newPass"]);
-
-        //valida sesión con logging
-        const auto& s = guardSession("changePassword", sessions_, tok, log_);
-
-        std::string target;
-        std::string mode;
-
-        if (a.hasMember("user")) {
-            // admin resetea la clave de otro
-            if (s.privilegio != "admin") {
-                log_.warning("[user] changePassword FORBIDDEN — actor=" + s.user + " (admin-reset)");
-                throw XmlRpcException("FORBIDDEN: privilegios insuficientes");
-            }
-            target = std::string(a["user"]);
-            mode = "admin-reset";
-            repo_.changePass(target, newPass);
-        } else {
-            // autoservicio
-            if (!a.hasMember("oldPass")) throw XmlRpcException("BAD_REQUEST: falta oldPass para autoservicio");
-            std::string old = std::string(a["oldPass"]);
-            auto ck = repo_.validate(s.user, old);
-            if (!ck.ok) {
-                log_.warning("[user] changePassword FAIL — actor=" + s.user + " (oldPass inválida)");
-                throw XmlRpcException("AUTH_INVALID: oldPass");
-            }
-            target = s.user;
-            mode = "self";
-            repo_.changePass(target, newPass);
-        }
-
-        result["ok"] = true;
-        log_.info("[user] changePassword OK — actor=" + s.user + ", target=" + target + " (" + mode + ")");
-    }
-    catch (const std::runtime_error& e){
-        log_.warning(std::string("[user] changePassword FAIL — ") + e.what());
-        throw XmlRpcException(e.what());
-    }
-    catch (const XmlRpcException&){ throw; }
-    catch (...) {
-        log_.error("[user] changePassword ERROR — excepción inesperada");
-        throw XmlRpcException("BAD_REQUEST: user.changePassword");
-    }
+static XmlRpcValue norm(XmlRpcValue& p){
+    if (p.getType()==XmlRpcValue::TypeArray && p.size()==1) return p[0];
+    return p;
 }
 
-std::string UserChangePassword::help() {
-    return "user.changePassword({token:string, user?:string, oldPass?:string, newPass:string}) -> {ok:bool}\n"
-           "Admin: {token,user,newPass}  |  Auto-servicio: {token,oldPass,newPass}";
+UserChangePassword::UserChangePassword(XmlRpcServer* s,
+                                       SessionManager& sm,
+                                       IUsersRepo& r,
+                                       PALogger& L)
+: XmlRpcServerMethod("user.changePassword", s)
+, sessions_(sm)
+, repo_(r)
+, log_(L)
+{}
+
+void UserChangePassword::execute(XmlRpcValue& params, XmlRpcValue& result){
+    try{
+        XmlRpcValue a = norm(params);
+        if (a.getType()!=XmlRpcValue::TypeStruct ||
+            !a.hasMember("user") ||
+            !a.hasMember("old")  ||
+            !a.hasMember("new")) {
+            throw XmlRpcException("BAD_REQUEST: se esperaban {user, old, new}");
+        }
+
+        const std::string user = std::string(a["user"]);
+        const std::string oldp = std::string(a["old"]);
+        const std::string newp = std::string(a["new"]);
+
+        // 1) Validar credenciales con AuthService (reemplaza repo_.validate del CSV)
+        auto& W = auth_wiring();
+        auto au = W.auth->login(user, oldp);
+        if (!au){
+            log_.warning("[user.changePassword] FAIL -- user=" + user + " (credenciales inválidas)");
+            throw XmlRpcException("AUTH_INVALID: usuario/clave incorrectos");
+        }
+
+        // 2) Actualizar hash (reemplaza changePass del CSV)
+        const std::string newHash = W.auth->makeHash(newp);
+        repo_.updatePasswordHash(au->id, newHash);
+
+        // (opcional) invalidar sesiones previas: sessions_.invalidateUser(au->id);
+
+        result["ok"]   = true;
+        result["user"] = user;
+        log_.info("[user.changePassword] OK -- user=" + user);
+    }
+    catch(const XmlRpcException&){ throw; }
+    catch(...){ throw XmlRpcException("INTERNAL_ERROR: user.changePassword"); }
+}
+
+std::string UserChangePassword::help(){
+    return "user.changePassword {user, old, new} -> ok";
 }
 
 } // namespace userrpc
+
