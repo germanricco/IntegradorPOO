@@ -1,0 +1,8 @@
+bin/
+obj/
+*.o
+*.log
+data/db/*.db
+data/db/*.db-*
+__pycache__/
+*.pyc
