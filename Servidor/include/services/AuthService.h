@@ -19,6 +19,8 @@ public:
                                   const std::string& password);
 
     bool verifyPassword(const std::string& clear, const std::string& hash) const;
+    
+    std::string makeHash(const std::string& clear) const;
 
 private:
     IUsersRepo& users_;

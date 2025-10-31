@@ -1,49 +1,49 @@
 #include "user/UserList.h"
-#include "common/AuthZ.h"
 
 using namespace XmlRpc;
+
 namespace userrpc {
 
-UserList::UserList(XmlRpcServer* s, SessionManager& sm, UsersRepoCsv& r, PALogger& L)
-: XmlRpcServerMethod("user.list", s), sessions_(sm), repo_(r), log_(L) {}
-
-void UserList::execute(XmlRpcValue& params, XmlRpcValue& result) {
-    try {
-        XmlRpcValue a = rpc_norm(params);
-        if (a.getType()!=XmlRpcValue::TypeStruct || !a.hasMember("token"))
-            throw XmlRpcException("BAD_REQUEST: falta token");
-
-        std::string tok = std::string(a["token"]);
-
-        //valida sesión y ADMIN
-        const SessionView& sv = guardAdmin("list", sessions_, tok, log_);
-        std::string actor = sv.user;
-
-        XmlRpcValue arr; arr.setSize(0);
-        int i = 0;
-        for (const auto& u : repo_.list()) {
-            XmlRpcValue item;
-            item["id"]         = u.id;
-            item["user"]       = u.username;
-            item["privilegio"] = privToStr(u.priv);
-            item["habilitado"] = u.habilitado;
-            arr.setSize(i+1); arr[i++] = item;
-        }
-
-        result["ok"]   = true;
-        result["users"]= arr;
-
-        log_.info("[user] list OK — actor=" + actor + ", count=" + std::to_string(repo_.list().size()));
-    }
-    catch (const XmlRpcException&){ throw; }
-    catch (...) {
-        log_.error("[user] list ERROR — excepción inesperada");
-        throw XmlRpcException("BAD_REQUEST: user.list");
-    }
+static XmlRpcValue norm(XmlRpcValue& p){
+    if (p.getType()==XmlRpcValue::TypeArray && p.size()==1) return p[0];
+    return p;
 }
 
-std::string UserList::help() {
-    return "user.list({token:string}) -> {ok:bool, users:[{id:int,user:string,privilegio:string,habilitado:bool}]}";
+UserList::UserList(XmlRpcServer* s,
+                   SessionManager& sm,
+                   IUsersRepo& r,
+                   PALogger& L)
+: XmlRpcServerMethod("user.list", s)
+, sessions_(sm)
+, repo_(r)
+, log_(L)
+{}
+
+void UserList::execute(XmlRpcValue& params, XmlRpcValue& result){
+    try{
+        (void)params; // sin args
+
+        auto all = repo_.listAll();
+
+        XmlRpcValue arr;
+        arr.setSize(int(all.size()));
+        for (int i=0;i<int(all.size());++i){
+            XmlRpcValue u;
+            u["id"]       = all[i].id;
+            u["username"] = all[i].username;
+            u["role"]     = all[i].role;
+            u["active"]   = all[i].is_active;
+            arr[i] = u;
+        }
+        result["ok"]    = true;
+        result["users"] = arr;
+    }
+    catch(const XmlRpcException&){ throw; }
+    catch(...){ throw XmlRpcException("INTERNAL_ERROR: user.list"); }
+}
+
+std::string UserList::help(){
+    return "user.list -> {ok, users:[{id,username,role,active}...] }";
 }
 
 } // namespace userrpc

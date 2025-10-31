@@ -1,4 +1,6 @@
 #include "auth/AuthLogin.h"
+#include "services/AuthBootstrap.h"
+#include "session/CurrentUser.h"
 #include "XmlRpc.h"
 using namespace XmlRpc;
 
@@ -9,7 +11,7 @@ static XmlRpcValue norm(XmlRpcValue& p){
     return p;
 }
 
-AuthLogin::AuthLogin(XmlRpcServer* s, SessionManager& sm, PALogger& L, UsersRepoCsv& repo)
+AuthLogin::AuthLogin(XmlRpcServer* s, SessionManager& sm, PALogger& L, IUsersRepo& repo)
 : XmlRpcServerMethod("auth.login", s), sessions_(sm), logger_(L), repo_(repo) {}
 
 void AuthLogin::execute(XmlRpcValue& params, XmlRpcValue& result){
@@ -21,23 +23,36 @@ void AuthLogin::execute(XmlRpcValue& params, XmlRpcValue& result){
         std::string user = std::string(a["user"]);
         std::string pass = std::string(a["pass"]);
 
-        auto ck = repo_.validate(user, pass);
-        if(!ck.ok) {
-            // Log claro y humano para credenciales inválidas
-            logger_.warning("[auth] login FAIL — user=" + user + " (credenciales inválidas)");
-            throw XmlRpcException("AUTH_INVALID: usuario/clave incorrectos");
-        }
-        if(!ck.habilitado) {
-            logger_.warning("[auth] login FAIL — user=" + user + " (usuario deshabilitado)");
-            throw XmlRpcException("USER_DISABLED: usuario deshabilitado");
+        auto& W = auth_wiring();  // accedemos a { db, repo, auth }
+
+        // usamos AuthService::login (consulta + hash)
+        auto authUser = W.auth->login(user, pass);
+        if (!authUser) {
+          logger_.warning("[auth] login FAIL -- user=" + user + " (credenciales inválidas)");
+          throw XmlRpcException("AUTH_INVALID: usuario/clave incorrectos");
         }
 
-        std::string tok = sessions_.create(user, ck.priv);
+        // usuario activo (por si agregás lógica adicional)
+        CurrentUser::set(authUser->id);
 
-        result["ok"]         = true;
-        result["token"]      = tok;
-        result["user"]       = user;
-        result["privilegio"] = ck.priv;
+        // si querés, log de éxito  
+        logger_.info("[auth] login OK -- user=" + user);
+
+        // Datos “fuertes” del usuario
+        result["id"]       = authUser->id;
+        result["username"] = authUser->username;
+        result["role"]     = authUser->role;
+
+        // Token de sesión: SessionManager::create(username, role)
+        std::string tok = sessions_.create(authUser->username, authUser->role);
+
+        // Campos de salida del método (mantengo tus claves originales)
+        result["ok"]        = true;
+        result["token"]     = tok;
+        result["user"]      = authUser->username;
+        result["privilegio"]= authUser->role; 
+
+        CurrentUser::clear();
 
         // Log de éxito (sin token en el log)
         logger_.info("[auth] login OK — user=" + user);

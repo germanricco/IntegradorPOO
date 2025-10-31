@@ -5,25 +5,26 @@ class CLI:
     def __init__(self, url):
         self.api = ServerProxy(url, allow_none=True)
         self.token = None
-        self.user = None
-        self.priv = None
+        self.username = None
+        self.role = None
 
     # ===== helpers =====
     def _refresh_me(self):
         if not self.token:
-            self.user = self.priv = None
+            self.username = self.role = None
             return
         try:
             r = self.api.__getattr__("auth.me")({"token": self.token})
-            self.user = r["user"]
-            self.priv = r["privilegio"]
+            # Ajustar a tu contrato real de auth.me si difiere
+            self.username = r.get("user") or r.get("username")
+            self.role     = r.get("privilegio") or r.get("role")
         except Exception:
             # token inválido o server reiniciado
-            self.user = self.priv = self.token = None
+            self.username = self.role = self.token = None
 
     def _is_admin(self):
         self._refresh_me()
-        return self.priv == "admin"
+        return self.role == "admin"
 
     def _print_table(self, rows, headers):
         if not rows:
@@ -42,19 +43,17 @@ class CLI:
     def _help(self):
         self._refresh_me()
         print("Comandos disponibles:")
-        print("  methods                      # listar métodos RPC publicados por el servidor")
-        print("  help                         # esta ayuda (filtrada por rol)")
+        print("  methods                      # listar métodos RPC publicados")
+        print("  help                         # esta ayuda")
         print("  help-rpc <metodo>            # ver help() del método en el servidor")
         print("  login <user> <pass>")
         print("  me")
         print("  logout")
         if self._is_admin():
-            print("  uadd <user> <pass> <priv>    # user.register  (priv=admin|op|viewer)")
-            print("  ulist                        # user.list")
-            print("  uupd <user> [name=NEW] [priv=admin|op|viewer] [hab=0|1]")
-            print("                               # user.update")
-            print("  uchpass <user> <newpass>     # user.changePassword (modo admin)")
-        print("  mychpass <old> <new>         # user.changePassword (autoservicio)")
+            print("  uadd <user> <pass> [role] [active=1]   # user.register")
+            print("  ulist                                 # user.list")
+            print("  uupd <id> active=0|1                   # user.update (habilitar/deshabilitar)")
+        print("  mychpass <old> <new>       # user.changePassword (autoservicio)")
         print("  quit")
 
     # ===== dispatcher =====
@@ -83,13 +82,16 @@ class CLI:
                 else:
                     u, p = args
                     r = self.api.__getattr__("auth.login")({"user": u, "pass": p})
-                    self.token = r["token"]; self.user = r["user"]; self.priv = r["privilegio"]
-                    print(f"login OK — user={self.user}, priv={self.priv}")
+                    # contrato actual del server
+                    self.token    = r["token"]
+                    self.username = r.get("username") or r.get("user")
+                    self.role     = r.get("role") or r.get("privilegio")
+                    print(f"login OK — user={self.username}, role={self.role}")
 
             elif cmd == "me":
                 self._refresh_me()
-                if self.user:
-                    print({"ok": True, "user": self.user, "privilegio": self.priv})
+                if self.username:
+                    print({"ok": True, "user": self.username, "role": self.role})
                 else:
                     print("No hay sesión activa.")
 
@@ -98,66 +100,58 @@ class CLI:
                     print("No hay sesión activa.")
                 else:
                     print(self.api.__getattr__("auth.logout")({"token": self.token}))
-                    self.token = self.user = self.priv = None
+                    self.token = self.username = self.role = None
 
             elif cmd == "uadd":
                 if not self._is_admin():
                     print("No sos admin.")
-                elif len(args) != 3:
-                    print("uso: uadd <user> <pass> <priv>")
+                elif len(args) < 2:
+                    print("uso: uadd <user> <pass> [role] [active=1]")
                 else:
-                    u, p, prv = args
+                    user = args[0]
+                    pw   = args[1]
+                    role = args[2] if len(args) >= 3 else "operator"
+                    active = True
+                    if len(args) >= 4:
+                        kv = args[3]
+                        if kv.startswith("active="):
+                            active = (kv.split("=",1)[1] == "1")
                     r = self.api.__getattr__("user.register")({
-                        "token": self.token, "user": u, "pass": p, "privilegio": prv
-                    })
+                        "user": user, "pass": pw, "role": role, "active": active
+                    })  # el server ignora 'token' hoy, pero podrías agregarlo si lo validás
                     print(r)
 
             elif cmd == "ulist":
                 if not self._is_admin():
                     print("No sos admin.")
                 else:
-                    r = self.api.__getattr__("user.list")({"token": self.token})
+                    r = self.api.__getattr__("user.list")({})
                     users = r["users"]
-                    rows = [[u["id"], u["user"], u["privilegio"], "sí" if u["habilitado"] else "no"] for u in users]
-                    self._print_table(rows, headers=["id", "usuario", "rol", "habilitado"])
+                    rows = [[u["id"], u["username"], u["role"], "sí" if u["active"] else "no"] for u in users]
+                    self._print_table(rows, headers=["id", "username", "role", "active"])
 
             elif cmd == "uupd":
                 if not self._is_admin():
                     print("No sos admin.")
-                elif not args:
-                    print("uso: uupd <user> [name=NEW] [priv=admin|op|viewer] [hab=0|1]")
+                elif len(args) < 2 or not args[1].startswith("active="):
+                    print("uso: uupd <id> active=0|1")
                 else:
-                    payload = {"token": self.token, "user": args[0]}
-                    for kv in args[1:]:
-                        if "=" not in kv: 
-                            print("parámetro inválido:", kv); return True
-                        k, v = kv.split("=", 1)
-                        if k == "name": payload["newUser"] = v
-                        elif k == "priv": payload["newPrivilegio"] = v
-                        elif k == "hab":  payload["habilitado"] = (v == "1")
-                        else:
-                            print("parámetro desconocido:", k); return True
-                    print(self.api.__getattr__("user.update")(payload))
-
-            elif cmd == "uchpass":
-                if not self._is_admin():
-                    print("No sos admin.")
-                elif len(args) != 2:
-                    print("uso: uchpass <user> <newpass>")
-                else:
-                    u, newp = args
-                    print(self.api.__getattr__("user.changePassword")({
-                        "token": self.token, "user": u, "newPass": newp
-                    }))
+                    uid = int(args[0])
+                    active = (args[1].split("=",1)[1] == "1")
+                    print(self.api.__getattr__("user.update")({"id": uid, "active": active}))
 
             elif cmd == "mychpass":
                 if len(args) != 2:
                     print("uso: mychpass <old> <new>")
                 else:
-                    old, newp = args
-                    print(self.api.__getattr__("user.changePassword")({
-                        "token": self.token, "oldPass": old, "newPass": newp
-                    }))
+                    self._refresh_me()
+                    if not self.username:
+                        print("Primero hacé login.")
+                    else:
+                        old, newp = args
+                        print(self.api.__getattr__("user.changePassword")({
+                            "user": self.username, "old": old, "new": newp
+                        }))
 
             elif cmd == "quit":
                 return False
@@ -166,7 +160,6 @@ class CLI:
                 print("Comando desconocido. Escribí 'help'.")
 
         except Fault as e:
-            # Nunca cortamos el CLI: mostramos el fault y seguimos
             print("Fault:", e)
         except Exception as e:
             print("Error:", e)

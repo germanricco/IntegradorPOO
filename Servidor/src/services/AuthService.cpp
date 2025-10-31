@@ -28,4 +28,8 @@ std::optional<AuthUser> AuthService::login(const std::string& username,
     return au;
 }
 
-
+std::string AuthService::makeHash(const std::string& clear) const {
+    // usa el mismo sha256_hex y salt_ interno
+    extern std::string sha256_hex(const std::string&); // o mové sha256_hex a un header común
+    return sha256_hex(salt_ + clear);
+}
