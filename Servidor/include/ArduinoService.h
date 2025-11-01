@@ -27,7 +27,7 @@ private:
 
 public:
     // Constructor
-    ArduinoService(const std::string& puerto = "/dev/ttyACM0",
+    ArduinoService(const std::string& puerto = "/dev/ttyUSB0",
                     int baudrate = 115200);
     
     // Destructor

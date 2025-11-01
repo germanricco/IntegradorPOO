@@ -7,7 +7,7 @@ int main(){
     try {
         SqliteDb db("data/db/poo.db");
         UsersRepoSqlite repo(db);
-        AuthService auth(repo, "cambia_este_salt");
+        AuthService auth(repo, "palabra_secreta");
 
         // crea tablas por las dudas
         db.exec("PRAGMA foreign_keys=ON;");

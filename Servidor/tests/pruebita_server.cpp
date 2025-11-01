@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 
+#include "services/AuthService.h"
+#include "services/AuthBootstrap.h"
 #include "XmlRpc.h"
 
 // Logger: firma real -> PALogger(LogLevel, bool toConsole, std::string filename)
@@ -29,6 +31,20 @@
 // Demo simple
 #include "ServiciosBasicos.h"
 
+
+#include "ArduinoService.h"
+#include "RobotService.h"
+// Servicios del robot
+#include "ServiciosRobot/RobotHomingMethod.h"
+#include "ServiciosRobot/RobotMotorsMethod.h"
+#include "ServiciosRobot/RobotConnectMethod.h"
+#include "ServiciosRobot/RobotDisconnectMethod.h"
+#include "ServiciosRobot/RobotGripperMethod.h"
+#include "ServiciosRobot/RobotModeMethod.h"
+#include "ServiciosRobot/RobotStatusMethod.h"
+#include "ServiciosRobot/RobotMoveMethod.h"
+
+
 using namespace XmlRpc;
 
 int main(int argc, char** argv) {
@@ -48,14 +64,34 @@ int main(int argc, char** argv) {
 
     try {
         // --- DB y repos ---
-        SqliteDb db(dbPath);
+        init_auth_layer(dbPath, "palabra_secreta");
 
         // Opción A: si la clase está en namespace storage
         // storage::UsersRepoSqlite repo(db);
 
         // Opción B: si no tiene namespace (muy común)
-        UsersRepoSqlite repo(db);
+        auto& wiring = auth_wiring();
+        IUsersRepo& repo = *wiring.repo;
 
+        AuthService auth(repo, "palabra_secreta");
+        
+        // 1. Creamos el "Intercomunicador" (Capa de Hardware)
+        auto arduinoService = std::make_shared<ArduinoService>("/dev/ttyUSB0", 115200);
+
+        // 2. Creamos el "Jefe de Cocina" (Capa de Lógica)
+        auto robotService = std::make_shared<RobotService>(arduinoService, logger);
+
+        // 3. ¡Conectamos el robot!
+        logger.info("[system] Intentando conectar con el robot...");
+        if (!robotService->conectarRobot()) {
+            // Si no está el Arduino, solo avisamos, pero el servidor sigue
+            logger.error("[system] FALLÓ LA CONEXIÓN CON EL ROBOT (Arduino no encontrado).");
+            // Puedes decidir si lanzar una excepción aquí o no.
+            // throw std::runtime_error("No se pudo conectar al robot.");
+        } else {
+            logger.info("[system] Robot conectado exitosamente.");
+        }
+                
         // --- Infra RPC + sesiones ---
         XmlRpcServer server;
         XmlRpc::setVerbosity(0);
@@ -76,8 +112,18 @@ int main(int argc, char** argv) {
         userrpc::UserUpdate         mUUpd  (&server, sessions, repo, logger);
         userrpc::UserChangePassword mUChg  (&server, sessions, repo, logger);
         userrpc::UserRegister       mUReg  (&server, sessions, repo, logger);
-
+        
         // (No registramos robot.* aquí para evitar dependencias de hardware)
+
+        // Servicios del robot
+        robot_service_methods::RobotHomingMethod mRHoming(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotMotorsMethod mRMotors(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotModeMethod mRMode(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotConnectMethod mRConnect(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotDisconnectMethod mRDisconnect(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotGripperMethod mRGripper(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotStatusMethod mRStatus(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotMoveMethod mRMove(&server, sessions, logger, *robotService);
 
         server.enableIntrospection(true);
         server.bindAndListen(port, 32);

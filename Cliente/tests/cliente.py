@@ -10,6 +10,7 @@ class CLI:
         self.priv = None
 
     # ===== helpers =====
+    # verifica constantemente que el token esté vigente
     def _refresh_me(self):
         if not self.token:
             self.user = self.priv = None
@@ -55,7 +56,7 @@ class CLI:
             print("  uupd <user> [name=NEW] [priv=admin|op|viewer] [hab=0|1]")
             print("                               # user.update")
             print("  uchpass <user> <newpass>     # user.changePassword (modo admin)")
-        print("  mychpass <old> <new>         # user.changePassword (autoservicio)")
+            print("  mychpass <old> <new>         # user.changePassword (autoservicio)")
         # --- Comandos de Robot ---
         if self.priv == "admin":
             print("  connect                      # [ROBOT] Conecta el servidor al robot")
@@ -70,12 +71,14 @@ class CLI:
             print("  mode <abs|rel>               # [ROBOT] Setea modo coordenadas (G90/G91)")
             print("  move <x> <y> <z> [vel]       # [ROBOT] Mueve a (X,Y,Z) [vel] (G1)")
 
-            print("  upload <local_file>        # [ROBOT] Sube un .gcode al servidor")
-            print("  run <remote_file>          # [ROBOT] Ejecuta un .gcode en el servidor")
+            print("  upload <local_file>          # [ROBOT] Sube un .gcode al servidor")
+            print("  run <remote_file>            # [ROBOT] Ejecuta un .gcode en el servidor")
 
         print("  quit")
 
     # ===== dispatcher =====
+    # Lee la linea que escribimos, la divide con line.strip().split()
+    # Con el if/elif gigante decide que hacer
     def do(self, line: str) -> bool:
         try:
             parts = line.strip().split()
@@ -100,6 +103,8 @@ class CLI:
                     print("uso: login <user> <pass>")
                 else:
                     u, p = args
+                    # Llama al metodo de autenticacion y le pasa un diccionario con el user y pass
+                    # Este diccionario se guarda en r
                     r = self.api.__getattr__("auth.login")({"user": u, "pass": p})
                     self.token = r["token"]; self.user = r["user"]; self.priv = r["privilegio"]
                     print(f"login OK — user={self.user}, priv={self.priv}")
@@ -408,6 +413,7 @@ class CLI:
 if __name__ == "__main__":
     cli = CLI("http://127.0.0.1:8080")
     print("CLI RPC. Escribí 'help'. Ctrl+C para salir.")
+    # Todo lo que se escribe dentro de este bucle se pasa a la funcion do() como un string
     while True:
         if not cli.do(input("> ")):
             break

@@ -75,3 +75,11 @@ where:
 	@echo "SRC_XMLRPC   = $(SRC_XMLRPC)"
 	@echo "SRC_TESTS    = $(SRC_TESTS)"
 
+run-smoke: bin/auth_smoke
+	@echo "🧪 Ejecutando smoke test de autenticación..."
+	./bin/auth_smoke
+
+bin/auth_smoke: src/auth_smoke.cpp $(OBJS_SRC) $(OBJS_XMLRPC)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ src/auth_smoke.cpp $(filter-out $(OBJ_DIR)/tests/%.o, $(OBJS_SRC)) $(OBJS_XMLRPC) $(LIBS)
+
