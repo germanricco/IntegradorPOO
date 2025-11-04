@@ -34,6 +34,7 @@
 
 #include "ArduinoService.h"
 #include "RobotService.h"
+
 // Servicios del robot
 #include "ServiciosRobot/RobotHomingMethod.h"
 #include "ServiciosRobot/RobotMotorsMethod.h"
@@ -67,26 +68,20 @@ int main(int argc, char** argv) {
 
     try {
         // --- DB y repos ---
-        //init_auth_layer(dbPath, "palabra_secreta");
         init_auth_layer(dbPath, salt);
 
-        // Opción A: si la clase está en namespace storage
-        // storage::UsersRepoSqlite repo(db);
-
-        // Opción B: si no tiene namespace (muy común)
         auto& wiring = auth_wiring();
         IUsersRepo& repo = *wiring.repo;
 
-        //AuthService auth(repo, "palabra_secreta");
         AuthService auth(repo, salt);
         
-        // 1. Creamos el "Intercomunicador" (Capa de Hardware)
+        // Creamos el servicio de comunicacion serie
         auto arduinoService = std::make_shared<ArduinoService>("/dev/ttyUSB0", 115200);
 
-        // 2. Creamos el "Jefe de Cocina" (Capa de Lógica)
+        // Creamos el servicio que maneja la logica del robot
         auto robotService = std::make_shared<RobotService>(arduinoService, logger);
 
-        // 3. ¡Conectamos el robot!
+        // Conectamos el robot
         logger.info("[system] Intentando conectar con el robot...");
         if (!robotService->conectarRobot()) {
             // Si no está el Arduino, solo avisamos, pero el servidor sigue
