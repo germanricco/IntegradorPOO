@@ -1,190 +1,141 @@
-#include <iostream>
-#include <csignal>
-#include <atomic>
+// Servidor/tests/pruebita_server.cpp
 #include <cstdlib>
-#include <memory> // Para std::shared_ptr y std::make_shared
+#include <string>
+#include <iostream>
+
+#include "services/AuthService.h"
+#include "services/AuthBootstrap.h"
 #include "XmlRpc.h"
 
-// === HERRAMIENTAS GLOBALES ===
-#include "../include/PALogger.h"
-#include "../include/ArduinoService.h"
-#include "../include/TrajectoryManager.h"
-#include "../include/RobotService.h" // La fachada clave
+// Logger: firma real -> PALogger(LogLevel, bool toConsole, std::string filename)
+#include "PALogger.h"
 
-// sesiones / usuarios
-#include "../include/session/SessionManager.h"
-#include "../include/user/UsersRepoCsv.h"
+// DB + repo de usuarios (SQLite)
+#include "db/SqliteDb.h"
+#include "storage/UsersRepoSqlite.h"
 
-// auth.*
-#include "../include/auth/AuthLogin.h"
-#include "../include/auth/AuthMe.h"
-#include "../include/auth/AuthLogout.h"
+// Sesiones
+#include "session/SessionManager.h"
 
-// user.*
-#include "../include/user/UserRegister.h"
-#include "../include/user/UserUpdate.h"
-#include "../include/user/UserChangePassword.h"
-#include "../include/user/UserList.h"
+// Auth
+#include "auth/AuthLogin.h"
+#include "auth/AuthLogout.h"
+#include "auth/AuthMe.h"
 
-// Servicios Robot
-#include "../include/ServiciosRobot/RobotHomingMethod.h" // <-- NUESTRO PRIMER SERVICIO DE ROBOT
-#include "../include/ServiciosRobot/RobotMoveMethod.h"
-#include "../include/ServiciosRobot/RobotMotorsMethod.h"
-#include "../include/ServiciosRobot/RobotGripperMethod.h"
-#include "../include/ServiciosRobot/RobotModeMethod.h"
-#include "../include/ServiciosRobot/RobotStatusMethod.h"
-#include "../include/ServiciosRobot/RobotConnectMethod.h"
-#include "../include/ServiciosRobot/RobotDisconnectMethod.h"
+// Users RPC
+#include "user/UserList.h"
+#include "user/UserUpdate.h"
+#include "user/UserChangePassword.h"
+#include "user/UserRegister.h"
 
-// Otros servicios básicos
-#include "../include/ServiciosBasicos.h"
+// Demo simple
+#include "ServiciosBasicos.h"
+
+
+#include "ArduinoService.h"
+#include "RobotService.h"
+
+// Servicios del robot
+#include "ServiciosRobot/RobotHomingMethod.h"
+#include "ServiciosRobot/RobotMotorsMethod.h"
+#include "ServiciosRobot/RobotConnectMethod.h"
+#include "ServiciosRobot/RobotDisconnectMethod.h"
+#include "ServiciosRobot/RobotGripperMethod.h"
+#include "ServiciosRobot/RobotModeMethod.h"
+#include "ServiciosRobot/RobotStatusMethod.h"
+#include "ServiciosRobot/RobotMoveMethod.h"
 
 
 using namespace XmlRpc;
 
-// Variables globales para manejo de señal y logger
-static std::atomic<bool> g_running{true};
-static PALogger* g_logger = nullptr;
-
-// Manejador de señales (Ctrl+C, kill)
-void handle_signal(int sig){
-    if (g_logger) g_logger->info(std::string("[system] signal recibido — ")+(sig==SIGINT?"SIGINT":"SIGTERM"));
-    g_running = false;
-}
-
-int main(int argc, char** argv){
-    if (argc < 3){
-        std::cerr << "Uso: " << argv[0] << " <puerto> <users.csv>\n";
-        return 1;
+int main(int argc, char** argv) {
+    int port = 8080;
+    if (argc >= 2) {
+        int p = std::atoi(argv[1]);
+        if (p > 0) port = p;
     }
 
-    int port = std::atoi(argv[1]);
-    std::string usersCsv = argv[2];
+    const std::string dbPath = "data/db/poo.db";
 
-    // --- Inicialización Fuera del Try (para acceso en cleanup) ---
+    // ctor correcto del logger (nivel, a consola, archivo)
     PALogger logger(LogLevel::INFO, true, "servidor.log");
-    g_logger = &logger; // Permitir al manejador de señal usar el logger
+    logger.info("=== INICIANDO SERVIDOR XML-RPC ===");
+    logger.info(std::string("[system] puerto=") + std::to_string(port));
+    logger.info(std::string("[system] db=") + dbPath);
 
-    // Usamos punteros para controlar el ciclo de vida y la desconexión
-    std::shared_ptr<ArduinoService> arduinoService = nullptr;
-    RobotService* pRobotService = nullptr; // Puntero crudo para acceso fácil en catch/finally
+    const char* envSalt = std::getenv("AUTH_SALT");
+    std::string salt = envSalt ? envSalt : "cambia_este_salt";
 
     try {
-        logger.info("=== INICIANDO SERVIDOR XML-RPC ===");
-        logger.info("[system] puerto=" + std::to_string(port));
-        logger.info("[system] users.csv=" + usersCsv);
+        // --- DB y repos ---
+        init_auth_layer(dbPath, salt);
 
-        // Señales para apagado prolijo
-        std::signal(SIGINT,  handle_signal);        //METIÓ ESTAS DOS LINEAS EN EL TRY
-        std::signal(SIGTERM, handle_signal);
+        auto& wiring = auth_wiring();
+        IUsersRepo& repo = *wiring.repo;
 
-        // Crear servidor XML-RPC
-        XmlRpcServer server;
-        XmlRpc::setVerbosity(0); // 0 = sin logs de la librería XmlRpc++
+        AuthService auth(repo, salt);
+        
+        // Creamos el servicio de comunicacion serie
+        auto arduinoService = std::make_shared<ArduinoService>("/dev/ttyUSB0", 115200);
 
-        // === Dependencias (Herramientas Globales) ===
-        SessionManager sessions;
-        UsersRepoCsv   repo(usersCsv);
-        //AGREGÓ LA SIGUIENTE LÍNEA MEDIO INCESEARIO CREO
-        repo.ensureDefaultAdmin(); // Asegura que exista admin/1234 si el CSV está vacío
+        // Creamos el servicio que maneja la logica del robot
+        auto robotService = std::make_shared<RobotService>(arduinoService, logger);
 
-        //HASTA RESGISTRO DE SERVICIOS ES TODO NUEVO
-
-        // Crear e inicializar las herramientas del robot
-        arduinoService = std::make_shared<ArduinoService>("/dev/ttyUSB0", 115200); // <-- USA TU PUERTO CORRECTO
-        TrajectoryManager trajectoryManager("data/trayectorias/"); // Crea la carpeta si no existe
-        RobotService robotSvc(arduinoService, logger, "data/trayectorias/");
-        pRobotService = &robotSvc; // Guardamos puntero para poder desconectar al final
-
-        // Intentar conectar el RobotService al inicio
-        logger.info("[RobotService] Intentando conectar al robot...");
-        if (robotSvc.conectarRobot(3)) { // Intenta conectar 3 veces
-             logger.info("[RobotService] Conexión establecida con el robot.");
-             // Podrías descomentar la siguiente línea si quieres que haga homing al iniciar:
-             // logger.info("[RobotService] Realizando homing inicial...");
-             // robotSvc.homing(); // Llamada directa (no RPC)
+        // Conectamos el robot
+        logger.info("[system] Intentando conectar con el robot...");
+        if (!robotService->conectarRobot()) {
+            // Si no está el Arduino, solo avisamos, pero el servidor sigue
+            logger.error("[system] FALLÓ LA CONEXIÓN CON EL ROBOT (Arduino no encontrado).");
+            // Puedes decidir si lanzar una excepción aquí o no.
+            // throw std::runtime_error("No se pudo conectar al robot.");
         } else {
-             logger.warning("[RobotService] No se pudo conectar al robot al inicio. Los servicios de robot podrían fallar.");
+            logger.info("[system] Robot conectado exitosamente.");
         }
+                
+        // --- Infra RPC + sesiones ---
+        XmlRpcServer server;
+        XmlRpc::setVerbosity(0);
+        SessionManager sessions;
 
-        // --- Registro de servicios ---
+        // --- Servicio demo (firma real: sólo XmlRpcServer*) ---
+        ServicioPrueba mPrueba(&server);
 
-        // Servicio de prueba básico
-        ServicioPrueba servicioPrueba(&server);
-        logger.info("[system] ServicioPrueba registrado");
-
-        // Servicios de Autenticación (auth.*)
+        // --- auth.* ---
         auth::AuthLogin  mLogin (&server, sessions, logger, repo);
-        auth::AuthMe     mMe    (&server, sessions);
         auth::AuthLogout mLogout(&server, sessions, logger);
-        logger.info("[system] auth.* registrados");
 
-        // Servicios de Gestión de Usuarios (user.*)
-        userrpc::UserRegister       mUR(&server, sessions, repo, logger);
-        userrpc::UserUpdate         mUU(&server, sessions, repo, logger);
-        userrpc::UserChangePassword mUC(&server, sessions, repo, logger);
-        userrpc::UserList           mUL(&server, sessions, repo, logger);
-        logger.info("[system] user.* registrados");
+        // AuthMe: tu header indica (XmlRpcServer*, SessionManager&) SIN logger
+        auth::AuthMe     mMe    (&server, sessions);
 
-        // Servicios del Robot (robot.*)   //ESTAS DOS LÍNEAS SON NUEVAS ==================================
-        robot_service_methods::RobotHomingMethod mRHome(&server, sessions, logger, robotSvc); // <-- ¡REGISTRADO!
-        logger.info("[system] robot.homing registrado");
-        // ... (Aquí irían las instancias de RobotMoveMethod, RobotConnectMethod, etc.) ...
-        robot_service_methods::RobotMoveMethod mRMove(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.move registrado"); // (¡Es bueno loguear esto!)
-        robot_service_methods::RobotMotorsMethod mRMotor(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.setMotors registrado"); 
-        robot_service_methods::RobotGripperMethod mRGripper(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.setGripper registrado");
-        robot_service_methods::RobotModeMethod mRMode(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.setMode registrado");
-        robot_service_methods::RobotStatusMethod mRStatus(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.getStatus registrado");
-        robot_service_methods::RobotConnectMethod mRConnect(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.connect registrado");
-        robot_service_methods::RobotDisconnectMethod mRDisconnect(&server, sessions, logger, robotSvc);
-        logger.info("[system] robot.disconnect registrado");
+        // --- user.* (firmas: (server*, sessions, repo, logger)) ---
+        userrpc::UserList           mUList (&server, sessions, repo, logger);
+        userrpc::UserUpdate         mUUpd  (&server, sessions, repo, logger);
+        userrpc::UserChangePassword mUChg  (&server, sessions, repo, logger);
+        userrpc::UserRegister       mUReg  (&server, sessions, repo, logger);
+        
+        // (No registramos robot.* aquí para evitar dependencias de hardware)
 
+        // Servicios del robot
+        robot_service_methods::RobotHomingMethod mRHoming(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotMotorsMethod mRMotors(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotModeMethod mRMode(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotConnectMethod mRConnect(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotDisconnectMethod mRDisconnect(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotGripperMethod mRGripper(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotStatusMethod mRStatus(&server, sessions, logger, *robotService);
+        robot_service_methods::RobotMoveMethod mRMove(&server, sessions, logger, *robotService);
 
-        // --- Enlace, Escucha y Bucle Principal ---
-        server.bindAndListen(port);
-        server.enableIntrospection(true); // Permite system.listMethods etc.
-        logger.info("[system] introspección habilitada");
+        server.enableIntrospection(true);
+        server.bindAndListen(port, 32);
         logger.info("[system] escuchando… (work loop)");
 
-        while (g_running.load()){
-            // work() con timeout corto permite reaccionar a señales (Ctrl+C)
-            server.work(0.5); // Espera eventos por 0.5 segundos
-        }
-
-        logger.info("[system] apagando servidor…");
-
-    } // Fin del try principal
-    catch(const std::exception& e){
-        logger.error(std::string("[system] ERROR fatal — ")+e.what());
-        // Intentar desconectar el robot incluso si hubo un error fatal
-        if (pRobotService && pRobotService->estaConectado()) {              //LÍNEAS NUEVAS=====================
-             logger.warning("[RobotService] Desconectando robot debido a error fatal...");
-             pRobotService->desconectarRobot();
-        }
-        return 2; // Código de error
+        while (true) server.work(0.5);
+    } catch (const std::exception& e) {
+        logger.error(std::string("FATAL: ") + e.what());
+        return 1;
+    } catch (...) {
+        logger.error("FATAL: excepción desconocida");
+        return 1;
     }
-    catch(...){
-        logger.error("[system] ERROR fatal — excepción no identificada");
-        if (pRobotService && pRobotService->estaConectado()) {              //LÍNEAS NUEVAS=====================
-             logger.warning("[RobotService] Desconectando robot debido a error fatal...");
-             pRobotService->desconectarRobot();
-        }
-        return 3; // Código de error
-    }
-    //LÍNEAS NUEVAS=====================
-    // --- Desconexión Limpia ---
-    // Se ejecuta si salimos del bucle while (por señal) sin errores fatales
-    if (pRobotService && pRobotService->estaConectado()) {
-        logger.info("[RobotService] Desconectando robot al finalizar...");
-        pRobotService->desconectarRobot();
-    }
-
-    logger.info("=== SERVIDOR DETENIDO ===");
-    return 0; // Éxito
 }
+

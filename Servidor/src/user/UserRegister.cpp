@@ -1,47 +1,67 @@
 #include "user/UserRegister.h"
-#include "common/AuthZ.h"
-#include <stdexcept>
+#include "services/AuthBootstrap.h"
 
 using namespace XmlRpc;
+
 namespace userrpc {
 
-UserRegister::UserRegister(XmlRpcServer* s, SessionManager& sm, UsersRepoCsv& r, PALogger& L)
-: XmlRpcServerMethod("user.register", s), sessions_(sm), repo_(r), log_(L) {}
-
-void UserRegister::execute(XmlRpcValue& params, XmlRpcValue& result) {
-    try {
-        XmlRpcValue a = rpc_norm(params);
-        if (a.getType()!=XmlRpcValue::TypeStruct || !a.hasMember("token") ||
-            !a.hasMember("user") || !a.hasMember("pass") || !a.hasMember("privilegio"))
-            throw XmlRpcException("BAD_REQUEST: token,user,pass,privilegio");
-
-        std::string tok  = std::string(a["token"]);
-        std::string user = std::string(a["user"]);
-        std::string pass = std::string(a["pass"]);
-        std::string prv  = std::string(a["privilegio"]);
-
-        // valida sesión y ADMIN 
-        const SessionView& sv = guardAdmin("register", sessions_, tok, log_);
-
-        int id = repo_.create(user, pass, privFromStr(prv));
-        result["ok"] = true;
-        result["id"] = id;
-
-        log_.info("[user] register OK — actor=" + sv.user + ", new=" + user + ", priv=" + prv);
-    }
-    catch (const std::runtime_error& e){
-        log_.warning(std::string("[user] register FAIL — ") + e.what());
-        throw XmlRpcException(e.what());
-    }
-    catch (const XmlRpcException&){ throw; }
-    catch (...) {
-        log_.error("[user] register ERROR — excepción inesperada");
-        throw XmlRpcException("BAD_REQUEST: user.register");
-    }
+static XmlRpcValue norm(XmlRpcValue& p){
+    if (p.getType()==XmlRpcValue::TypeArray && p.size()==1) return p[0];
+    return p;
 }
 
-std::string UserRegister::help() {
-    return "user.register({token:string, user:string, pass:string, privilegio:'admin'|'op'|'viewer'}) -> {ok:bool, id:int}";
+UserRegister::UserRegister(XmlRpcServer* s,
+                           SessionManager& sm,
+                           IUsersRepo& r,
+                           PALogger& L)
+: XmlRpcServerMethod("user.register", s)
+, sessions_(sm)
+, repo_(r)
+, log_(L)
+{}
+
+void UserRegister::execute(XmlRpcValue& params, XmlRpcValue& result){
+    try{
+        XmlRpcValue a = norm(params);
+        if (a.getType()!=XmlRpcValue::TypeStruct ||
+            !a.hasMember("user") ||
+            !a.hasMember("pass")) {
+            throw XmlRpcException("BAD_REQUEST: se esperaban {user, pass, [role], [active]}");
+        }
+
+        const std::string user   = std::string(a["user"]);
+        const std::string pass   = std::string(a["pass"]);
+        const std::string role   = a.hasMember("role")   ? std::string(a["role"])   : "operator";
+        const bool        active = a.hasMember("active") ? bool(a["active"])        : true;
+
+        // ¿ya existe?
+        if (repo_.findByUsername(user)){
+            throw XmlRpcException("CONFLICT: username existente");
+        }
+
+        auto& W = auth_wiring();
+
+        UserDTO u{};
+        u.username      = user;
+        u.password_hash = W.auth->makeHash(pass);
+        u.role          = role;
+        u.is_active     = active;
+
+        int id = repo_.insert(u);
+
+        result["ok"]     = true;
+        result["id"]     = id;
+        result["user"]   = user;
+        result["role"]   = role;
+        result["active"] = active;
+        log_.info("[user.register] OK -- user=" + user + " id=" + std::to_string(id));
+    }
+    catch(const XmlRpcException&){ throw; }
+    catch(...){ throw XmlRpcException("INTERNAL_ERROR: user.register"); }
+}
+
+std::string UserRegister::help(){
+    return "user.register {user, pass, [role='operator'], [active=true]} -> {ok,id,...}";
 }
 
 } // namespace userrpc
