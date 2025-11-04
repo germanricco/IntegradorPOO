@@ -62,9 +62,13 @@ int main(int argc, char** argv) {
     logger.info(std::string("[system] puerto=") + std::to_string(port));
     logger.info(std::string("[system] db=") + dbPath);
 
+    const char* envSalt = std::getenv("AUTH_SALT");
+    std::string salt = envSalt ? envSalt : "cambia_este_salt";
+
     try {
         // --- DB y repos ---
-        init_auth_layer(dbPath, "palabra_secreta");
+        //init_auth_layer(dbPath, "palabra_secreta");
+        init_auth_layer(dbPath, salt);
 
         // Opción A: si la clase está en namespace storage
         // storage::UsersRepoSqlite repo(db);
@@ -73,7 +77,8 @@ int main(int argc, char** argv) {
         auto& wiring = auth_wiring();
         IUsersRepo& repo = *wiring.repo;
 
-        AuthService auth(repo, "palabra_secreta");
+        //AuthService auth(repo, "palabra_secreta");
+        AuthService auth(repo, salt);
         
         // 1. Creamos el "Intercomunicador" (Capa de Hardware)
         auto arduinoService = std::make_shared<ArduinoService>("/dev/ttyUSB0", 115200);
