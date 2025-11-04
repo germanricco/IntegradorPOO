@@ -71,7 +71,6 @@ std::string RobotService::homing(){
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
 
         modoEjecucion_ = ModoEjecucion::DETENIDO;
-        logger_.info("Homing completado exitosamente");
         return respuestaCliente;
 
     } catch (const std::exception& e) {
@@ -105,6 +104,8 @@ std::string RobotService::mover(double x, double y, double z, double velocidad) 
     } catch (const std::exception& e) {
         modoEjecucion_ = ModoEjecucion::DETENIDO;
         logger_.error("ERROR en mover :" + std::string(e.what()));
+
+        // Retornar ERROR: 
         return "ERROR: " + std::string(e.what());
     }
 }
@@ -120,7 +121,7 @@ std::string RobotService::activarEfector() {
     }
     
     try {
-        std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", 5000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", 4000ms);
 
         logRespuestaCompleta(respuestaCompleta, "M3");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -129,6 +130,7 @@ std::string RobotService::activarEfector() {
 
     } catch (const std::exception& e) {
         logger_.error("Error activando efector: " + std::string(e.what()));
+        // Retornar ERROR: 
         return "ERROR: " + std::string(e.what());
     }
 }
@@ -140,7 +142,7 @@ std::string RobotService::desactivarEfector() {
     }
     
     try {
-        std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", 5000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", 4000ms);
 
         logRespuestaCompleta(respuestaCompleta, "M5");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -159,7 +161,7 @@ std::string RobotService::activarMotores() {
     }
     
     try { 
-        std::string respuestaCompleta = arduinoService_->enviarComando("M17\r\n", 3000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M17\r\n", 4000ms);
         
         logRespuestaCompleta(respuestaCompleta, "M17");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -178,7 +180,7 @@ std::string RobotService::desactivarMotores() {
     }
     
     try {   
-        std::string respuestaCompleta = arduinoService_->enviarComando("M18\r\n", 3000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M18\r\n", 4000ms);
         
         logRespuestaCompleta(respuestaCompleta, "M18");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -199,7 +201,7 @@ std::string RobotService::obtenerEstado() {
     }
     
     try {
-        std::string respuestaCompleta = arduinoService_->enviarComando("M114\r\n", 3000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M114\r\n", 6000ms);
         
         logRespuestaCompleta(respuestaCompleta, "M114");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -222,6 +224,7 @@ bool RobotService::setModoCoordenadas(ModoCoordenadas modo) {
         std::string comando = (modo == ModoCoordenadas::ABSOLUTO) ? "G90\r\n" : "G91\r\n";
         std::string nombreModo = (modo == ModoCoordenadas::ABSOLUTO) ? "ABSOLUTO" : "RELATIVO";
 
+        // Enviar comando
         std::string respuestaCompleta = arduinoService_->enviarComando(comando);
         
         logRespuestaCompleta(respuestaCompleta, comando);
@@ -286,6 +289,7 @@ std::string RobotService::procesarRespuesta(const std::string& respuestaCompleta
     std::vector<std::string> mensajes;
 
     bool comandoExitoso = false;
+
     bool tieneError = false;
     std::string mensajeError;
 
@@ -318,6 +322,8 @@ std::string RobotService::procesarRespuesta(const std::string& respuestaCompleta
         if (linea.find(PREFIX_ERROR) == 0) {
             std::string mensaje = linea.substr(PREFIX_ERROR.length());
             mensaje.erase(0, mensaje.find_first_not_of(" \t"));
+
+            // Guardar mensaje de error
             if (!mensaje.empty()) {
                 tieneError = true;
                 mensajeError = mensaje;

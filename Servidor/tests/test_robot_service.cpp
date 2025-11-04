@@ -136,7 +136,8 @@ TEST_SUITE("RobotService Integration Tests") {
         CHECK_FALSE(respuesta.empty());
         CHECK(robotService->getModoEjecucion() == RobotService::ModoEjecucion::DETENIDO);
 
-        logger->info("✅ Homing Rta: " + respuesta);
+        respuesta = robotService->obtenerEstado();
+        CHECK_FALSE(respuesta.empty());
     }
     
     TEST_CASE("Comando G1 - Movimiento") {
@@ -155,7 +156,6 @@ TEST_SUITE("RobotService Integration Tests") {
             CHECK_FALSE(respuesta.empty());
             bool tieneError = (respuesta.find("ERROR:") == 0);
             CHECK_FALSE(tieneError);
-            logger->info("✅ Movimiento con velocidad: " + respuesta);
         }
         
         SUBCASE("Movimiento con velocidad por defecto") {
@@ -163,14 +163,6 @@ TEST_SUITE("RobotService Integration Tests") {
             CHECK_FALSE(respuesta.empty());
             bool tieneError = (respuesta.find("ERROR:") == 0);
             CHECK_FALSE(tieneError);
-            logger->info("✅ Rta. movimiento sin velocidad: " + respuesta);
-        }
-        
-        SUBCASE("Movimiento inválido") {
-            std::string respuesta = robotService->mover(1000.0, 1000.0, 1000.0); // Fuera de límites
-            bool tieneError = (respuesta.find("ERROR:") == 0);
-            CHECK_FALSE(tieneError);
-            logger->info("✅ Movimiento inválido detectado: " + respuesta);
         }
     }
     
@@ -188,13 +180,17 @@ TEST_SUITE("RobotService Integration Tests") {
         SUBCASE("Activar efector") {
             std::string respuesta = robotService->activarEfector();
             CHECK_FALSE(respuesta.empty());
-            logger->info("✅ Efector activado: " + respuesta);
+
+            bool tieneError = (respuesta.find("ERROR:") == 0);
+            CHECK_FALSE(tieneError);
         }
         
         SUBCASE("Desactivar efector") {
             std::string respuesta = robotService->desactivarEfector();
             CHECK_FALSE(respuesta.empty());
-            logger->info("✅ Efector desactivado: " + respuesta);
+
+            bool tieneError = (respuesta.find("ERROR:") == 0);
+            CHECK_FALSE(tieneError);
         }
     }
     
@@ -212,13 +208,17 @@ TEST_SUITE("RobotService Integration Tests") {
         SUBCASE("Desactivar motores") {
             std::string respuesta = robotService->desactivarMotores();
             CHECK_FALSE(respuesta.empty());
-            logger->info("✅ Motores desactivados: " + respuesta);
+
+            bool tieneError = (respuesta.find("ERROR:") == 0);
+            CHECK_FALSE(tieneError);
         }
         
         SUBCASE("Activar motores") {
             std::string respuesta = robotService->activarMotores();
             CHECK_FALSE(respuesta.empty());
-            logger->info("✅ Motores activados: " + respuesta);
+
+            bool tieneError = (respuesta.find("ERROR:") == 0);
+            CHECK_FALSE(tieneError);
         }
     }
     
@@ -235,7 +235,9 @@ TEST_SUITE("RobotService Integration Tests") {
         std::string respuesta = robotService->obtenerEstado();
         
         CHECK_FALSE(respuesta.empty());
-        logger->info("✅ Estado obtenido: " + respuesta);
+
+        bool tieneError = (respuesta.find("ERROR:") == 0);
+        CHECK_FALSE(tieneError);
     }
     
     TEST_CASE("Comandos G90/G91 - Modos Coordenadas") {
@@ -253,14 +255,12 @@ TEST_SUITE("RobotService Integration Tests") {
             bool exito = robotService->setModoCoordenadas(RobotService::ModoCoordenadas::RELATIVO);
             CHECK(exito);
             CHECK(robotService->getModoCoordenadas() == RobotService::ModoCoordenadas::RELATIVO);
-            logger->info("✅ Modo relativo configurado");
         }
         
         SUBCASE("Modo absoluto G90") {
             bool exito = robotService->setModoCoordenadas(RobotService::ModoCoordenadas::ABSOLUTO);
             CHECK(exito);
             CHECK(robotService->getModoCoordenadas() == RobotService::ModoCoordenadas::ABSOLUTO);
-            logger->info("✅ Modo absoluto configurado");
         }
     }
     
