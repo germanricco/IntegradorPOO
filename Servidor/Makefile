@@ -40,9 +40,11 @@ CORE_SRCS := \
   $(SRC_DIR)/ArduinoService.cpp \
   $(SRC_DIR)/File.cpp \
   $(SRC_DIR)/RobotService.cpp \
-  $(SRC_DIR)/TrajectoryManager.cpp
+  $(SRC_DIR)/TrajectoryManager.cpp \
+  $(SRC_DIR)/Servidor.cpp \
+  $(SRC_DIR)/auth/AuthWiring.cpp
 
-# Archivos adicionales necesarios para pruebita_server
+# Archivos adicionales necesarios
 EXTRA_SRCS := $(wildcard $(SRC_DIR)/ServiciosRobot/*.cpp) \
               $(wildcard $(SRC_DIR)/services/*.cpp) \
               $(wildcard $(SRC_DIR)/storage/*.cpp) \
@@ -56,19 +58,22 @@ CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CORE_SRCS))
 EXTRA_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(EXTRA_SRCS))
 ALL_CORE_OBJS := $(CORE_OBJS) $(EXTRA_OBJS)
 
+# Main del Servidor
+MAIN_SRC := main.cpp
+MAIN_OBJ := $(OBJ_DIR)/main.o
+
 # ==========================================
 # EJECUTABLES
 # ==========================================
 
 # Servidor principal
-SERVER_BIN := $(BIN_DIR)/servidor_min
+SERVER_BIN := $(BIN_DIR)/servidor_robot
 
 # Tests individuales
 TEST_SERIAL_BIN := $(BIN_DIR)/test_serial_com
 TEST_ARDUINO_BIN := $(BIN_DIR)/test_arduino_service
 TEST_FILE_BIN := $(BIN_DIR)/test_file
 TEST_ROBOT_BIN := $(BIN_DIR)/test_robot_service
-TEST_PRUEBITA_BIN := $(BIN_DIR)/pruebita_server
 
 # ==========================================
 # REGLAS DE COMPILACIÓN
@@ -77,14 +82,18 @@ TEST_PRUEBITA_BIN := $(BIN_DIR)/pruebita_server
 .PHONY: all tests test-serial test-arduino test-servidor clean help run-tests test-pruebita
 
 # Target principal
-all: $(SERVER_BIN) tests
+all: servidor tests
 	@echo "✅ Todos los objetivos compilados"
 
+# Servidor principal
+servidor: $(SERVER_BIN)
+	@echo "✅ Servidor principal compilado"
+
 # Compilar servidor principal
-$(SERVER_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_servidor.o
-	@echo "🔧 Enlazando servidor..."
+$(SERVER_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(MAIN_OBJ)
+	@echo "🚀 Enlazando servidor principal..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
-	@echo "✅ Servidor compilado: $@"
+	@echo "✅ Servidor listo: $@"
 
 # Compilar Tests
 tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN) $(TEST_ROBOT_BIN) $(TEST_PRUEBITA_BIN)
@@ -110,14 +119,15 @@ $(TEST_ROBOT_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_robot_service.o
 	@echo "🤖 Enlazando test de RobotService..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-# Pruebita server necesita TODOS los objetos incluyendo los extras
-$(TEST_PRUEBITA_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/pruebita_server.o
-	@echo "🧪 Enlazando pruebita_server..."
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
-
 # ==========================================
 # REGLAS DE PATRÓN PARA COMPILACIÓN
 # ==========================================
+
+# Objeto principal (main.cpp en raíz)
+$(MAIN_OBJ): $(MAIN_SRC)
+	@mkdir -p $(dir $@)
+	@echo "🎯 Compilando punto de entrada principal..."
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # Objetos del core (src/) - manteniendo estructura de directorios
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -141,6 +151,14 @@ $(OBJ_DIR)/%.o: $(TESTS_DIR)/%.cpp
 # REGLAS DE EJECUCIÓN
 # ==========================================
 
+run: $(SERVER_BIN)
+	@echo "🚀 Ejecutando servidor principal..."
+	@./$(SERVER_BIN)
+
+run-port: $(SERVER_BIN)
+	@echo "🚀 Ejecutando servidor en puerto específico..."
+	@./$(SERVER_BIN) 8080
+
 test-serial: $(TEST_SERIAL_BIN)
 	@echo "🚀 Ejecutando test de SerialCom..."
 	@./$(TEST_SERIAL_BIN)
@@ -148,10 +166,6 @@ test-serial: $(TEST_SERIAL_BIN)
 test-arduino: $(TEST_ARDUINO_BIN)
 	@echo "🚀 Ejecutando test de ArduinoService..."
 	@./$(TEST_ARDUINO_BIN)
-
-test-servidor: $(SERVER_BIN)
-	@echo "🚀 Ejecutando servidor en puerto 8080..."
-	@./$(SERVER_BIN) 8080 users.csv
 
 test-file: $(TEST_FILE_BIN)
 	@echo "🚀 Ejecutando test de File..."
@@ -161,27 +175,14 @@ test-robot: $(TEST_ROBOT_BIN)
 	@echo "🚀 Ejecutando test de RobotService..."
 	@./$(TEST_ROBOT_BIN)
 
-test-pruebita: $(TEST_PRUEBITA_BIN)
-	@echo "🚀 Ejecutando pruebita_server..."
-	@./$(TEST_PRUEBITA_BIN) 8080 users.csv
-
 # Ejecutar todos los tests (sin el servidor)
 run-tests: test-serial test-arduino test-file test-robot
 	@echo "✅ Todos los tests ejecutados"
 
-# Verificar archivos necesarios para pruebita_server
-check-pruebita-files:
-	@echo "🔍 Verificando archivos necesarios para pruebita_server..."
-	@echo "Archivos encontrados:"
-	@find $(SRC_DIR) -name "*.cpp" | sort
-	@echo ""
-	@echo "Headers encontrados:"
-	@find $(INCLUDE_DIR) -name "*.h" | grep -E "(TrajectoryManager|RobotHomingMethod)" || echo "⚠️  Headers faltantes detectados"
-
 # Verificar que los archivos existen antes de compilar
 check-files:
 	@echo "🔍 Verificando archivos fuente..."
-	@for file in $(ALL_CORE_SRCS); do \
+	@for file in $(ALL_CORE_SRCS) $(MAIN_SRC); do \
 		if [ ! -f "$$file" ]; then \
 			echo "❌ Archivo no encontrado: $$file"; \
 			exit 1; \
@@ -209,16 +210,17 @@ rebuild: clean all
 help:
 	@echo "🎯 COMANDOS DISPONIBLES:"
 	@echo "   make all               - Compila servidor y todos los tests"
+	@echo "   make servidor          - Compila solo el servidor principal"
 	@echo "   make tests             - Compila solo los tests"
+	@echo "   make run               - Compila y ejecuta el servidor principal"
+	@echo "   make run-port          - Compila y ejecuta el servidor en puerto 8080"
 	@echo "   make test-serial       - Compila y ejecuta test de SerialCom"
 	@echo "   make test-arduino      - Compila y ejecuta test de ArduinoService"
 	@echo "   make test-file         - Compila y ejecuta test de Archivos"
 	@echo "   make test-robot        - Compila y ejecuta test de RobotService"
 	@echo "   make test-pruebita     - Compila y ejecuta pruebita_server"
-	@echo "   make test-servidor     - Compila y ejecuta el servidor"
 	@echo "   make run-tests         - Ejecuta todos los tests (sin servidor)"
 	@echo "   make check-files       - Verifica que existen los archivos fuente"
-	@echo "   make check-pruebita-files - Verifica archivos específicos para pruebita"
 	@echo "   make clean             - Limpia completamente el directorio bin"
 	@echo "   make clean-obj         - Limpia solo los objetos compilados"
 	@echo "   make rebuild           - Limpia y recompila todo"
@@ -231,4 +233,5 @@ help:
 # Incluir dependencias automáticas si existen
 -include $(ALL_CORE_OBJS:.o=.d)
 -include $(XMLRPC_OBJS:.o=.d)
+-include $(MAIN_OBJ:.o=.d)
 
