@@ -155,32 +155,65 @@ void Servidor::registrarServiciosLogin() {
     IUsersRepo& repo = *wiring.repo;
 
     logger_.info("Registrando método AuthLogin...");
-    auth::AuthLogin  mLogin (servidorRpc_.get(), *sessionManager_, logger_, repo);
+    mAuthLogin_ = std::make_unique<auth::AuthLogin>(
+        servidorRpc_.get(), *sessionManager_, logger_, repo
+    );
 
     logger_.info("Registrando método AuthLogout...");
-    auth::AuthLogout mLogout(servidorRpc_.get(), *sessionManager_, logger_);
+    mAuthLogout_ = std::make_unique<auth::AuthLogout>(
+        servidorRpc_.get(), *sessionManager_, logger_
+    );
 
     logger_.info("Registrando método AuthMe...");
-    auth::AuthMe     mMe    (servidorRpc_.get(), *sessionManager_);
+    mAuthMe_ = std::make_unique<auth::AuthMe>(
+        servidorRpc_.get(), *sessionManager_
+    );
 
     logger_.info("Registrando métodos de usuario...");
-    userrpc::UserList           mUList (servidorRpc_.get(), *sessionManager_, repo, logger_);
-    userrpc::UserUpdate         mUUpd  (servidorRpc_.get(), *sessionManager_, repo, logger_);
-    userrpc::UserChangePassword mUChg  (servidorRpc_.get(), *sessionManager_, repo, logger_);
-    userrpc::UserRegister       mUReg  (servidorRpc_.get(), *sessionManager_, repo, logger_);
+    mUserList_ = std::make_unique<userrpc::UserList>(
+        servidorRpc_.get(), *sessionManager_, repo, logger_
+    );
+    mUserUpdate_ = std::make_unique<userrpc::UserUpdate>(
+        servidorRpc_.get(), *sessionManager_, repo, logger_
+    );
+    mUserChangePassword_ = std::make_unique<userrpc::UserChangePassword>(
+        servidorRpc_.get(), *sessionManager_, repo, logger_
+    );
+    mUserRegister_ = std::make_unique<userrpc::UserRegister>(
+        servidorRpc_.get(), *sessionManager_, repo, logger_
+    );
+
+  
     logger_.info("✅ Servicios de Login y Autenticacion registrados");
 }
 
 void Servidor::registrarMetodosRobot() {
     // REGISTRAMOS DIRECTAMENTE TUS MÉTODOS EXISTENTES DEL ROBOT
-    robot_service_methods::RobotHomingMethod     mRHoming(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotMotorsMethod     mRMotors(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotModeMethod       mRMode(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotConnectMethod    mRConnect(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotDisconnectMethod mRDisconnect(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotGripperMethod    mRGripper(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotStatusMethod     mRStatus(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
-    robot_service_methods::RobotMoveMethod       mRMove(servidorRpc_.get(), *sessionManager_, logger_, *robotService_);
+    
+    mRobotHoming_ = std::make_unique<robot_service_methods::RobotHomingMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotMotors_ = std::make_unique<robot_service_methods::RobotMotorsMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotMode_ = std::make_unique<robot_service_methods::RobotModeMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotConnect_ = std::make_unique<robot_service_methods::RobotConnectMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotDisconnect_ = std::make_unique<robot_service_methods::RobotDisconnectMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotGripper_ = std::make_unique<robot_service_methods::RobotGripperMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotStatus_ = std::make_unique<robot_service_methods::RobotStatusMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotMove_ = std::make_unique<robot_service_methods::RobotMoveMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
     
     logger_.info("✅ Métodos del robot registrados");
 }

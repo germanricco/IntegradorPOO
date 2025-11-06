@@ -90,6 +90,27 @@ class Servidor {
         std::shared_ptr<TrajectoryManager> trajectoryManager_;
         std::shared_ptr<RobotService> robotService_;
         
+        // CAMBIOS GABI:Métodos RPC (se almacenan para mantenerlos vivos)
+        std::unique_ptr<auth::AuthLogin>              mAuthLogin_;
+        std::unique_ptr<auth::AuthLogout>             mAuthLogout_;
+        std::unique_ptr<auth::AuthMe>                 mAuthMe_;
+
+        std::unique_ptr<userrpc::UserList>            mUserList_;
+        std::unique_ptr<userrpc::UserUpdate>          mUserUpdate_;
+        std::unique_ptr<userrpc::UserChangePassword>  mUserChangePassword_;
+        std::unique_ptr<userrpc::UserRegister>        mUserRegister_;
+
+        std::unique_ptr<robot_service_methods::RobotHomingMethod>      mRobotHoming_;
+        std::unique_ptr<robot_service_methods::RobotMotorsMethod>      mRobotMotors_;
+        std::unique_ptr<robot_service_methods::RobotConnectMethod>     mRobotConnect_;
+        std::unique_ptr<robot_service_methods::RobotDisconnectMethod>  mRobotDisconnect_;
+        std::unique_ptr<robot_service_methods::RobotGripperMethod>     mRobotGripper_;
+        std::unique_ptr<robot_service_methods::RobotModeMethod>        mRobotMode_;
+        std::unique_ptr<robot_service_methods::RobotStatusMethod>      mRobotStatus_;
+        std::unique_ptr<robot_service_methods::RobotMoveMethod>        mRobotMove_;
+        
+        //HASTA ACA LLEGAN LOS CAMBIOS
+        
         // Estado
         bool ejecutandose_ = false;
         bool inicializado_ = false;
