@@ -62,6 +62,10 @@ std::string RobotService::homing(){
         return "ERROR: Robot no conectado";
     }
 
+    if (!motoresActivados_) {
+        return "ERROR: Motores desactivados";
+    }
+
     try {
         modoEjecucion_ = ModoEjecucion::EJECUTANDO;
 
@@ -85,6 +89,10 @@ std::string RobotService::homing(){
 std::string RobotService::mover(double x, double y, double z, double velocidad) {
     if (!estaConectado()) {
         return "ERROR: Robot no conectado";
+    }
+
+    if (!motoresActivados_) {
+        return "ERROR: Motores desactivados";
     }
     
     try {
@@ -119,6 +127,10 @@ std::string RobotService::activarEfector() {
     if (!estaConectado()) {
         return "ERROR: Robot no conectado";
     }
+
+    if (!motoresActivados_) {
+        return "ERROR: Motores desactivados";
+    }
     
     try {
         std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", 4000ms);
@@ -140,6 +152,10 @@ std::string RobotService::desactivarEfector() {
     if (!estaConectado()) {
         return "ERROR: Robot no conectado";
     }
+
+    if (!motoresActivados_) {
+        return "ERROR: Motores desactivados";
+    }
     
     try {
         std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", 4000ms);
@@ -159,6 +175,10 @@ std::string RobotService::activarMotores() {
     if (!estaConectado()) {
         return "ERROR: Robot no conectado";
     }
+
+    if (motoresActivados_) {
+        return "ERROR: Motores ya activados";
+    }
     
     try { 
         std::string respuestaCompleta = arduinoService_->enviarComando("M17\r\n", 4000ms);
@@ -166,6 +186,8 @@ std::string RobotService::activarMotores() {
         logRespuestaCompleta(respuestaCompleta, "M17");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
         
+        motoresActivados_ = true;
+
         return respuestaCliente;
         
     } catch (const std::exception& e) {
@@ -178,6 +200,10 @@ std::string RobotService::desactivarMotores() {
     if (!estaConectado()) {
         return "ERROR: Robot no conectado";
     }
+
+    if (!motoresActivados_) {
+        return "ERROR: Motores ya desactivados";
+    }
     
     try {   
         std::string respuestaCompleta = arduinoService_->enviarComando("M18\r\n", 4000ms);
@@ -185,6 +211,8 @@ std::string RobotService::desactivarMotores() {
         logRespuestaCompleta(respuestaCompleta, "M18");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
         
+        motoresActivados_ = false;
+
         return respuestaCliente;
         
     } catch (const std::exception& e) {

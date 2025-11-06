@@ -89,6 +89,8 @@ class RobotService {
         ModoOperacion modoOperacion_;
         ModoCoordenadas modoCoordenadas_;
         ModoEjecucion modoEjecucion_;
+
+        bool motoresActivados_ = false;
         
         // Métodos privados de ayuda
         string formatearComandoG1(double x, double y, double z, double vel = 1);
