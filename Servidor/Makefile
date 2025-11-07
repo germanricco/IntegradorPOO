@@ -74,6 +74,7 @@ TEST_SERIAL_BIN := $(BIN_DIR)/test_serial_com
 TEST_ARDUINO_BIN := $(BIN_DIR)/test_arduino_service
 TEST_FILE_BIN := $(BIN_DIR)/test_file
 TEST_ROBOT_BIN := $(BIN_DIR)/test_robot_service
+TEST_TRAJECTORY_BIN := $(BIN_DIR)/test_trajectory_manager
 
 # ==========================================
 # REGLAS DE COMPILACIÓN
@@ -96,7 +97,7 @@ $(SERVER_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(MAIN_OBJ)
 	@echo "✅ Servidor listo: $@"
 
 # Compilar Tests
-tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN) $(TEST_ROBOT_BIN) $(TEST_PRUEBITA_BIN)
+tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN) $(TEST_ROBOT_BIN) $(TEST_PRUEBITA_BIN) $(TEST_TRAJECTORY_BIN)
 	@echo "✅ Todos los tests compilados"
 
 # =============================================
@@ -117,6 +118,10 @@ $(TEST_FILE_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_file.o
 
 $(TEST_ROBOT_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_robot_service.o
 	@echo "🤖 Enlazando test de RobotService..."
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+$(TEST_TRAJECTORY_BIN): $(OBJ_DIR)/TrajectoryManager.o $(OBJ_DIR)/File.o $(OBJ_DIR)/session/CurrentUser.o $(OBJ_DIR)/test_trajectory_manager.o
+	@echo "📝 Enlazando test de TrajectoryManager..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 # ==========================================
@@ -175,8 +180,12 @@ test-robot: $(TEST_ROBOT_BIN)
 	@echo "🚀 Ejecutando test de RobotService..."
 	@./$(TEST_ROBOT_BIN)
 
+test-trajectory: $(TEST_TRAJECTORY_BIN)
+	@echo "🚀 Ejecutando test de TrajectoryManager..."
+	@./$(TEST_TRAJECTORY_BIN)
+
 # Ejecutar todos los tests (sin el servidor)
-run-tests: test-serial test-arduino test-file test-robot
+run-tests: test-serial test-arduino test-file test-robot test-trajectory
 	@echo "✅ Todos los tests ejecutados"
 
 # Verificar que los archivos existen antes de compilar

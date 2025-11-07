@@ -79,11 +79,16 @@ class RobotService {
         ModoOperacion getModoOperacion() const;
         ModoCoordenadas getModoCoordenadas() const;
         ModoEjecucion getModoEjecucion() const;
+
+        bool iniciarGrabacionTrayectoria(const std::string& nombreLogico);
+        bool finalizarGrabacionTrayectoria();
+        bool estaGrabando() const;
         
     private:
         shared_ptr<ArduinoService> arduinoService_;
         PALogger& logger_;
         string directorioTrayectorias_;
+        std::unique_ptr<TrajectoryManager> trajectoryManager_;
         
         // Estado interno
         ModoOperacion modoOperacion_;

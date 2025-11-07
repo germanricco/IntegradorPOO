@@ -12,6 +12,7 @@ RobotService::RobotService(shared_ptr<ArduinoService> arduinoService,
     : arduinoService_(arduinoService)
     , logger_(logger)
     , directorioTrayectorias_(directorioTrayectorias)
+    , trajectoryManager_(std::make_unique<TrajectoryManager>(directorioTrayectorias_))
     , modoOperacion_(ModoOperacion::MANUAL)
     , modoCoordenadas_(ModoCoordenadas::ABSOLUTO)
     , modoEjecucion_(ModoEjecucion::DETENIDO) {
@@ -98,6 +99,8 @@ std::string RobotService::mover(double x, double y, double z, double velocidad) 
     try {
         // Parsear a GCode   
         std::string comando = formatearComandoG1(x, y, z, velocidad);
+        std::string comandoLimpio = comando.substr(0, comando.find("\r\n")); 
+        trajectoryManager_->guardarComando(comandoLimpio); // El manager añade su propio '\n'
         modoEjecucion_ = ModoEjecucion::EJECUTANDO;
 
         // Enviar comando a Firmware y recibir rta.
@@ -133,6 +136,8 @@ std::string RobotService::activarEfector() {
     }
     
     try {
+        trajectoryManager_->guardarComando("M3");
+
         std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", 4000ms);
 
         logRespuestaCompleta(respuestaCompleta, "M3");
@@ -158,6 +163,8 @@ std::string RobotService::desactivarEfector() {
     }
     
     try {
+        trajectoryManager_->guardarComando("M5");
+
         std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", 4000ms);
 
         logRespuestaCompleta(respuestaCompleta, "M5");
@@ -437,4 +444,28 @@ void RobotService::logRespuestaCompleta(const std::string& respuestaCompleta, co
     } else {
         logger_.info(mensajeLog);
     }
+}
+
+bool RobotService::iniciarGrabacionTrayectoria(const std::string& nombreLogico) {
+    if (!estaConectado()) {
+        logger_.warning("Intento de iniciar grabación sin robot conectado.");
+        return false;
+    }
+    // El nombre de archivo final se construirá dentro del manager
+    // usando el nombreLogico y el UserID del contexto.
+    logger_.info("Iniciando grabación de trayectoria: " + nombreLogico);
+    return trajectoryManager_->iniciarGrabacion(nombreLogico);
+}
+
+bool RobotService::finalizarGrabacionTrayectoria() {
+    if (!trajectoryManager_->estaGrabando()) {
+        logger_.info("No hay grabación activa para finalizar.");
+        return true; // No es un error, solo no había nada que hacer.
+    }
+    logger_.info("Finalizando grabación de trayectoria.");
+    return trajectoryManager_->finalizarGrabacion();
+}
+
+bool RobotService::estaGrabando() const {
+    return trajectoryManager_->estaGrabando();
 }

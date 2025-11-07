@@ -214,6 +214,12 @@ void Servidor::registrarMetodosRobot() {
     mRobotMove_ = std::make_unique<robot_service_methods::RobotMoveMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_
     );
+    mRobotStartRecording_ = std::make_unique<robot_service_methods::RobotStartRecordingMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+    mRobotStopRecording_ = std::make_unique<robot_service_methods::RobotStopRecordingMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
     
     logger_.info("✅ Métodos del robot registrados");
 }

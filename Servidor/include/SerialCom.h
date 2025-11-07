@@ -26,7 +26,7 @@ class SerialCom {
          * @param port Nombre del puerto serial (default "/dev/ttyACM0")
          * @param baudrate Velocidad de comunicacion (default 19200)
          */
-        SerialCom(const std::string& port = "/dev/ttyACM0", int baudrate = 19200);
+        SerialCom(const std::string& port = "/dev/ttyUSB0", int baudrate = 19200);
 
         /**
          * @brief Destructor que asegura la desconexion si esta conectado

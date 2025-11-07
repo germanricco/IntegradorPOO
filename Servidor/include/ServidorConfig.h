@@ -20,7 +20,7 @@ struct ServidorConfig {
     bool logEnConsola = true;
 
     // === Configuracion del robot ===
-    std::string puertoSerial = "/dev/ttyACM0";
+    std::string puertoSerial = "/dev/ttyUSB0";
     int baudrate = 115200;
     std::string directorioTrayectorias = "data/trayectorias/";
 

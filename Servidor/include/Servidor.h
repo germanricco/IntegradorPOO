@@ -38,6 +38,8 @@
 #include "ServiciosRobot/RobotModeMethod.h"
 #include "ServiciosRobot/RobotStatusMethod.h"
 #include "ServiciosRobot/RobotMoveMethod.h"
+#include "ServiciosRobot/RobotStartRecordingMethod.h" 
+#include "ServiciosRobot/RobotStopRecordingMethod.h"  
 
 // Libreria
 #include "XmlRpc.h"
@@ -108,6 +110,8 @@ class Servidor {
         std::unique_ptr<robot_service_methods::RobotModeMethod>        mRobotMode_;
         std::unique_ptr<robot_service_methods::RobotStatusMethod>      mRobotStatus_;
         std::unique_ptr<robot_service_methods::RobotMoveMethod>        mRobotMove_;
+        std::unique_ptr<robot_service_methods::RobotStartRecordingMethod> mRobotStartRecording_;
+        std::unique_ptr<robot_service_methods::RobotStopRecordingMethod> mRobotStopRecording_;
         
         //HASTA ACA LLEGAN LOS CAMBIOS
         
