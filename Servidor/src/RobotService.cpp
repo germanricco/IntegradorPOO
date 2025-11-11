@@ -121,9 +121,9 @@ std::string RobotService::mover(double x, double y, double z, double velocidad) 
     }
 }
 
-std::string RobotService::mover(double x, double y, double z) {
-    return mover(x, y, z, 50.0);
-}
+//std::string RobotService::mover(double x, double y, double z) {
+//    return mover(x, y, z, 50.0);
+//}
 
 
 std::string RobotService::activarEfector() {

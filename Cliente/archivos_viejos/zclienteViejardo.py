@@ -328,11 +328,11 @@ class CLI:
                             "x": float(args[0]),
                             "y": float(args[1]),
                             "z": float(args[2]),
-                            "vel": float(args[3]) if len(args) == 4 else 150.0 # Velocidad default
+                            "velocidad": float(args[3]) if len(args) == 4 else 50.0 # Velocidad default
                         }
                         
                         # 2. Llamar al Servicio
-                        print(f"Moviendo a (X:{params_rpc['x']}, Y:{params_rpc['y']}, Z:{params_rpc['z']}) a Vel:{params_rpc['vel']}...")
+                        print(f"Moviendo a (X:{params_rpc['x']}, Y:{params_rpc['y']}, Z:{params_rpc['z']}) a Vel:{params_rpc['velocidad']}...")
                         r = self.api.__getattr__("robot.move")(params_rpc)
                         print("Respuesta del servidor:", r)
                     except ValueError:
@@ -417,4 +417,3 @@ if __name__ == "__main__":
     while True:
         if not cli.do(input("> ")):
             break
-

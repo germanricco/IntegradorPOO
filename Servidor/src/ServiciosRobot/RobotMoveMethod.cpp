@@ -44,14 +44,11 @@ void RobotMoveMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& 
         double x_val = getDouble("x");
         double y_val = getDouble("y");
         double z_val = getDouble("z");
-        double vel_val = 100.0; // Valor default de RobotService
+        double vel_val = 50; // Valor default de RobotService
 
-        // Velocidad es opcional
         if (args.hasMember("velocidad")) {
             vel_val = getDouble("velocidad");
         }
-        // <-- FIN DE CAMBIOS MAYORES -->
-        // -----------------------------------------------------------------
 
         // 2. Validar Sesión y Permisos (Op o Admin)
         // (Esta lógica es idéntica a Homing)
