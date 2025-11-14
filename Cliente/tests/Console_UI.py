@@ -2,13 +2,64 @@
 from ApiClient import APIClient
 
 class ConsoleUI:
-    """Interfaz de consola para el cliente del sistema de robot"""
-    
+    """Interfaz de consola para el cliente del sistema de robot"""   
     def __init__(self, api_url):
         self.client = APIClient(api_url)
+        
+    def print_help(self):       
+        self.client.refresh_session()
+        print("==================================================================================================================")
+        print("                                             COMANDOS DISPONIBLES:")
+        print("==================================================================================================================")   
+        print("METODOS: <methods>                                                       # listar métodos RPC del servidor")
+        print("HELP: <help>                                                             # comando de ayuda (filtrada por rol)")
+        print("HELP RPC: <help-rpc> <metodo>                                            # ver help() del método en el servidor")
+        print("LOGIN: <login> <user> <pass>                                             # loggeo de usuario ")
+        print("==================================================================================================================")  
+        if self.client.priv == "admin":
+            print("==================================================================================================================")
+            print("                                CONEXION ADMINISTRADOR - COMANDOS DISPONIBLES:")
+            print("==================================================================================================================")   
+            print("REGISTRO DE USUARIO: <uadd> <user> <pass> <priv>                     # user.register  (priv=admin|op|viewer)")
+            print("LISTAR USUARIOS: <ulist>                                             # user.list")
+            print("ACTUALIZAR ESTADO DE USUARIO: <uupd> <id> [hab=false|true]           # user.update")
+            print("CAMBIAR CONTRASEÑA DE USUARIO: <uchpass> <user> <oldpass> <newpass>  # user.changePassword (modo admin)")
+            print("CAMBIAR MI CONTRASEÑA: <mychpass> <old> <new>                        # user.changePassword (autoservicio)")
+            print("==================================================================================================================")             
+            print("CONECTAR ROBOT: <connect>                                                       ")
+            print("DESCONECTAR ROBOT: <disconnect>                                                 ")                  
+            print("HOME: <home>                                                         # (G28)    ")
+            print("ESTADO DEL ROBOT: <status>                                           # (M114)   ")
+            print("MOTORES: <motors> <on|off>                                           # (M17/M18)")
+            print("GRIPPER: <gripper> <on|off>                                          # (M3/M5)  ")
+            print("MODO DE COORDENADAS: <mode> <abs|rel>                                # (G90/G91)")
+            print("MOVER ROBOT: <move> <x> <y> <z> <vel>                                # (G1)     ")
+            print("SUBIR ARCHIVO: <upload> <local_file>                                            ")
+            print("EJECUTAR: <run> <remote_file>                                                   ")
+            print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
+            print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
+            print("======================================================================================================================")   
+
+        elif self.client.priv == "operator":      
+            print("======================================================================================================================")
+            print("                                     CONEXION OPERADOR - COMANDOS DISPONIBLES:")
+            print("======================================================================================================================")    
+            print("HOME: <home>                                                         # (G28)    ")
+            print("ESTADO DEL ROBOT: <status>                                           # (M114)   ")
+            print("MOTORES: <motors> <on|off>                                           # (M17/M18)")
+            print("GRIPPER: <gripper> <on|off>                                          # (M3/M5)  ")
+            print("MODO DE COORDENADAS: <mode> <abs|rel>                                # (G90/G91)")
+            print("MOVER ROBOT: <move> <x> <y> <z> <vel>                                # (G1)     ")
+            print("SUBIR ARCHIVO: <upload> <local_file>                                            ")
+            print("EJECUTAR: run <remote_file>                                                     ")
+            print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
+            print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
+            print("======================================================================================================================")  
+        print("CERRAR PROGRAMA: <quit>       # Cerrar el programa "  )
+        print("==================================================================================================================")  
 
     def print_table(self, rows, headers):
-        """Imprime una tabla formateada"""
+        "Tabla para mostrar los usuarios cuando se ejecuta ulist"
         if not rows:
             print("(sin datos)")
             return
@@ -21,51 +72,6 @@ class ConsoleUI:
         print(line); print(sep)
         for r in rows:
             print(" | ".join(str(r[i]).ljust(widths[i]) for i in range(len(headers))))
-
-    def print_help(self):
-        """Muestra ayuda contextual según el rol del usuario"""
-        self.client.refresh_session()
-        print("Comandos disponibles:")
-        print("  methods                      # listar métodos RPC publicados por el servidor")
-        print("  help                         # esta ayuda (filtrada por rol)")
-        print("  help-rpc <metodo>            # ver help() del método en el servidor")
-        print("  login <user> <pass>          # log")
-        print("  me")
-        print("  logout")
-        print("  mychpass <old> <new>         # user.changePassword (autoservicio)")   
-        
-        if self.client.priv == "admin":
-            print("  uadd <user> <pass> <priv>    # user.register  (priv=admin|op|viewer)")
-            print("  ulist                        # user.list")
-            print("  uupd <id> [hab=false|true]          # user.update")
-            print("  uchpass <user> <oldpass> <newpass>     # user.changePassword (modo admin)")
-            print("  mychpass <old> <new>         # user.changePassword (autoservicio)")
-            print("  connect                      # [ROBOT] Conecta el servidor al robot")
-            print("  disconnect                   # [ROBOT] Desconecta el servidor del robot")
-            print("  home                         # [ROBOT] Mover a posicion Origen (G28)")
-            print("  status                       # [ROBOT] Pide estado actual (M114)")
-            print("  motors <on|off>              # [ROBOT] Activa/Desactiva motores (M17/M18)")
-            print("  gripper <on|off>             # [ROBOT] Activa/Desactiva efector (M3/M5)")
-            print("  mode <abs|rel>               # [ROBOT] Setea modo coordenadas (G90/G91)")
-            print("  move <x> <y> <z> [vel]       # [ROBOT] Mueve a (X,Y,Z) [vel] (G1)")
-            print("  upload <local_file>          # [ROBOT] Sube un .gcode al servidor") # Falta este
-            print("  run <remote_file>            # [ROBOT] Ejecuta un .gcode en el servidor") # Falta este
-            print("  rec-start                    # [ROBOT] Inicia grabación de movimientos") # Este
-            print("  rec-stop                     # [ROBOT] Finaliza grabación de movimientos") # y este
-
-        elif self.client.priv == "operator":        
-            print("  home                         # [ROBOT] Mover a posicion Origen (G28)")
-            print("  status                       # [ROBOT] Pide estado actual (M114)")
-            print("  motors <on|off>              # [ROBOT] Activa/Desactiva motores (M17/M18)")
-            print("  gripper <on|off>             # [ROBOT] Activa/Desactiva efector (M3/M5)")
-            print("  mode <abs|rel>               # [ROBOT] Setea modo coordenadas (G90/G91)")
-            print("  move <x> <y> <z> [vel]       # [ROBOT] Mueve a (X,Y,Z) [vel] (G1)")
-            print("  upload <local_file>          # [ROBOT] Sube un .gcode al servidor")
-            print("  run <remote_file>            # [ROBOT] Ejecuta un .gcode en el servidor")
-            print("  rec-start                    # [ROBOT] Inicia grabación de movimientos")
-            print("  rec-stop                     # [ROBOT] Finaliza grabación de movimientos")
-
-        print("  quit                             # Cerrar el programa "  )
 
     def handle_command(self, line: str) -> bool:
         """Procesa un comando de la consola. Retorna False si debe salir."""
@@ -322,24 +328,30 @@ class ConsoleUI:
             elif cmd == "rec-start":
                 if not self.client.has_operator_privileges():
                     print("Error: Permiso denegado (se requiere 'op' o 'admin')")
+                elif len(args) != 1:
+                    print("Uso: rec-start <nombre_logico>")
                 else:
-                    print("Iniciando grabación de movimientos...")
-                    result = self.client.robot_rec_start()
+                    nombre_logico = args[0]
+                    print(f"Iniciando grabación de movimientos con nombre '{nombre_logico}'...")
+                    result = self.client.robot_rec_start(nombre_logico)
                     if result["success"]:
                         print("Respuesta del servidor:", result["data"])
                     else:
                         print(f"Error del servidor: {result['error']}")
-
+                
             elif cmd == "rec-stop":
                 if not self.client.has_operator_privileges():
                     print("Error: Permiso denegado (se requiere 'op' o 'admin')")
+                elif len(args) != 1:
+                    print("Uso: rec-stop <nombre_logico>")
                 else:
-                    print("Deteniendo grabación de movimientos...")
-                    result = self.client.robot_rec_stop()
+                    nombre_logico = args[0]
+                    print(f"Finalizando grabación con nombre '{nombre_logico}'...")
+                    result = self.client.robot_rec_stop(nombre_logico)
                     if result["success"]:
                         print("Respuesta del servidor:", result["data"])
                     else:
-                        print(f"Error del servidor: {result['error']}")
+                        print(f"Error: {result['error']}")
 
             elif cmd == "quit":
                 return False

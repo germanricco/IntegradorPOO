@@ -130,18 +130,22 @@ class APIClient:
         except Fault as e:
             return {"success": False, "error": e.faultString}
 
-    def robot_rec_start(self):
+    def robot_rec_start(self, nombreLogico):
         """Inicia la grabación de movimientos"""
         try:
-            r = self.api.__getattr__("robot.iniciarGrabacion")({"token": self.token})
+            r = self.api.__getattr__("robot.iniciarGrabacion")({
+                "token": self.token, "nombre": nombreLogico
+            })
             return {"success": True, "data": r}
         except Fault as e:
             return {"success": False, "error": e.faultString}
 
-    def robot_rec_stop(self):
+    def robot_rec_stop(self, nombreLogico):
         """Detiene la grabación de movimientos"""
         try:
-            r = self.api.__getattr__("robot.finalizarGrabacion")({"token": self.token})
+            r = self.api.__getattr__("robot.finalizarGrabacion")({
+                "token": self.token, "nombre": nombreLogico
+            })
             return {"success": True, "data": r}
         except Fault as e:
             return {"success": False, "error": e.faultString}
