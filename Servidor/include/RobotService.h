@@ -79,11 +79,13 @@ class RobotService {
         ModoOperacion getModoOperacion() const;
         ModoCoordenadas getModoCoordenadas() const;
         ModoEjecucion getModoEjecucion() const;
-
+        
+        // Gestión de trayectorias
         bool iniciarGrabacionTrayectoria(const std::string& nombreLogico);
         bool finalizarGrabacionTrayectoria();
-        bool estaGrabando() const;
-        
+        bool estaGrabando() const;        
+        string ejecutarTrayectoria(const std::string& nombreArchivo);
+
     private:
         shared_ptr<ArduinoService> arduinoService_;
         PALogger& logger_;
@@ -107,6 +109,9 @@ class RobotService {
         static const string PREFIX_INFO;
         static const string PREFIX_ERROR;
         static const string SUFFIX_OK;
+
+        std::chrono::milliseconds getTimeoutParaComando(const std::string& lineaGCode) const;
+
 };
 
 #endif // ROBOTSERVICE_H

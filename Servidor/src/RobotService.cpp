@@ -469,3 +469,139 @@ bool RobotService::finalizarGrabacionTrayectoria() {
 bool RobotService::estaGrabando() const {
     return trajectoryManager_->estaGrabando();
 }
+
+std::chrono::milliseconds RobotService::getTimeoutParaComando(const std::string& lineaGCode) const {
+    // G1 (Mover) - Timeout estándar
+    if (lineaGCode.rfind("G1", 0) == 0) {
+        return 3000ms; 
+    }
+    // M3 (Gripper On) - Timeout largo
+    if (lineaGCode.rfind("M3", 0) == 0) {
+        return 4000ms;
+    }
+    // M5 (Gripper Off) - Timeout largo
+    if (lineaGCode.rfind("M5", 0) == 0) {
+        return 4000ms;
+    }
+
+    // Comando desconocido, usar un default seguro
+    logger_.warning("Timeout desconocido para comando: " + lineaGCode + ". Usando 3000ms.");
+    return 3000ms;
+}
+
+// --- REEMPLAZAR LA FUNCIÓN COMPLETA ---
+
+string RobotService::ejecutarTrayectoria(const std::string& nombreArchivo) {
+    logger_.info("Solicitud para ejecutar trayectoria: " + nombreArchivo);
+
+    // 1. Cambiar estado a automático (para la preparación)
+    setModoOperacion(ModoOperacion::AUTOMATICO);
+    modoEjecucion_ = ModoEjecucion::EJECUTANDO; // Estado general de "preparación"
+
+    try {
+        // 2. Cargar el archivo de trayectoria
+        logger_.info("Cargando archivo: " + nombreArchivo);
+        std::vector<std::string> lineas = trajectoryManager_->cargarTrayectoria(nombreArchivo);
+
+        if (lineas.empty()) {
+            throw std::runtime_error("El archivo no existe o está vacío.");
+        }
+
+        // 3. Preparar el robot (Contexto de Ejecución)
+        // (Esta lógica sigue igual)
+        // -------------------------------------------------
+        logger_.info("Preparando robot para ejecución automática...");
+        
+        std::string respMotores = activarMotores();
+        if (respMotores.rfind("ERROR:", 0) == 0 && respMotores.find("ya activados") == std::string::npos) {
+            throw std::runtime_error("Fallo al activar motores: " + respMotores);
+        }
+        if (!setModoCoordenadas(ModoCoordenadas::ABSOLUTO)) {
+            throw std::runtime_error("Fallo al establecer modo absoluto (G90).");
+        }
+        logger_.info("Ejecutando Homing (G28) antes de la trayectoria...");
+        std::string respHoming = homing();
+        if (respHoming.rfind("ERROR:", 0) == 0) {
+            throw std::runtime_error("Fallo durante el homing: " + respHoming);
+        }
+        
+        // ¡Importante! 'homing()' ya resetea el estado a DETENIDO.
+        // Estamos listos para el bucle.
+        
+        logger_.info("Robot preparado. Iniciando ejecución de " + std::to_string(lineas.size()) + " comandos.");
+        
+        // 4. Ejecutar la Tarea (Línea por línea) - MODO INTELIGENTE
+        // -------------------------------------------------
+        for (const std::string& linea : lineas) {
+            if (linea.empty()) continue; 
+
+            logger_.info("-> Procesando: " + linea);
+            std::string respuestaLinea;
+
+            // --- INICIO DE LA LÓGICA DE PARSEO ---
+
+            if (linea.rfind("G1", 0) == 0) {
+                // Es un comando G1. ¡Tenemos que parsearlo!
+                std::istringstream iss(linea);
+                std::string token;
+                double x = 0, y = 0, z = 0, f = 50; // Asumir valores por defecto
+
+                // Parseo simple de G-Code
+                while (iss >> token) {
+                    if (token.empty()) continue;
+                    char tipo = token[0];
+                    double valor = std::stod(token.substr(1));
+                    
+                    switch (tipo) {
+                        case 'X': x = valor; break;
+                        case 'Y': y = valor; break;
+                        case 'Z': z = valor; break;
+                        case 'F': f = valor; break;
+                        default: break;
+                    }
+                }
+                // Llamamos al método 'mover' que SABEMOS que funciona
+                respuestaLinea = mover(x, y, z, f);
+            
+            } else if (linea == "M3") {
+                // Llamamos al método 'activarEfector' que SABEMOS que funciona
+                respuestaLinea = activarEfector();
+
+            } else if (linea == "M5") {
+                // Llamamos al método 'desactivarEfector' que SABEMOS que funciona
+                respuestaLinea = desactivarEfector();
+            
+            } else {
+                logger_.warning("Comando desconocido en archivo: '" + linea + "'. Omitiendo.");
+                continue; // Saltar al siguiente comando
+            }
+
+            // --- FIN DE LA LÓGICA DE PARSEO ---
+
+            // Ahora chequeamos el resultado de la *llamada al método*
+            // (mover, activarEfector, etc.)
+            if (respuestaLinea.rfind("ERROR:", 0) == 0) {
+                // Si el método (ej. 'mover') falló, lanzamos una excepción
+                // para detener toda la trayectoria.
+                throw std::runtime_error("Error en la línea '" + linea + "': " + respuestaLinea);
+            }
+            
+            // Ya no necesitamos el 'sleep' ni el ciclo de estado,
+            // ¡porque los métodos 'mover'/'activarEfector' ya lo hacen!
+        }
+
+        // 5. Finalización
+        // -------------------------------------------------
+        logger_.info("Ejecución de trayectoria '" + nombreArchivo + "' completada.");
+        setModoOperacion(ModoOperacion::MANUAL);
+        modoEjecucion_ = ModoEjecucion::DETENIDO;
+        return "Ejecución completada: " + nombreArchivo;
+
+    } catch (const std::exception& e) {
+        // Manejo de CUALQUER error
+        logger_.error("ERROR durante la ejecución de la trayectoria: " + std::string(e.what()));
+        setModoOperacion(ModoOperacion::MANUAL);
+        modoEjecucion_ = ModoEjecucion::DETENIDO;
+        return "ERROR: " + std::string(e.what());
+    }
+}

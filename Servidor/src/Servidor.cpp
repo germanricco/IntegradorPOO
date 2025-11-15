@@ -87,15 +87,10 @@ bool Servidor::inicializarServiciosRobot() {
         );
         logger_.info("✅ ArduinoService inicializado correctamente");
         
-        //trajectoryManager_ = std::make_shared<TrajectoryManager>(
-        //    config_.directorioTrayectorias
-        //);
-        
-        //! AGREGAR TRAJECTORY-MANAGER CUANDO SE IMPLEMENTE
         robotService_ = std::make_shared<RobotService>(
             arduinoService_, 
-            logger_//, 
-            //*trajectoryManager_
+            logger_,
+            config_.directorioTrayectorias
         );
         logger_.info("✅ RobotService inicializado correctamente");
         
@@ -220,7 +215,10 @@ void Servidor::registrarMetodosRobot() {
     mRobotStopRecording_ = std::make_unique<robot_service_methods::RobotStopRecordingMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_
     );
-    
+    mRobotRunFile_ = std::make_unique<robot_service_methods::RobotRunFileMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
+
     logger_.info("✅ Métodos del robot registrados");
 }
 

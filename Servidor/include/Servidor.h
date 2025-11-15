@@ -39,7 +39,8 @@
 #include "ServiciosRobot/RobotStatusMethod.h"
 #include "ServiciosRobot/RobotMoveMethod.h"
 #include "ServiciosRobot/RobotStartRecordingMethod.h" 
-#include "ServiciosRobot/RobotStopRecordingMethod.h"  
+#include "ServiciosRobot/RobotStopRecordingMethod.h"
+#include "ServiciosRobot/RobotRunFileMethod.h"  
 
 // Libreria
 #include "XmlRpc.h"
@@ -89,7 +90,6 @@ class Servidor {
         std::shared_ptr<SessionManager> sessionManager_;
         std::unique_ptr<AuthService> authService_;
         std::shared_ptr<ArduinoService> arduinoService_;
-        std::shared_ptr<TrajectoryManager> trajectoryManager_;
         std::shared_ptr<RobotService> robotService_;
         
         // CAMBIOS GABI:Métodos RPC (se almacenan para mantenerlos vivos)
@@ -112,7 +112,8 @@ class Servidor {
         std::unique_ptr<robot_service_methods::RobotMoveMethod>        mRobotMove_;
         std::unique_ptr<robot_service_methods::RobotStartRecordingMethod> mRobotStartRecording_;
         std::unique_ptr<robot_service_methods::RobotStopRecordingMethod> mRobotStopRecording_;
-        
+        std::unique_ptr<robot_service_methods::RobotRunFileMethod> mRobotRunFile_;
+
         //HASTA ACA LLEGAN LOS CAMBIOS
         
         // Estado
