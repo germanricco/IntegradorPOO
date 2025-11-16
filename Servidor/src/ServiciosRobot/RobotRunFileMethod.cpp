@@ -1,6 +1,7 @@
 #include "../../include/ServiciosRobot/RobotRunFileMethod.h"
 #include <stdexcept> 
 #include <string>
+#include "../../include/session/CurrentUser.h"
 
 namespace robot_service_methods {
 
@@ -30,13 +31,42 @@ void RobotRunFileMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValu
         }
         // -----------------------------------------------------------------
 
-        // 2. Validar Sesión y Permisos (Op o Admin)
+        // 2. Validar Sesión y Permisos (Lógica de Admin vs. Operador)
+        // -----------------------------------------------------------------
         const SessionView& session = guardSession(METHOD_NAME, sessions_, token, logger_);
-        if (session.privilegio != "admin" && session.privilegio != "op") {
-            logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - Se requiere Op o Admin. Usuario: " + session.user);
+        
+        if (session.privilegio == "admin") {
+            // El Admin puede ejecutar cualquier cosa.
+            logger_.info(std::string("[") + METHOD_NAME + "] [ADMIN] Solicitad para ejecutar '" + nombreArchivo + "' por: " + session.user);
+        
+        } else if (session.privilegio == "op") {
+            // El Operador solo puede ejecutar sus propios archivos.
+            
+            // ¡Esta es la forma correcta de obtener el ID del usuario actual!
+            int currentUserId = CurrentUser::get(); //
+
+            // El ID no debería ser -1 (default) si la sesión es válida, pero chequear por si acaso.
+            if (currentUserId <= 0) {
+                 logger_.error(std::string("[") + METHOD_NAME + "] ERROR INTERNO: El usuario '" + session.user + "' tiene un ID inválido (" + std::to_string(currentUserId) + ").");
+                 throw XmlRpc::XmlRpcException("INTERNAL_ERROR: No se pudo verificar la propiedad del archivo.");
+            }
+
+            std::string prefijoRequerido = std::to_string(currentUserId) + "__";
+
+            if (nombreArchivo.rfind(prefijoRequerido, 0) != 0) {
+                // El archivo no empieza con el prefijo del usuario. ¡Denegado!
+                logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - El operador '" + session.user + "' (id=" + std::to_string(currentUserId) + ") intentó ejecutar el archivo '" + nombreArchivo + "' (no es de su propiedad).");
+                throw XmlRpc::XmlRpcException("FORBIDDEN: Como operador, solo puedes ejecutar archivos de tu propiedad.");
+            }
+            
+            // Si pasó el chequeo, registrar el éxito.
+            logger_.info(std::string("[") + METHOD_NAME + "] [OPERATOR] Solicitud para ejecutar '" + nombreArchivo + "' por: " + session.user);
+
+        } else {
+            // Ni admin ni "op" (ej. "viewer" o rol desconocido)
+            logger_.warning(std::string("[") + METHOD_NAME + "] FORDEN - Se requiere Op o Admin. Usuario: " + session.user);
             throw XmlRpc::XmlRpcException("FORBIDDEN: privilegios insuficientes (se requiere Op o Admin)");
         }
-        logger_.info(std::string("[") + METHOD_NAME + "] Solicitud para ejecutar '" + nombreArchivo + "' por: " + session.user);
 
         // 3. Llamar a la Lógica de Negocio (RobotService)
         std::string respuesta = robotService_.ejecutarTrayectoria(nombreArchivo);

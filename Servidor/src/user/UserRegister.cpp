@@ -31,7 +31,7 @@ void UserRegister::execute(XmlRpcValue& params, XmlRpcValue& result){
 
         const std::string user   = std::string(a["user"]);
         const std::string pass   = std::string(a["pass"]);
-        const std::string role   = a.hasMember("role")   ? std::string(a["role"])   : "operator";
+        const std::string role   = a.hasMember("role")   ? std::string(a["role"])   : "op";
         const bool        active = a.hasMember("active") ? bool(a["active"])        : true;
 
         // ¿ya existe?

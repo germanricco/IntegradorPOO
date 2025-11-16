@@ -17,15 +17,15 @@ SALT = os.environ.get("AUTH_SALT", "cambia_este_salt")
 
 USERS = [
     (1, "admin",    "admin",     "admin",    1),
-    (2, "pepe",     "pepe1234",  "operator", 1),
-    (3, "maria",    "maria1234", "operator", 1),
-    (4, "juan",     "juan1234",  "operator", 0),
+    (2, "pepe",     "pepe1234",  "op",       1),
+    (3, "maria",    "maria1234", "op",       1),
+    (4, "juan",     "juan1234",  "op",       0),
     (5, "luis",     "luis1234",  "viewer",   1),
-    (6, "carla",    "carla1234", "operator", 1),
+    (6, "carla",    "carla1234", "op",       1),
     (7, "ana",      "ana1234",   "viewer",   0),
-    (8, "pablo",    "pablo1234", "operator", 1),
+    (8, "pablo",    "pablo1234", "op",       1),
     (9, "laura",    "laura1234", "viewer",   1),
-    (10,"santiago", "santiago1234","operator",1),
+    (10,"santiago", "santiago1234","op",     1),
 ]
 
 def sha256_hash(plain):
