@@ -66,25 +66,38 @@ bool TrajectoryManager::existeTrayectoria(const std::string& nombreTrayectoria) 
     return fs::exists(rutaCompleta, ec);
 }
 
-std::vector<std::string> TrajectoryManager::listarTrayectorias() const {
+std::vector<std::string> TrajectoryManager::listarTrayectorias(int userId, const std::string& userRole) const {
     std::vector<std::string> lista;
-    const int uid = CurrentUser::get(); // -1 si no hay contexto
+    
+    // Preparamos el prefijo del operador (ej. "2__")
+    std::string prefijoOperador;
+    if (userId >= 0) {
+        prefijoOperador = std::to_string(userId) + "__";
+    }
 
     try {
         for (const auto& entry : fs::directory_iterator(directorioBase)) {
             if (!entry.is_regular_file()) continue;
-            if (entry.path().extension() != ".gcode") continue;
-
+            
             const std::string fname = entry.path().filename().string();
-
-            if (uid >= 0) {
-                // Con contexto: solo las del usuario actual (prefijo "<id>__")
-                const std::string pref = std::to_string(uid) + "__";
-                if (fname.rfind(pref, 0) == 0) lista.push_back(fname);
-            } else {
-                // Sin contexto: todas (útil para admin/scripts/legacy)
-                lista.push_back(fname);
+            if (fname.rfind(".gcode", 0) != 0 && fname.rfind(".gcode") != (fname.size() - 6)) {
+                 continue; // Ignorar si no termina en .gcode
             }
+
+            // --- INICIO DE LA NUEVA LÓGICA DE FILTRADO ---
+            
+            if (userRole == "admin") {
+                // El Admin ve todo.
+                lista.push_back(fname);
+            
+            } else if (userRole == "op" && !prefijoOperador.empty()) {
+                // El Operador solo ve sus archivos.
+                if (fname.rfind(prefijoOperador, 0) == 0) {
+                    lista.push_back(fname);
+                }
+            }
+            // (Los "viewers" o roles desconocidos no ven nada)
+            // --- FIN DE LA NUEVA LÓGICA ---
         }
     } catch (const std::exception& e) {
         std::cerr << "Error al listar trayectorias en " << directorioBase << ": " << e.what() << std::endl;

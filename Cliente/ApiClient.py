@@ -235,6 +235,18 @@ class APIClient:
         except Fault as e:
             return {"success": False, "error": e.faultString}
 
+    def robot_list_files(self):
+        """Obtiene la lista de archivos de trayectoria del usuario."""
+        try:
+            # Llama al nuevo método RPC que creamos en el servidor
+            r = self.api.__getattr__("robot.listMyFiles")({
+                "token": self.token
+            })
+            # El servidor C++ devuelve {ok: bool, files: array}
+            return {"success": True, "files": r["files"]}
+        except Fault as e:
+            return {"success": False, "error": e.faultString}
+
     # ===== Utilidades =====
     def get_available_methods(self):
         """Obtiene lista de métodos RPC disponibles"""

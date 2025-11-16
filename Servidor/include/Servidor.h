@@ -42,6 +42,7 @@
 #include "ServiciosRobot/RobotStopRecordingMethod.h"
 #include "ServiciosRobot/RobotRunFileMethod.h"  
 #include "ServiciosRobot/RobotUploadFileMethod.h"
+#include "ServiciosRobot/RobotListFilesMethod.h"
 
 // Libreria
 #include "XmlRpc.h"
@@ -115,7 +116,8 @@ class Servidor {
         std::unique_ptr<robot_service_methods::RobotStopRecordingMethod> mRobotStopRecording_;
         std::unique_ptr<robot_service_methods::RobotRunFileMethod> mRobotRunFile_;
         std::unique_ptr<robot_service_methods::RobotUploadFileMethod> mRobotUploadFile_; 
-
+        std::unique_ptr<robot_service_methods::RobotListFilesMethod> mRobotListFiles_;
+        
         //HASTA ACA LLEGAN LOS CAMBIOS
         
         // Estado

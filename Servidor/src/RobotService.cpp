@@ -676,3 +676,16 @@ std::string RobotService::guardarTrayectoriaSubida(const std::string& nombreArch
     // Delegamos la lógica al manager y devolvemos su respuesta (el nombre final o "")
     return trajectoryManager_->guardarTrayectoriaCompleta(nombreArchivo, contenido);
 }
+
+std::vector<std::string> RobotService::listarTrayectorias(int userId, const std::string& userRole) {
+    if (!trajectoryManager_) {
+        logger_.error("TrajectoryManager no está inicializado. No se pueden listar archivos.");
+        // Devolver un vector vacío en caso de error
+        return {};
+    }
+
+    logger_.info("Solicitud para listar trayectorias por usuario ID: " + std::to_string(userId) + " (Rol: " + userRole + ")");
+    
+    // Delegamos toda la lógica de filtrado al manager
+    return trajectoryManager_->listarTrayectorias(userId, userRole);
+}

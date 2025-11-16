@@ -87,6 +87,9 @@ class RobotService {
         string ejecutarTrayectoria(const std::string& nombreArchivo);
         std::string guardarTrayectoriaSubida(const std::string& nombreArchivo, const std::string& contenido);
 
+        // Nuevo método para listar archivos
+        std::vector<std::string> listarTrayectorias(int userId, const std::string& userRole);
+
     private:
         shared_ptr<ArduinoService> arduinoService_;
         PALogger& logger_;

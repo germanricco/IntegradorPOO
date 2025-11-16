@@ -15,7 +15,8 @@ public:
 
     // Gestión de archivos de trayectorias
     bool existeTrayectoria(const std::string& nombreTrayectoria) const;
-    std::vector<std::string> listarTrayectorias() const;
+    // Ahora acepta el ID y el ROL para filtrar correctamente
+    std::vector<std::string> listarTrayectorias(int userId, const std::string& userRole) const;
     bool eliminarTrayectoria(const std::string& nombreTrayectoria);
 
     // Flujo de grabación

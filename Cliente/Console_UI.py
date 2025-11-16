@@ -36,6 +36,7 @@ class ConsoleUI:
             print("MOVER ROBOT: <move> <x> <y> <z> <vel>                                # (G1)     ")
             print("SUBIR ARCHIVO: <upload> <local_file>                                            ")
             print("EJECUTAR: <run> <remote_file>                                                   ")
+            print("LISTAR ARCHIVOS: <list>                                              # Lista sus archivos (admin ve todos)")
             print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
             print("======================================================================================================================")   
@@ -52,6 +53,7 @@ class ConsoleUI:
             print("MOVER ROBOT: <move> <x> <y> <z> <vel>                                # (G1)     ")
             print("SUBIR ARCHIVO: <upload> <local_file>                                            ")
             print("EJECUTAR: run <remote_file>                                                     ")
+            print("LISTAR ARCHIVOS: <list> (o <ls>)                                     # Lista sus archivos de trayectoria")
             print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
             print("======================================================================================================================")  
@@ -321,6 +323,27 @@ class ConsoleUI:
                     result = self.client.robot_run_file(remote_file)
                     if result["success"]:
                         print("Respuesta del servidor:", result["data"])
+                    else:
+                        print(f"Error del servidor: {result['error']}")
+
+            elif cmd == "list":
+                if not self.client.has_operator_privileges():
+                    print("Error: Permiso denegado (se requiere 'op' o 'admin')")
+                elif len(args) != 0:
+                    print("Uso: list (o ls)")
+                else:
+                    print("Solicitando lista de archivos del servidor...")
+                    result = self.client.robot_list_files() # Llama al nuevo método de la API
+                    
+                    if result["success"]:
+                        files = result["files"]
+                        if not files:
+                            print("(No se encontraron archivos en el servidor)")
+                        else:
+                            print("Archivos disponibles:")
+                            # Imprime cada archivo en una nueva línea
+                            for f in files:
+                                print(f"  - {f}")
                     else:
                         print(f"Error del servidor: {result['error']}")
 

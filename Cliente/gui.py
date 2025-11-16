@@ -154,10 +154,10 @@ class RobotApp:
         frame_trayectorias = tk.LabelFrame(self.frame_control, text="Gestión de trayectorias")
         frame_trayectorias.pack(fill="x", padx=10, pady=5)
         botones_trayectoria = [
-            ("Upload", self.upload),
-            ("Run", self.run),
-            ("Inicializar grabado de trayectoria", self.rec_start),
-            ("Finalizar grabado de trayectoria", self.rec_stop),
+            ("Subir Archivo (Upload)", self.upload),
+            ("Listar y Ejecutar Archivo (Run)", self.show_file_selection_dialog), # <-- Nuevo método
+            ("Iniciar Grabación (Rec Start)", self.rec_start),
+            ("Detener Grabación (Rec Stop)", self.rec_stop),
         ]
         for texto, funcion in botones_trayectoria:
             ttk.Button(frame_trayectorias, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
@@ -350,7 +350,10 @@ class RobotApp:
 
             r = self.cliente.robot_upload_file(filename, file_path)
             if r.get("success"):
-                messagebox.showinfo("Upload exitoso", r.get('data', {}).get('msg', 'Archivo subido correctamente'))
+                # Obtenemos el 'filename' de la respuesta del servidor
+                final_filename = r.get('data', {}).get('filename', filename)
+                msg = f"{r.get('data', {}).get('msg', 'OK')}\n\nGuardado como:\n{final_filename}"
+                messagebox.showinfo("Upload Exitoso", msg)
             else:
                 messagebox.showerror("Error al subir", r.get("error", "Error desconocido"))
             
@@ -359,23 +362,23 @@ class RobotApp:
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
-    def run(self):
-        if not self.cliente.has_operator_privileges():
-            messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
-            return
+    # def run(self):
+    #     if not self.cliente.has_operator_privileges():
+    #         messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
+    #         return
         
-        try:
-            filename = simpledialog.askstring("Ejecutar archivo", "Ingrese el nombre del archivo gcode a ejecutar:")
-            if not filename:
-                return
+    #     try:
+    #         filename = simpledialog.askstring("Ejecutar archivo", "Ingrese el nombre del archivo gcode a ejecutar:")
+    #         if not filename:
+    #             return
 
-            r = self.cliente.robot_run_file(filename)
-            messagebox.showinfo("Ejecución de archivo", r.get('data', 'N/A').get('msg', 'OK'))
+    #         r = self.cliente.robot_run_file(filename)
+    #         messagebox.showinfo("Ejecución de archivo", r.get('data', 'N/A').get('msg', 'OK'))
 
-        except Fault as e:
-            messagebox.showerror("Error de Servidor", e.faultString)
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
+    #     except Fault as e:
+    #         messagebox.showerror("Error de Servidor", e.faultString)
+    #     except Exception as e:
+    #         messagebox.showerror("Error", str(e))
 
     def rec_start(self):
         if not self.cliente.has_operator_privileges():
@@ -534,6 +537,96 @@ class RobotApp:
             messagebox.showerror("Error de Servidor", e.faultString)
         except Exception as e:
             messagebox.showerror("Error", str(e))    
+
+    def show_file_selection_dialog(self):
+        """
+        Llama a listMyFiles, muestra un diálogo Toplevel con un Listbox
+        y permite al usuario seleccionar un archivo para ejecutar.
+        """
+        if not self.cliente.has_operator_privileges():
+            messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
+            return
+
+        try:
+            # 1. Llamar a la API para obtener la lista de archivos
+            r_list = self.cliente.robot_list_files()
+            if not r_list.get("success"):
+                raise Exception(r_list.get("error", "Error desconocido al listar archivos"))
+            
+            files = r_list.get("files", [])
+            if not files:
+                messagebox.showinfo("Sin Archivos", "No se encontraron archivos de trayectoria en el servidor.")
+                return
+
+            # 2. Crear una nueva ventana (Toplevel) para el diálogo
+            dialog = tk.Toplevel(self.root)
+            dialog.title("Seleccionar Archivo para Ejecutar")
+            dialog.geometry("450x300")
+            dialog.transient(self.root) # Mantenerla encima de la app principal
+            dialog.grab_set() # Hacerla modal (bloquea la ventana principal)
+
+            ttk.Label(dialog, text="Seleccione un archivo de la lista:").pack(pady=5)
+
+            # 3. Crear el Listbox con Scrollbar
+            listbox_frame = ttk.Frame(dialog)
+            listbox_frame.pack(fill="both", expand=True, padx=10, pady=5)
+            
+            scrollbar = ttk.Scrollbar(listbox_frame, orient=tk.VERTICAL)
+            listbox = tk.Listbox(listbox_frame, yscrollcommand=scrollbar.set, exportselection=False)
+            scrollbar.config(command=listbox.yview)
+            
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            listbox.pack(side=tk.LEFT, fill="both", expand=True)
+
+            # Poblar la lista de archivos
+            for file in files:
+                listbox.insert(tk.END, file)
+            
+            # 4. Función interna para el botón "Ejecutar"
+            def on_execute():
+                try:
+                    selected_indices = listbox.curselection()
+                    if not selected_indices:
+                        messagebox.showwarning("Sin Selección", "Por favor, seleccione un archivo.", parent=dialog)
+                        return
+                    
+                    filename = listbox.get(selected_indices[0])
+                    
+                    if not messagebox.askyesno("Confirmar Ejecución", f"¿Seguro que desea ejecutar:\n\n{filename}?", parent=dialog):
+                        return
+                    
+                    # 5. Llamar a la API para ejecutar el archivo
+                    r_run = self.cliente.robot_run_file(filename)
+                    if r_run.get("success"):
+                        msg = r_run.get('data', {}).get('msg', 'Ejecución iniciada.')
+                        
+                        # --- ¡AQUÍ ESTÁ EL ARREGLO! ---
+                        # Actualizamos el visualizer a la posición de homing,
+                        # ya que el servidor siempre hace homing (G28) antes de empezar.
+                        self.visualizer.set_position(150, 0, 150)
+                        
+                        # Mostrar el éxito en la ventana principal
+                        messagebox.showinfo("Éxito", msg, parent=self.root) 
+                        dialog.destroy() # Cerrar el diálogo
+                    else:
+                        raise Exception(r_run.get("error", "Error desconocido al ejecutar"))
+
+                except Fault as e:
+                    messagebox.showerror("Error de Servidor", e.faultString, parent=dialog)
+                except Exception as e:
+                    messagebox.showerror("Error", str(e), parent=dialog)
+
+            # 6. Botones del diálogo
+            btn_frame = ttk.Frame(dialog)
+            btn_frame.pack(fill="x", pady=10, padx=10)
+            
+            ttk.Button(btn_frame, text="Ejecutar", command=on_execute).pack(side=tk.LEFT, expand=True, padx=5)
+            ttk.Button(btn_frame, text="Cancelar", command=dialog.destroy).pack(side=tk.RIGHT, expand=True, padx=5)
+
+        except Fault as e:
+            messagebox.showerror("Error de Servidor", e.faultString)
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
 
 # --- El Lanzador ---
 if __name__ == "__main__":
