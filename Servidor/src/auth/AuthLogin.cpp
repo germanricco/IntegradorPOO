@@ -43,8 +43,8 @@ void AuthLogin::execute(XmlRpcValue& params, XmlRpcValue& result){
         result["username"] = authUser->username;
         result["role"]     = authUser->role;
 
-        // Token de sesión: SessionManager::create(username, role)
-        std::string tok = sessions_.create(authUser->username, authUser->role);
+        // Token de sesión: SessionManager::create(id, username, role)
+        std::string tok = sessions_.create(authUser->id, authUser->username, authUser->role);
 
         // Campos de salida del método (mantengo tus claves originales)
         result["ok"]        = true;

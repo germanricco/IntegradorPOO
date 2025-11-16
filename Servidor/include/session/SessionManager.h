@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 struct SessionView {
+    int id;
     std::string user;
     std::string privilegio; // "admin" | "op" | "viewer"
 };
@@ -12,7 +13,7 @@ struct SessionView {
 class SessionManager {
     std::unordered_map<std::string, SessionView> map_;
 public:
-    std::string create(const std::string& user, const std::string& priv); // devuelve token
+    std::string create(int id, const std::string& user, const std::string& priv); // devuelve token
     bool        remove(const std::string& token);
     const SessionView* get(const std::string& token) const;
     static std::string genToken(); // 32 chars hex

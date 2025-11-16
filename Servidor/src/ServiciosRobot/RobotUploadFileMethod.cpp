@@ -40,18 +40,22 @@ void RobotUploadFileMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcV
         logger_.info(std::string("[") + METHOD_NAME + "] Solicitud para subir '" + nombreArchivo + "' por: " + session.user);
 
         // 3. Llamar a la Lógica de Negocio (RobotService)
-        bool exito = robotService_.guardarTrayectoriaSubida(nombreArchivo, contenidoArchivo);
+        // La función ahora devuelve el nombre final del archivo o "" si falla.
+        std::string nombreArchivoFinal = robotService_.guardarTrayectoriaSubida(nombreArchivo, contenidoArchivo);
 
         // 4. Procesar Respuesta y Armar Resultado
-        if (!exito) {
+        if (nombreArchivoFinal.empty()) {
+             // Falló si la función devolvió un string vacío.
              logger_.warning(std::string("[") + METHOD_NAME + "] Falló el guardado para " + session.user);
              throw XmlRpc::XmlRpcException("ERROR: No se pudo guardar el archivo en el servidor.");
         }
 
+        // ¡Éxito! Devolvemos el nombre real que se guardó.
         result["ok"] = true;
-        result["msg"] = "Archivo '" + nombreArchivo + "' subido con éxito."; 
-        logger_.info(std::string("[") + METHOD_NAME + "] Éxito para " + session.user);
-
+        result["msg"] = "Archivo subido con éxito.";
+        result["filename"] = nombreArchivoFinal; // <-- ¡LA NUEVA RESPUESTA!
+        
+        logger_.info(std::string("[") + METHOD_NAME + "] Éxito para " + session.user + ". Guardado como: " + nombreArchivoFinal);
     } catch (const XmlRpc::XmlRpcException& e) {
         throw;
     } catch (const std::runtime_error& e) {

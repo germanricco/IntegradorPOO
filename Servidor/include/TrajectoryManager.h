@@ -27,7 +27,8 @@ public:
     std::vector<std::string> cargarTrayectoria(const std::string& nombreTrayectoria) const;
 
     // Guarda un archivo de trayectoria completo (para subidas)
-    bool guardarTrayectoriaCompleta(const std::string& nombreArchivo, const std::string& contenido);
+    // Devuelve el nombre de archivo final (con ID y timestamp) o "" si falla.
+    std::string guardarTrayectoriaCompleta(const std::string& nombreArchivo, const std::string& contenido);
 
     // Info de estado
     std::string getDirectorioBase() const { return directorioBase; }

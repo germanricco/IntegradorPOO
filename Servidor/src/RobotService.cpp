@@ -660,19 +660,19 @@ string RobotService::ejecutarTrayectoria(const std::string& nombreArchivo) {
     }
 }
 
-bool RobotService::guardarTrayectoriaSubida(const std::string& nombreArchivo, const std::string& contenido) {
+std::string RobotService::guardarTrayectoriaSubida(const std::string& nombreArchivo, const std::string& contenido) {
     if (!trajectoryManager_) {
         logger_.error("TrajectoryManager no está inicializado. No se puede guardar el archivo.");
-        return false;
+        return ""; // Devolver string vacío en caso de error
     }
 
     if (contenido.empty()) {
         logger_.warning("Intento de guardar trayectoria vacía: " + nombreArchivo);
-        return false;
+        return ""; // Devolver string vacío en caso de error
     }
     
     logger_.info("Guardando archivo de trayectoria subido: " + nombreArchivo);
     
-    // Delegamos toda la lógica de validación y guardado al manager
+    // Delegamos la lógica al manager y devolvemos su respuesta (el nombre final o "")
     return trajectoryManager_->guardarTrayectoriaCompleta(nombreArchivo, contenido);
 }

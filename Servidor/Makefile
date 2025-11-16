@@ -93,7 +93,7 @@ servidor: $(SERVER_BIN)
 # Compilar servidor principal
 $(SERVER_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(MAIN_OBJ)
 	@echo "🚀 Enlazando servidor principal..."
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 	@echo "✅ Servidor listo: $@"
 
 # Compilar Tests

@@ -124,7 +124,14 @@ bool TrajectoryManager::iniciarGrabacion(const std::string& nombreTrayectoria) {
         return false;
     }
 
-    trayectoriaActual = normalizarNombreArchivo(nombreTrayectoria);
+    // No usamos 'normalizarNombreArchivo' para crear.
+    // Usamos 'buildNombreConvencion' directamente para forzar el prefijo de ID.
+    int uid = CurrentUser::get();
+    if (uid < 0) {
+         std::cerr << "Error: No hay usuario en contexto para iniciar la grabación." << std::endl;
+         return false;
+    }
+    trayectoriaActual = buildNombreConvencion(uid, nombreTrayectoria); 
 
     try {
         archivoActual = std::make_unique<File>(trayectoriaActual, directorioBase);
@@ -225,43 +232,47 @@ std::string TrajectoryManager::normalizarNombreArchivo(const std::string& nombre
     return nombreTrayectoria + ".gcode";
 }
 
-bool TrajectoryManager::guardarTrayectoriaCompleta(const std::string& nombreArchivo, const std::string& contenido) {
+std::string TrajectoryManager::guardarTrayectoriaCompleta(const std::string& nombreArchivo, const std::string& contenido) {
     
     // 1. Validar el nombre de archivo (seguridad básica)
-    // No permitimos ".." (subir de directorio) ni barras (crear subdirectorios)
     if (nombreArchivo.empty() || 
         nombreArchivo.find("..") != std::string::npos || 
         nombreArchivo.find('/') != std::string::npos || 
         nombreArchivo.find('\\') != std::string::npos) {
         
         std::cerr << "Error: Nombre de archivo no válido para subida: " << nombreArchivo << std::endl;
-        return false;
+        return ""; // Devolver string vacío en caso de error
     }
 
-    // 2. Normalizar el nombre (esto añade .gcode si falta)
-    // Usamos el 'nombreArchivo' provisto por el usuario, no el slug/timestamp
-    std::string nombreNorm = nombreArchivo;
-    if (nombreNorm.rfind(".gcode") == std::string::npos) {
-        nombreNorm += ".gcode";
+    // 2. Normalizar el nombre usando la convención de ID de usuario
+    int uid = CurrentUser::get(); //
+    if (uid < 0) {
+         std::cerr << "Error: No hay usuario en contexto (id=" << uid << ") para subir el archivo." << std::endl;
+         return ""; // Devolver string vacío en caso de error
     }
+    
+    // Quitar .gcode si el cliente lo envía, para pasarlo al slugify
+    std::string nombreLogico = nombreArchivo;
+    if (nombreLogico.size() >= 6 && nombreLogico.substr(nombreLogico.size() - 6) == ".gcode") {
+        nombreLogico = nombreLogico.substr(0, nombreLogico.size() - 6);
+    }
+    
+    std::string nombreNorm = buildNombreConvencion(uid, nombreLogico); //
 
+    // 3. Guardar el archivo
     try {
-        // 3. Usar la clase File para escribir el contenido
         File archivo(nombreNorm, directorioBase);
-        
-        // Abrir en modo WRITE (esto borra el archivo si ya existe)
         archivo.open(FileMode::WRITE); 
-        
-        // Escribir el contenido completo
         archivo.append(contenido); 
-        
         archivo.close();
         
         std::cout << "Archivo subido guardado en: " << archivo.getFilePath() << std::endl;
-        return true;
+        
+        // ¡ÉXITO! Devolver el nombre de archivo final
+        return nombreNorm; 
 
     } catch (const std::exception& e) {
         std::cerr << "Error al guardar archivo subido '" << nombreNorm << "': " << e.what() << std::endl;
-        return false;
+        return ""; // Devolver string vacío en caso de error
     }
 }

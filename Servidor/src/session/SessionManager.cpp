@@ -9,9 +9,9 @@ std::string SessionManager::genToken() {
     return t;
 }
 
-std::string SessionManager::create(const std::string& user, const std::string& priv) {
+std::string SessionManager::create(int id, const std::string& user, const std::string& priv) {
     std::string tok = genToken();
-    map_[tok] = {user, priv};
+    map_[tok] = {id, user, priv};
     return tok;
 }
 

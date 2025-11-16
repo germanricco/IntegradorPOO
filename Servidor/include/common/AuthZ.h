@@ -3,6 +3,7 @@
 
 #include "XmlRpc.h"
 #include "session/SessionManager.h"
+#include "../session/CurrentUser.h"
 #include <string>
 
 inline XmlRpc::XmlRpcValue rpc_norm(XmlRpc::XmlRpcValue& p) {
@@ -25,8 +26,13 @@ inline const SessionView& guardSession(const char* op, SessionManager& sm, const
     const SessionView* sv = sm.get(token);
     if (!sv) {
         log.warning(std::string("[auth] token inválido — ") + op);
+        CurrentUser::clear();
         throw XmlRpc::XmlRpcException("AUTH_INVALID: token");
     }
+
+    // En cada petición válida, establecemos el ID del usuario en el hilo actual.
+    CurrentUser::set(sv->id);
+    
     return *sv;
 }
 inline const SessionView& guardAdmin(const char* op, SessionManager& sm, const std::string& token, PALogger& log) {
