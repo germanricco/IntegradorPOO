@@ -218,6 +218,9 @@ void Servidor::registrarMetodosRobot() {
     mRobotRunFile_ = std::make_unique<robot_service_methods::RobotRunFileMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_
     );
+    mRobotUploadFile_ = std::make_unique<robot_service_methods::RobotUploadFileMethod>(
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+    );
 
     logger_.info("✅ Métodos del robot registrados");
 }

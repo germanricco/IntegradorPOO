@@ -68,14 +68,20 @@ std::string RobotService::homing(){
     }
 
     try {
-        modoEjecucion_ = ModoEjecucion::EJECUTANDO;
+        bool esTareaManual = (modoOperacion_ == ModoOperacion::MANUAL);
+        
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::EJECUTANDO;
+        }
 
-        std::string respuestaCompleta = arduinoService_->enviarComando("G28\r\n", 6000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("G28\r\n", getTimeoutParaComando("G28"));
         
         logRespuestaCompleta(respuestaCompleta, "G28");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
 
-        modoEjecucion_ = ModoEjecucion::DETENIDO;
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::DETENIDO;
+        }
         return respuestaCliente;
 
     } catch (const std::exception& e) {
@@ -101,15 +107,23 @@ std::string RobotService::mover(double x, double y, double z, double velocidad) 
         std::string comando = formatearComandoG1(x, y, z, velocidad);
         std::string comandoLimpio = comando.substr(0, comando.find("\r\n")); 
         trajectoryManager_->guardarComando(comandoLimpio); // El manager añade su propio '\n'
-        modoEjecucion_ = ModoEjecucion::EJECUTANDO;
+        
+        bool esTareaManual = (modoOperacion_ == ModoOperacion::MANUAL);
+        
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::EJECUTANDO;
+        }
 
         // Enviar comando a Firmware y recibir rta.
-        std::string respuestaCompleta = arduinoService_->enviarComando(comando, 3000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando(comando, getTimeoutParaComando(comando));
         
         logRespuestaCompleta(respuestaCompleta, comando);
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
 
-        modoEjecucion_ = ModoEjecucion::DETENIDO;
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::DETENIDO;
+        }        
+
         return respuestaCliente;
 
     } catch (const std::exception& e) {
@@ -138,10 +152,20 @@ std::string RobotService::activarEfector() {
     try {
         trajectoryManager_->guardarComando("M3");
 
-        std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", 4000ms);
+        bool esTareaManual = (modoOperacion_ == ModoOperacion::MANUAL);
+        
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::EJECUTANDO;
+        }
+
+        std::string respuestaCompleta = arduinoService_->enviarComando("M3\r\n", getTimeoutParaComando("M3"));
 
         logRespuestaCompleta(respuestaCompleta, "M3");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
+
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::DETENIDO;
+        }
 
         return respuestaCliente;
 
@@ -165,10 +189,20 @@ std::string RobotService::desactivarEfector() {
     try {
         trajectoryManager_->guardarComando("M5");
 
-        std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", 4000ms);
+        bool esTareaManual = (modoOperacion_ == ModoOperacion::MANUAL);
+        
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::EJECUTANDO;
+        }
+
+        std::string respuestaCompleta = arduinoService_->enviarComando("M5\r\n", getTimeoutParaComando("M5"));
 
         logRespuestaCompleta(respuestaCompleta, "M5");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
+
+        if (esTareaManual) {
+            modoEjecucion_ = ModoEjecucion::DETENIDO;
+        }
 
         return respuestaCliente;
 
@@ -188,7 +222,7 @@ std::string RobotService::activarMotores() {
     }
     
     try { 
-        std::string respuestaCompleta = arduinoService_->enviarComando("M17\r\n", 4000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M17\r\n", getTimeoutParaComando("M17"));
         
         logRespuestaCompleta(respuestaCompleta, "M17");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -213,7 +247,7 @@ std::string RobotService::desactivarMotores() {
     }
     
     try {   
-        std::string respuestaCompleta = arduinoService_->enviarComando("M18\r\n", 4000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M18\r\n", getTimeoutParaComando("M18"));
         
         logRespuestaCompleta(respuestaCompleta, "M18");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -236,7 +270,7 @@ std::string RobotService::obtenerEstado() {
     }
     
     try {
-        std::string respuestaCompleta = arduinoService_->enviarComando("M114\r\n", 6000ms);
+        std::string respuestaCompleta = arduinoService_->enviarComando("M114\r\n", getTimeoutParaComando("M114"));
         
         logRespuestaCompleta(respuestaCompleta, "M114");
         std::string respuestaCliente = procesarRespuesta(respuestaCompleta);
@@ -471,21 +505,46 @@ bool RobotService::estaGrabando() const {
 }
 
 std::chrono::milliseconds RobotService::getTimeoutParaComando(const std::string& lineaGCode) const {
-    // G1 (Mover) - Timeout estándar
+    
+    // Timeouts para comandos de movimiento
+    
+    // G1 (Mover) - Este es el que nos fallaba.
+    // TODO: A futuro, podríamos calcular la distancia y la velocidad para un timeout dinámico.
+    // Por ahora, usamos el valor 'seguro' que encontramos (20 segundos).
     if (lineaGCode.rfind("G1", 0) == 0) {
-        return 3000ms; 
+        return 20000ms; 
     }
-    // M3 (Gripper On) - Timeout largo
-    if (lineaGCode.rfind("M3", 0) == 0) {
-        return 4000ms;
-    }
-    // M5 (Gripper Off) - Timeout largo
-    if (lineaGCode.rfind("M5", 0) == 0) {
-        return 4000ms;
+    
+    // G28 (Homing) - También es un movimiento físico largo.
+    if (lineaGCode.rfind("G28", 0) == 0) {
+        return 20000ms; // Usamos 20s también por seguridad.
     }
 
-    // Comando desconocido, usar un default seguro
-    logger_.warning("Timeout desconocido para comando: " + lineaGCode + ". Usando 3000ms.");
+    // Timeouts para comandos de actuadores
+    
+    // M3 (Gripper On) - Suele ser lento.
+    if (lineaGCode.rfind("M3", 0) == 0) {
+        return 8000ms;
+    }
+    // M5 (Gripper Off) - Suele ser lento.
+    if (lineaGCode.rfind("M5", 0) == 0) {
+        return 8000ms;
+    }
+
+    // Timeouts para comandos de estado (suelen ser rápidos)
+    
+    if (lineaGCode.rfind("M17", 0) == 0) { // Activar motores
+        return 3000ms;
+    }
+    if (lineaGCode.rfind("M18", 0) == 0) { // Desactivar motores
+        return 3000ms;
+    }
+    if (lineaGCode.rfind("M114", 0) == 0) { // Obtener estado
+        return 5000ms; // Un poco más por si la respuesta es larga
+    }
+    
+    // Default para cualquier otro comando (G90, G91, etc.)
+    // logger_.warning("Timeout desconocido para comando: " + lineaGCode + ". Usando 3000ms.");
     return 3000ms;
 }
 
@@ -524,10 +583,7 @@ string RobotService::ejecutarTrayectoria(const std::string& nombreArchivo) {
         if (respHoming.rfind("ERROR:", 0) == 0) {
             throw std::runtime_error("Fallo durante el homing: " + respHoming);
         }
-        
-        // ¡Importante! 'homing()' ya resetea el estado a DETENIDO.
-        // Estamos listos para el bucle.
-        
+                
         logger_.info("Robot preparado. Iniciando ejecución de " + std::to_string(lineas.size()) + " comandos.");
         
         // 4. Ejecutar la Tarea (Línea por línea) - MODO INTELIGENTE
@@ -585,9 +641,7 @@ string RobotService::ejecutarTrayectoria(const std::string& nombreArchivo) {
                 // para detener toda la trayectoria.
                 throw std::runtime_error("Error en la línea '" + linea + "': " + respuestaLinea);
             }
-            
-            // Ya no necesitamos el 'sleep' ni el ciclo de estado,
-            // ¡porque los métodos 'mover'/'activarEfector' ya lo hacen!
+                        
         }
 
         // 5. Finalización
@@ -604,4 +658,21 @@ string RobotService::ejecutarTrayectoria(const std::string& nombreArchivo) {
         modoEjecucion_ = ModoEjecucion::DETENIDO;
         return "ERROR: " + std::string(e.what());
     }
+}
+
+bool RobotService::guardarTrayectoriaSubida(const std::string& nombreArchivo, const std::string& contenido) {
+    if (!trajectoryManager_) {
+        logger_.error("TrajectoryManager no está inicializado. No se puede guardar el archivo.");
+        return false;
+    }
+
+    if (contenido.empty()) {
+        logger_.warning("Intento de guardar trayectoria vacía: " + nombreArchivo);
+        return false;
+    }
+    
+    logger_.info("Guardando archivo de trayectoria subido: " + nombreArchivo);
+    
+    // Delegamos toda la lógica de validación y guardado al manager
+    return trajectoryManager_->guardarTrayectoriaCompleta(nombreArchivo, contenido);
 }

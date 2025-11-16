@@ -224,3 +224,44 @@ std::string TrajectoryManager::normalizarNombreArchivo(const std::string& nombre
     // Sin contexto → legacy: solo agrega ".gcode"
     return nombreTrayectoria + ".gcode";
 }
+
+bool TrajectoryManager::guardarTrayectoriaCompleta(const std::string& nombreArchivo, const std::string& contenido) {
+    
+    // 1. Validar el nombre de archivo (seguridad básica)
+    // No permitimos ".." (subir de directorio) ni barras (crear subdirectorios)
+    if (nombreArchivo.empty() || 
+        nombreArchivo.find("..") != std::string::npos || 
+        nombreArchivo.find('/') != std::string::npos || 
+        nombreArchivo.find('\\') != std::string::npos) {
+        
+        std::cerr << "Error: Nombre de archivo no válido para subida: " << nombreArchivo << std::endl;
+        return false;
+    }
+
+    // 2. Normalizar el nombre (esto añade .gcode si falta)
+    // Usamos el 'nombreArchivo' provisto por el usuario, no el slug/timestamp
+    std::string nombreNorm = nombreArchivo;
+    if (nombreNorm.rfind(".gcode") == std::string::npos) {
+        nombreNorm += ".gcode";
+    }
+
+    try {
+        // 3. Usar la clase File para escribir el contenido
+        File archivo(nombreNorm, directorioBase);
+        
+        // Abrir en modo WRITE (esto borra el archivo si ya existe)
+        archivo.open(FileMode::WRITE); 
+        
+        // Escribir el contenido completo
+        archivo.append(contenido); 
+        
+        archivo.close();
+        
+        std::cout << "Archivo subido guardado en: " << archivo.getFilePath() << std::endl;
+        return true;
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error al guardar archivo subido '" << nombreNorm << "': " << e.what() << std::endl;
+        return false;
+    }
+}

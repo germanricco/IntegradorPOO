@@ -139,11 +139,15 @@ std::string SerialCom::readResponse(int timeoutMs) {
                 buffer[bytesRead] = '\0';
                 response.append(buffer);
                 
-                // Criterio de mensaje completo. Buscar terminador
-                if (response.find('\n') != std::string::npos ||
-                    response.find('}') != std::string::npos ||
-                    response.find('>') != std::string::npos) {
-                    break;
+                // Criterio de mensaje completo: Buscar terminador (ej: 'OK\n' o 'ERROR:...\n')
+                // A diferencia de antes, no salimos en el *primer* \n.
+                // Damos una pequeña ventana (100ms) para que lleguen más líneas
+                // (ej. en M114 que son varias líneas).
+                
+                // Si encontramos un \n, re-ajustamos el timeout para una espera corta.
+                if (response.find('\n') != std::string::npos) {
+                    timeout.tv_sec = 0;
+                    timeout.tv_usec = 100 * 1000; // 100ms
                 }
 
             } else if (bytesRead == 0) {

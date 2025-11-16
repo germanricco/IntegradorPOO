@@ -85,6 +85,7 @@ class RobotService {
         bool finalizarGrabacionTrayectoria();
         bool estaGrabando() const;        
         string ejecutarTrayectoria(const std::string& nombreArchivo);
+        bool guardarTrayectoriaSubida(const std::string& nombreArchivo, const std::string& contenido);
 
     private:
         shared_ptr<ArduinoService> arduinoService_;

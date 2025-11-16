@@ -26,6 +26,9 @@ public:
     // Carga completa (línea por línea) de una trayectoria
     std::vector<std::string> cargarTrayectoria(const std::string& nombreTrayectoria) const;
 
+    // Guarda un archivo de trayectoria completo (para subidas)
+    bool guardarTrayectoriaCompleta(const std::string& nombreArchivo, const std::string& contenido);
+
     // Info de estado
     std::string getDirectorioBase() const { return directorioBase; }
     bool        estaGrabando() const { return grabando; }
