@@ -3,6 +3,7 @@ from tkinter import messagebox, simpledialog, ttk
 
 from ApiClient import APIClient
 from xmlrpc.client import Fault
+from RobotVisualizer import RobotVisualizer
 
 class RobotApp:
     """
@@ -18,17 +19,26 @@ class RobotApp:
         self.cliente = APIClient("http://127.0.0.1:8080")
 
         # Configurar la ventana principal
-        self.root.geometry("1080x920")
+        self.root.geometry("1200x920")
         
+        # CREAR UN CONTENEDOR PRINCIPAL (PANEDWINDOW)
+        # Esto nos permite dividir la pantalla en Izquierda (Control) y Derecha (Visual)
+        self.paned = ttk.PanedWindow(root, orient=tk.HORIZONTAL)
+        self.paned.pack(fill="both", expand=True, padx=10, pady=10)
+
+        # --- IZQUIERDA: Frame LOGIN + CONTROL ---
+        self.frame_left = ttk.Frame(self.paned)
+        self.paned.add(self.frame_left, weight=1)
+
         # --- 1. Frame de Login (Superior) ---
-        self.frame_login = ttk.LabelFrame(root, text="Autenticación")
+        self.frame_login = ttk.LabelFrame(self.frame_left, text="Autenticación")
         self.frame_login.pack(fill="x", padx=10, pady=5)
         
         ttk.Label(self.frame_login, text="User:").pack(side=tk.LEFT, padx=5)
         self.entry_user = ttk.Entry(self.frame_login, width=15)
         self.entry_user.pack(side=tk.LEFT, padx=5)
         
-        ttk.Label(self.frame_login, text="Pass:").pack(side=tk.LEFT, padx=5)
+        ttk.Label(self.frame_login, text="Password:").pack(side=tk.LEFT, padx=5)
         self.entry_pass = ttk.Entry(self.frame_login, width=15, show="*")
         self.entry_pass.pack(side=tk.LEFT, padx=5)
 
@@ -43,13 +53,18 @@ class RobotApp:
         self.lbl_status.pack(side=tk.RIGHT, padx=10)
 
         # --- 2. Frame de Control (Principal) ---
-        self.frame_control = ttk.LabelFrame(root, text="Panel de Control")
+        self.frame_control = ttk.LabelFrame(self.frame_left, text="Panel de Control")
         self.frame_control.pack(fill="both", expand=True, padx=10, pady=10)
         
-        # (Aquí pondremos los botones de Homing, Move, etc.)
-        # Por ahora, un simple saludo:
         ttk.Label(self.frame_control, text="Por favor, inicia sesión para habilitar los controles.").pack(pady=20)
 
+        # --- DERECHA: VISUALIZADOR ROBOT ---
+        self.frame_right = ttk.Frame(self.paned)
+        self.paned.add(self.frame_right, weight=2) # Weight 2 para que sea mas grande
+        
+        # Instanciamos nuestro visualizador
+        self.visualizer = RobotVisualizer(self.frame_right, width=350, height=300)
+        self.visualizer.pack(fill="both", expand=True)
 
     # --- Controladores de Eventos (Callbacks) ---
 
@@ -106,47 +121,61 @@ class RobotApp:
         ttk.Label(self.frame_control, text="Por favor, inicia sesión para habilitar los controles.").pack(pady=20)
 
     def crear_widgets_control(self):
-        """Crea los botones de control una vez logueado."""
-        # Frame interno para la grilla de botones
-        botones_frame = ttk.Frame(self.frame_control)
-        botones_frame.pack(expand=True, fill="both", padx=10, pady=10)
+        """Crea los botones de control una vez logueado, agrupados por funcionalidad."""
 
-        # Lista de botones comunes (texto, función)
-        botones = [
+        # --- Grupo: Conexión (solo admin) ---
+        if self.cliente.is_admin():
+            frame_conexion = ttk.LabelFrame(self.frame_control, text="Conexión robot")
+            frame_conexion.pack(fill="x", padx=10, pady=5)
+            ttk.Button(frame_conexion, text="Conectar robot", command=self.connect).pack(fill="x", padx=5, pady=3)
+            ttk.Button(frame_conexion, text="Desconectar robot", command=self.disconnect).pack(fill="x", padx=5, pady=3)
+
+        # --- Grupo: Cuenta personal ---
+        frame_cuenta = ttk.LabelFrame(self.frame_control, text="Cuenta")
+        frame_cuenta.pack(fill="x", padx=10, pady=5)
+        ttk.Button(frame_cuenta, text="Cambiar mi contraseña", command=self.changeMyPassword).pack(fill="x", padx=5, pady=3)
+
+        # --- Grupo: Comandos del robot ---
+        frame_comandos = ttk.LabelFrame(self.frame_control, text="Comandos del robot")
+        frame_comandos.pack(fill="x", padx=10, pady=5)
+        botones_comandos = [
             ("Homing (G28)", self.homing),
             ("Status (M114)", self.status),
             ("Motors (M17/M18)", self.motors),
             ("Gripper (M3/M5)", self.gripper),
-            ("Mode ", self.mode),
+            ("Mode (G90/G91)", self.mode),
             ("Move (G0)", self.move),
-            ("Upload ", self.upload),
-            ("Run ", self.run),
+        ]
+        for texto, funcion in botones_comandos:
+            ttk.Button(frame_comandos, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
+
+        # --- Grupo: Manejo de trayectorias
+
+        frame_trayectorias = tk.LabelFrame(self.frame_control, text="Gestión de trayectorias")
+        frame_trayectorias.pack(fill="x", padx=10, pady=5)
+        botones_trayectoria = [
+            ("Upload", self.upload),
+            ("Run", self.run),
             ("Inicializar grabado de trayectoria", self.rec_start),
             ("Finalizar grabado de trayectoria", self.rec_stop),
-            ("Cambiar mi contraseña", self.changeMyPassword),
         ]
+        for texto, funcion in botones_trayectoria:
+            ttk.Button(frame_trayectorias, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
 
-        # Si es admin, agrega los botones de admin
+
+        # --- Grupo: Gestión de usuarios (solo admin) ---
         if self.cliente.is_admin():
-            botones += [
-                ("Conectar robot", self.connect),
-                ("Desconectar robot", self.disconnect),
+            frame_usuarios = ttk.LabelFrame(self.frame_control, text="Gestión de usuarios")
+            frame_usuarios.pack(fill="x", padx=10, pady=5)
+            botones_usuarios = [
                 ("Registrar usuario", self.userRegister),
                 ("Lista de usuarios", self.userList),
                 ("Cambiar contraseña de usuario", self.changeUserPassword),
                 ("Cambiar estado de usuario", self.updateUser),
             ]
+            for texto, funcion in botones_usuarios:
+                ttk.Button(frame_usuarios, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
 
-        # Distribuir los botones en 2 columnas
-        for i, (texto, funcion) in enumerate(botones):
-            fila = i // 2
-            columna = i % 2
-            btn = ttk.Button(botones_frame, text=texto, command=funcion)
-            btn.grid(row=fila, column=columna, padx=10, pady=8, sticky="ew")
-
-        # Hacer que las columnas se expandan
-        botones_frame.columnconfigure(0, weight=1)
-        botones_frame.columnconfigure(1, weight=1)
 
     def homing(self):
         """Se ejecuta al presionar el botón 'Homing'."""
@@ -157,9 +186,10 @@ class RobotApp:
             return
 
         try:
-          
             r = self.cliente.robot_home()
-            
+            if r.get('success'):
+                self.visualizer.set_position(150, 0, 150)
+                self.visualizer.log(r.get('data', {}).get('msg', 'Activa los motores antes de hacer homing'))
             # Alarma Visual/Auditiva (¡Opcional!)
             messagebox.showinfo("Homing", r.get('data', {}).get('msg', 'Activa los motores antes de hacer homing'))
             # (Aquí pondríamos el playsound('success.wav'))
@@ -186,7 +216,8 @@ class RobotApp:
             mensaje = f"Estado: {status_info.get('status', 'N/A')}\n"
             # Esta linea de abajo creo que la vamos a tener que sacar
             mensaje += f"Posicion: {status_info.get('position', 'N/A')}\n"
-           
+            self.visualizer.log(mensaje)
+
             messagebox.showinfo("Robot Status", mensaje)
     
         except Fault as e:
@@ -201,15 +232,26 @@ class RobotApp:
             messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
             return
         try:
-            enabled = messagebox.askyesno("Encender motores", "Quieres encender los motores del robot?")
+            # Consultar el estado actual de los motores
+            status = self.cliente.robot_get_status()
+            status_str = status.get('data', {}).get('status', '')
+
+            # Preguntar primero si quiere encender o apagar
+            enabled = messagebox.askyesno("Motores", "¿Quieres encender los motores del robot? (Sí = Encender, No = Apagar)")
+
+            if enabled and "MOTORS ENABLED" in status_str:
+                messagebox.showerror("Motores ya encendidos", "Los motores ya están encendidos.")
+                return
+            if not enabled and "MOTORS ENABLED" not in status_str:
+                messagebox.showerror("Motores ya apagados", "Los motores ya están apagados.")
+                return
 
             r = self.cliente.robot_set_motors(enabled)
-            messagebox.showinfo("Motores", r.get('data', {}).get('msg', 'OK'))
+            messagebox.showinfo("Motores", r.get('data', {}).get('msg'))
+            self.visualizer.log(r.get('data').get('msg'))
 
         except Fault as e:
-            # Alarma de Error
             messagebox.showerror("Error de Servidor", e.faultString)
-            # (Aquí pondríamos el playsound('error.wav'))
         except Exception as e:
             messagebox.showerror("Error", str(e))
 
@@ -220,10 +262,13 @@ class RobotApp:
         
         try:
             enabled = messagebox.askyesno("Gripper", "Quieres activar el gripper del robot?")
-
             r = self.cliente.robot_set_gripper(enabled)
-            messagebox.showinfo("Gripper", r.get('data', {}).get('msg', 'OK'))
-        
+
+            if r.get('success'):
+                self.visualizer.set_gripper(enabled)
+
+            messagebox.showinfo("Gripper", r.get('data').get('msg', 'OK'))
+            self.visualizer.log(r.get('data', {}).get('msg'))
         except Fault as e:
             # Alarma de Error
             messagebox.showerror("Error de Servidor", e.faultString)
@@ -247,7 +292,7 @@ class RobotApp:
             
             r = self.cliente.robot_set_mode(modo)
             messagebox.showinfo("Modo cambiado", r.get('data', {}).get('msg', 'OK'))
-                
+            self.visualizer.log(r.get('data').get('msg'))
         except Fault as e:
             # Alarma de Error
             messagebox.showerror("Error de Servidor", e.faultString)
@@ -262,20 +307,27 @@ class RobotApp:
             return
         
         try:
-            x = simpledialog.askfloat("Coordenada X", "Ingrese la coordenada X:")
+    
+            x = simpledialog.askfloat("Coordenada X", "Ingrese la coordenada X [mm]:")
             if x is None:  
                 return
-            y = simpledialog.askfloat("Coordenada Y", "Ingrese la coordenada Y:")
+            y = simpledialog.askfloat("Coordenada Y", "Ingrese la coordenada Y [mm]:")
             if y is None:
                 return
-            z = simpledialog.askfloat("Coordenada Z", "Ingrese la coordenada Z:")
+            z = simpledialog.askfloat("Coordenada Z", "Ingrese la coordenada Z [mm]:")
             if z is None:
                 return
-            
+            v = simpledialog.askfloat("Velocidad", "Ingrese la velocidad del robot [mm/s]:\n Si desea utilizar la velicdad por defecto presione ~cancel~")
+            if v is None:
+                v = 50
             # Llamada al cerebro
-            r = self.cliente.robot_move(x, y, z)
-            messagebox.showinfo("Move Exitoso", r.get('data', {}).get('msg', 'OK'))
+            r = self.cliente.robot_move(x, y, z, v)
             
+            if r.get('success'):
+                self.visualizer.set_position(x, y, z)
+
+            messagebox.showinfo("Move Exitoso", r.get('data', {}).get('msg', 'OK'))
+            self.visualizer.log(r.get('data').get('msg'))
         except Fault as e:
             # Alarma de Error
             messagebox.showerror("Error de Servidor", e.faultString)
@@ -375,9 +427,6 @@ class RobotApp:
 # ==== Metodos solo para admin ====
 
     def connect(self):
-        # if not self.cliente.is_admin():
-        #     messagebox.showerror("Error, no posees el privilegio para realizar esta operación")
-        #     return 
         try:
             r = self.cliente.robot_connect()
             messagebox.showinfo("Conexión", r.get('data', 'N/A').get('msg', 'N/A'))
@@ -388,9 +437,6 @@ class RobotApp:
             messagebox.showerror("Error", str(e))    
 
     def disconnect(self):
-        # if not self.cliente.is_admin():
-        #     messagebox.showerror("Error, no posees el privilegio para realizar esta operación")
-        #     return
         try:
             r = self.cliente.robot_disconnect()
             messagebox.showinfo("Conexión", r.get('data', 'N/A').get('msg', 'N/A'))
@@ -408,11 +454,11 @@ class RobotApp:
             password = simpledialog.askstring("Regsitro de usuario", "Contraseña: ")
             if password is None:
                 return
-            privilege = simpledialog.askstring("Registro de usuario", "Privilegio (admin, operador, viewer): ) ")
+            privilege = simpledialog.askstring("Registro de usuario", "Privilegio (admin, op, viewer): ) ")
             if privilege is None:
                 return
-            if privilege not in ["admin", "operador", "viewer"]:
-                messagebox.showerror("Error", "Modo inválido. Use 'admin', 'operador', 'viewer'.")
+            if privilege not in ["admin", "op", "viewer"]:
+                messagebox.showerror("Error", "Modo inválido. Use 'admin', 'op', 'viewer'.")
                 return
             r = self.cliente.register_user(username, password, privilege)
             messagebox.showinfo("Registro", r.get('data', 'N/A').get('msg', 'N/A'))

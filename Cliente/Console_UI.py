@@ -9,7 +9,7 @@ class ConsoleUI:
     def print_help(self):       
         self.client.refresh_session()
         print("==================================================================================================================")
-        print("                                             COMANDOS DISPONIBLES:")
+        print("                                             COMANDOS BÁSICOS:")
         print("==================================================================================================================")   
         print("METODOS: <methods>                                                       # listar métodos RPC del servidor")
         print("HELP: <help>                                                             # comando de ayuda (filtrada por rol)")
@@ -40,7 +40,7 @@ class ConsoleUI:
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
             print("======================================================================================================================")   
 
-        elif self.client.priv == "operator":      
+        elif self.client.priv == "op":      
             print("======================================================================================================================")
             print("                                     CONEXION OPERADOR - COMANDOS DISPONIBLES:")
             print("======================================================================================================================")    

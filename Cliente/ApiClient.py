@@ -207,21 +207,24 @@ class APIClient:
             return {"success": False, "error": e.faultString}
 
     def robot_upload_file(self, filename, file_path):
-        """Sube un archivo gcode al servidor"""
+        """Sube un archivo gcode al servidor (como texto plano)"""
         try:
-            with open(file_path, "rb") as f:
-                file_content = f.read()
-            content_b64 = base64.b64encode(file_content).decode('utf-8')
-            
+            # 1. Abrir en modo texto ('r'), no binario ('rb')
+            with open(file_path, "r", encoding="utf-8") as f:
+                file_content = f.read() # Leer como un string simple
+           
+            # 2. Enviar el contenido (texto) en el parámetro 'contenido'
             r = self.api.__getattr__("robot.uploadFile")({
-                "token": self.token, "nombre": filename, "data_b64": content_b64
+                "token": self.token,
+                "nombre": filename,
+                "contenido": file_content
             })
             return {"success": True, "data": r}
         except FileNotFoundError:
             return {"success": False, "error": f"Archivo no encontrado: {file_path}"}
         except Fault as e:
             return {"success": False, "error": e.faultString}
-
+        
     def robot_run_file(self, filename):
         """Ejecuta un archivo gcode en el servidor"""
         try:
