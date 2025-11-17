@@ -23,8 +23,8 @@ XMLRPC_OBJS := $(patsubst $(LIB_DIR)/xmlrpc/%.cpp,$(OBJ_DIR)/xmlrpc_%.o,$(XMLRPC
 
 # Core del servidor (sin main) - con rutas corregidas
 CORE_SRCS := \
-  $(SRC_DIR)/PALogger.cpp \
-  $(SRC_DIR)/ServiciosBasicos.cpp \
+  $(SRC_DIR)/utils/PALogger.cpp \
+  $(SRC_DIR)/ServiciosAdmin/ServiciosBasicos.cpp \
   $(SRC_DIR)/session/SessionManager.cpp \
   $(SRC_DIR)/session/CurrentUser.cpp \
   $(SRC_DIR)/user/UserEntity.cpp \
@@ -36,13 +36,13 @@ CORE_SRCS := \
   $(SRC_DIR)/user/UserUpdate.cpp \
   $(SRC_DIR)/user/UserChangePassword.cpp \
   $(SRC_DIR)/user/UserList.cpp \
-  $(SRC_DIR)/SerialCom.cpp \
-  $(SRC_DIR)/ArduinoService.cpp \
-  $(SRC_DIR)/File.cpp \
-  $(SRC_DIR)/RobotService.cpp \
-  $(SRC_DIR)/TrajectoryManager.cpp \
-  $(SRC_DIR)/Servidor.cpp \
-  $(SRC_DIR)/CommandHistory.cpp
+  $(SRC_DIR)/hardware/SerialCom.cpp \
+  $(SRC_DIR)/hardware/ArduinoService.cpp \
+  $(SRC_DIR)/utils/File.cpp \
+  $(SRC_DIR)/robot_model/RobotService.cpp \
+  $(SRC_DIR)/robot_model/TrajectoryManager.cpp \
+  $(SRC_DIR)/core/Servidor.cpp \
+  $(SRC_DIR)/core/CommandHistory.cpp
   #$(SRC_DIR)/auth/AuthWiring.cpp
 
 # Archivos adicionales necesarios
@@ -50,10 +50,8 @@ EXTRA_SRCS := $(wildcard $(SRC_DIR)/ServiciosRobot/*.cpp) \
               $(wildcard $(SRC_DIR)/services/*.cpp) \
               $(wildcard $(SRC_DIR)/storage/*.cpp) \
               $(wildcard $(SRC_DIR)/db/*.cpp) \
-			  $(wildcard $(SRC_DIR)/ServiciosAdmin/*.cpp)
-
-# Archivo que creamos directamente en src/
-EXTRA_SRCS += $(SRC_DIR)/AuditLogReader.cpp
+			  $(wildcard $(SRC_DIR)/ServiciosAdmin/*.cpp) \
+			  $(wildcard $(SRC_DIR)/utils/AuditLogReader.cpp)
 
 # Combinar todas las fuentes
 ALL_CORE_SRCS := $(CORE_SRCS) $(EXTRA_SRCS)

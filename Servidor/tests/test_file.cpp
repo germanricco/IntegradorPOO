@@ -1,6 +1,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"
-#include "../include/File.h"
+#include "lib/xmlrpc/doctest.h"
+#include "utils/File.h"
 #include <filesystem>
 #include <fstream>
 

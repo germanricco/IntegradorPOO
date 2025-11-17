@@ -5,7 +5,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
-#include "PALogger.h" // Lo usamos para el path
+#include "utils/PALogger.h" // Lo usamos para el path
 
 /**
  * @brief Estructura para almacenar una línea parseada del audit.csv

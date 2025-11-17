@@ -51,18 +51,18 @@
 #include "XmlRpc.h"
 
 // Módulos
-#include "PALogger.h"
+#include "utils/PALogger.h"
 #include "session/SessionManager.h"
-#include "ArduinoService.h"
-#include "RobotService.h"
-#include "TrajectoryManager.h"
-#include "AuditLogReader.h"
+#include "hardware/ArduinoService.h"
+#include "robot_model/RobotService.h"
+#include "robot_model/TrajectoryManager.h"
+#include "utils/AuditLogReader.h"
 
 // Historial de comandos
-#include "CommandHistory.h"
+#include "core/CommandHistory.h"
 
 // Demo Simple
-#include "ServiciosBasicos.h"
+//#include "ServiciosBasicos.h"
 
 class Servidor {
     public:

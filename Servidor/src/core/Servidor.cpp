@@ -1,4 +1,4 @@
-#include "Servidor.h"
+#include "core/Servidor.h"
 
 // CONSTRUCTOR
 Servidor::Servidor(const ServidorConfig& config) 

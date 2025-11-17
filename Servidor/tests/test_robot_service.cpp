@@ -1,9 +1,9 @@
 // test_robot_service.cpp - Tests actualizados
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"
-#include "RobotService.h"
-#include "PALogger.h"
-#include "ArduinoService.h"
+#include "lib/xmlrpc/doctest.h"
+#include "robot_model/RobotService.h"
+#include "utils/PALogger.h"
+#include "hardware/ArduinoService.h"
 #include <memory>
 #include <chrono>
 #include <iomanip>

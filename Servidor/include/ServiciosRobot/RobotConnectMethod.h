@@ -3,10 +3,10 @@
 
 #include "../../lib/xmlrpc/XmlRpc.h"
 #include "../session/SessionManager.h"
-#include "../PALogger.h"
-#include "../RobotService.h"
+#include "../utils/PALogger.h"
+#include "../robot_model/RobotService.h"
 #include "../common/AuthZ.h"
-#include "../CommandHistory.h"
+#include "../core/CommandHistory.h"
 
 namespace robot_service_methods {
 

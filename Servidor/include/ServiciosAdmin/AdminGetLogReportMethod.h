@@ -3,8 +3,8 @@
 
 #include "../lib/xmlrpc/XmlRpc.h" 
 #include "../session/SessionManager.h"
-#include "../PALogger.h"
-#include "../AuditLogReader.h" // ¡Necesitamos esto!
+#include "../utils/PALogger.h"
+#include "../utils/AuditLogReader.h" // ¡Necesitamos esto!
 #include "../common/AuthZ.h"
 
 namespace admin_service_methods {

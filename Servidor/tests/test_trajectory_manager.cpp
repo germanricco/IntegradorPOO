@@ -1,9 +1,9 @@
 // --- Servidor/tests/test_trajectory_manager.cpp ---
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "../include/doctest.h"
-#include "../include/TrajectoryManager.h"
-#include "../include/File.h"  // Necesario para leer/verificar
+#include "lib/xmlrpc/doctest.h"
+#include "robot_model/TrajectoryManager.h"
+#include "utils/File.h"  // Necesario para leer/verificar
 #include <filesystem>
 #include <vector>
 #include <string>

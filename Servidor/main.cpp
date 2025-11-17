@@ -1,5 +1,5 @@
-#include "Servidor.h"
-#include "ServidorConfig.h"
+#include "core/Servidor.h"
+#include "core/ServidorConfig.h"
 #include <iostream>
 #include <csignal>
 

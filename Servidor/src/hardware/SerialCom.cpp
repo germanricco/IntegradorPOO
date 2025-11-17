@@ -1,4 +1,4 @@
-#include "SerialCom.h"
+#include "hardware/SerialCom.h"
 
 //
 // ===== CONSTRUCTOR Y DESTRUCTOR =====

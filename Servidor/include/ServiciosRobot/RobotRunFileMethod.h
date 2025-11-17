@@ -4,9 +4,9 @@
 
 #include "../../lib/xmlrpc/XmlRpc.h" 
 #include "../session/SessionManager.h"
-#include "../PALogger.h"
-#include "../RobotService.h"
-#include "../common/AuthZ.h" // Para la función guardSession
+#include "../utils/PALogger.h"
+#include "../robot_model/RobotService.h"
+#include "../common/AuthZ.h"
 
 namespace robot_service_methods {
 

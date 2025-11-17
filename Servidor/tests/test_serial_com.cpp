@@ -1,6 +1,6 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "doctest.h"
-#include "../include/SerialCom.h"
+#include "lib/xmlrpc/doctest.h"
+#include "hardware/SerialCom.h"
 #include <iostream>
 
 TEST_SUITE("SerialCom Unit Tests") {

@@ -1,4 +1,4 @@
-#include "../include/TrajectoryManager.h"
+#include "robot_model/TrajectoryManager.h"
 #include "../include/session/CurrentUser.h"  // <-- contexto de usuario (thread_local)
 #include <filesystem>
 #include <iostream>

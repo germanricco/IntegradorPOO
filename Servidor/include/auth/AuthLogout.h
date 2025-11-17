@@ -3,7 +3,7 @@
 
 #include "XmlRpc.h"
 #include "session/SessionManager.h"
-#include "PALogger.h"
+#include "utils/PALogger.h"
 
 namespace auth {
 

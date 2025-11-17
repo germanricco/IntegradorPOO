@@ -4,8 +4,8 @@
 #include <cstdlib>
 #include "XmlRpc.h"
 
-#include "../include/PALogger.h"
-#include "../include/ServiciosBasicos.h"
+#include "utils/PALogger.h"
+#include "ServiciosAdmin/ServiciosBasicos.h"
 
 // sesiones / usuarios
 #include "../include/session/SessionManager.h"

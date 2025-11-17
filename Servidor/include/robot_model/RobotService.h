@@ -1,9 +1,9 @@
 #ifndef ROBOTSERVICE_H
 #define ROBOTSERVICE_H
 
-#include "ArduinoService.h"
-#include "PALogger.h"
-#include "TrajectoryManager.h"
+#include "hardware/ArduinoService.h"
+#include "utils/PALogger.h"
+#include "robot_model/TrajectoryManager.h"
 
 #include <memory>
 #include <string>

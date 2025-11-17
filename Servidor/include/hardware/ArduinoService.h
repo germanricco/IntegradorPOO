@@ -1,7 +1,7 @@
 #ifndef ARDUINOSERVICE_H
 #define ARDUINOSERVICE_H
 
-#include "SerialCom.h"
+#include "hardware/SerialCom.h"
 #include <string>
 #include <memory>
 #include <chrono>

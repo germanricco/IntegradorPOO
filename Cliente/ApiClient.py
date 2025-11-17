@@ -69,7 +69,7 @@ class APIClient:
         """Registra un nuevo usuario (requiere admin)"""
         try:
             r = self.api.__getattr__("user.register")({
-                "token": self.token, "user": username, "pass": password, "privilegio": privilege
+                "token": self.token, "user": username, "pass": password, "role": privilege
             })
             return {"success": True, "data": r}
         except Fault as e:

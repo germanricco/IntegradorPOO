@@ -28,3 +28,12 @@ timestamp,peticion,usuario,nodo,respuesta
 2025-11-16 23:46:04,robot.setGripper,pepe,N/A,OK
 2025-11-16 23:46:12,robot.move,pepe,N/A,OK
 2025-11-16 23:46:20,robot.setGripper,pepe,N/A,OK
+2025-11-17 02:34:05,robot.setMotors,admin,N/A,OK
+2025-11-17 02:34:15,robot.move,admin,N/A,OK
+2025-11-17 02:34:19,robot.homing,admin,N/A,OK
+2025-11-17 02:34:19,robot.homing,admin,N/A,ERROR: ERROR: POINT IS OUTSIDE OF WORKSPACE
+2025-11-17 02:34:22,robot.homing,admin,N/A,OK
+2025-11-17 02:34:43,robot.setMotors,admin,N/A,OK
+2025-11-17 02:34:47,robot.setMotors,admin,N/A,OK
+2025-11-17 02:34:51,robot.setGripper,admin,N/A,OK
+2025-11-17 02:34:56,robot.setGripper,admin,N/A,OK

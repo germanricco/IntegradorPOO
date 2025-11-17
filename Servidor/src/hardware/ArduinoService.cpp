@@ -1,4 +1,4 @@
-#include "ArduinoService.h"
+#include "hardware/ArduinoService.h"
 
 ArduinoService::ArduinoService(const std::string& puerto, int baudrate)
     : serialCom(std::make_unique<SerialCom>(puerto, baudrate)),

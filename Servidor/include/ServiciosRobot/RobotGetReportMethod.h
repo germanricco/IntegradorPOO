@@ -3,9 +3,9 @@
 
 #include "../../lib/xmlrpc/XmlRpc.h" 
 #include "../session/SessionManager.h"
-#include "../PALogger.h"
-#include "../CommandHistory.h" // ¡Necesitamos esto!
+#include "../utils/PALogger.h"
 #include "../common/AuthZ.h"
+#include "../core/CommandHistory.h"
 
 namespace robot_service_methods {
 
