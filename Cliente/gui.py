@@ -145,18 +145,17 @@ class RobotApp:
             ("Gripper (M3/M5)", self.gripper),
             ("Mode (G90/G91)", self.mode),
             ("Move (G0)", self.move),
-            ("Obtener Reporte de Comandos", self.get_report)
+            ("Reporte de Comandos (RAM)", self.get_report) # <-- CAMBIO DE NOMBRE
         ]
         for texto, funcion in botones_comandos:
             ttk.Button(frame_comandos, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
 
         # --- Grupo: Manejo de trayectorias
-
         frame_trayectorias = tk.LabelFrame(self.frame_control, text="Gestión de trayectorias")
         frame_trayectorias.pack(fill="x", padx=10, pady=5)
         botones_trayectoria = [
             ("Subir Archivo (Upload)", self.upload),
-            ("Listar y Ejecutar Archivo (Run)", self.show_file_selection_dialog), # <-- Nuevo método
+            ("Listar y Ejecutar Archivo (Run)", self.show_file_selection_dialog),
             ("Iniciar Grabación (Rec Start)", self.rec_start),
             ("Detener Grabación (Rec Stop)", self.rec_stop),
         ]
@@ -166,13 +165,15 @@ class RobotApp:
 
         # --- Grupo: Gestión de usuarios (solo admin) ---
         if self.cliente.is_admin():
-            frame_usuarios = ttk.LabelFrame(self.frame_control, text="Gestión de usuarios")
+            frame_usuarios = ttk.LabelFrame(self.frame_control, text="Gestión de usuarios y Reportes")
             frame_usuarios.pack(fill="x", padx=10, pady=5)
             botones_usuarios = [
                 ("Registrar usuario", self.userRegister),
                 ("Lista de usuarios", self.userList),
                 ("Cambiar contraseña de usuario", self.changeUserPassword),
                 ("Cambiar estado de usuario", self.updateUser),
+                # --- NUEVO BOTÓN ---
+                ("Ver Log de Auditoría (CSV)", self.get_audit_log_report),
             ]
             for texto, funcion in botones_usuarios:
                 ttk.Button(frame_usuarios, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
@@ -335,6 +336,8 @@ class RobotApp:
             # (Aquí pondríamos el playsound('error.wav'))
         except Exception as e:
             messagebox.showerror("Error", str(e))
+
+    # --- MODIFICADO (get_report) ---
     def get_report(self):
         """
         Llama al servicio robot.getReport.
@@ -350,25 +353,19 @@ class RobotApp:
 
             # 1. Preguntar por filtros SOLO si es Admin
             if self.cliente.is_admin():
-                # Pregunta 1: Filtrar por usuario
                 filter_user = simpledialog.askstring("Filtro de Reporte (Admin)", 
                                                      "Filtrar por usuario (dejar en blanco para ver todos):",
                                                      parent=self.root)
-                
-                # Si presiona "Cancelar" en el primer diálogo, salimos
-                if filter_user is None:
-                    return 
-                if filter_user == "":
-                    filter_user = None # Convertir "" a None
+                if filter_user is None: return 
+                if filter_user == "": filter_user = None
 
-                # Pregunta 2: Filtrar por error
                 err_choice = messagebox.askyesnocancel("Filtro de Reporte (Admin)",
                                                        "¿Filtrar por estado de error?\n\n"
                                                        " - SÍ: Ver solo ERRORES.\n"
                                                        " - NO: Ver solo ÉXITOS.\n"
                                                        " - CANCELAR: Ver ambos.",
                                                        parent=self.root)
-                filter_error = err_choice # Esto es (True, False, o None)
+                filter_error = err_choice
             
             # 2. Llamar a la API con los filtros
             result = self.cliente.robot_get_report(filter_user, filter_error)
@@ -390,7 +387,7 @@ class RobotApp:
             if self.cliente.is_admin() and filter_user:
                 report_title = filter_user
             elif self.cliente.is_admin() and not filter_user:
-                report_title = "TODOS LOS USUARIOS"
+                report_title = "TODOS LOS USUARIOS (RAM)"
 
             report_msg = f"--- Reporte de Comandos para '{report_title}' ---\n\n"
             report_msg += f"Mostrando {len(entries)} de {total_cmds} comandos ({total_errs} errores)\n"
@@ -414,10 +411,8 @@ class RobotApp:
                     if details != "N/A":
                          report_msg += f"    > {details}\n"
 
-            # 5. Mostrar en la consola y en un messagebox
             self.visualizer.log(f"OK: Reporte generado ({len(entries)} comandos).")
-            # Usar un Toplevel con Text para mostrar reportes largos
-            self.show_report_dialog("Reporte de Comandos", report_msg)
+            self.show_report_dialog("Reporte de Comandos (RAM)", report_msg)
 
         except Fault as e:
             self.visualizer.log(f"ERROR: {e.faultString}")
@@ -440,6 +435,8 @@ class RobotApp:
         text_widget.config(state="disabled") # Hacerlo de solo lectura
 
         ttk.Button(dialog, text="Cerrar", command=dialog.destroy).pack(pady=5)
+    
+    # --- FIN DE FUNCIÓN MODIFICADA ---
 
     def upload(self):
         if not self.cliente.has_operator_privileges():
@@ -473,7 +470,12 @@ class RobotApp:
             messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
             return
         try:
-            r = self.cliente.robot_rec_start()
+            # --- MODIFICADO: Pedir nombre ---
+            nombre_logico = simpledialog.askstring("Iniciar Grabación", "Ingrese un nombre para la trayectoria:")
+            if not nombre_logico:
+                return
+            
+            r = self.cliente.robot_rec_start(nombre_logico)
             data = r.get('data', 'N/A')
             if isinstance(data, dict):
                 msg = data.get('msg', str(data))
@@ -492,8 +494,19 @@ class RobotApp:
             messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
             return
         try:
-            r = self.cliente.robot_rec_stop()
-            messagebox.showinfo("Trayectoria del robot", r.get('data', 'N/A').get('msg', 'N/A'))
+            # --- MODIFICADO: Pedir nombre ---
+            nombre_logico = simpledialog.askstring("Detener Grabación", "Ingrese el nombre de la trayectoria a detener:")
+            if not nombre_logico:
+                return
+                
+            r = self.cliente.robot_rec_stop(nombre_logico)
+            # --- MODIFICADO: Mostrar nombre final ---
+            msg = r.get('data', {}).get('msg', 'Detenido.')
+            filename = r.get('data', {}).get('filename', None)
+            if filename:
+                msg += f"\n\nGuardado como:\n{filename}"
+            messagebox.showinfo("Trayectoria del robot", msg)
+
 
         except Fault as e:
             messagebox.showerror("Error de Servidor", e.faultString)
@@ -714,6 +727,78 @@ class RobotApp:
         except Fault as e:
             messagebox.showerror("Error de Servidor", e.faultString)
         except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    # --- NUEVA FUNCIÓN ---
+    def get_audit_log_report(self):
+        """
+        Llama al servicio admin.getLogReport y muestra los resultados.
+        """
+        if not self.cliente.is_admin():
+            messagebox.showerror("Permiso Denegado", "Solo el admin puede realizar esta acción.")
+            return
+
+        try:
+            filter_user = None
+            filter_response = None
+
+            # 1. Preguntar por filtros
+            filter_user = simpledialog.askstring("Filtro de Log (Admin)", 
+                                                 "Filtrar por usuario (dejar en blanco para ver todos):",
+                                                 parent=self.root)
+            if filter_user is None: return 
+            if filter_user == "": filter_user = None
+
+            filter_response = simpledialog.askstring("Filtro de Log (Admin)", 
+                                                     "Filtrar si la respuesta 'contiene' este texto (ej. ERROR, OK, FORBIDDEN). Dejar en blanco para ver todo:",
+                                                     parent=self.root)
+            if filter_response is None: return
+            if filter_response == "": filter_response = None
+            
+            # 2. Llamar a la API con los filtros
+            result = self.cliente.admin_get_log_report(filter_user, filter_response)
+
+            if not result.get("success"):
+                 raise Exception(result.get("error", "Error desconocido del cliente"))
+
+            # 3. Procesar la respuesta
+            r = result["data"]
+            if not r.get('ok'):
+                 raise Exception("El servidor devolvió un error")
+
+            entries = r.get('log_entries', [])
+
+            # 4. Formatear el mensaje para mostrar
+            report_title = "TODOS LOS USUARIOS (CSV)"
+            if filter_user:
+                report_title = f"USUARIO: {filter_user} (CSV)"
+
+            report_msg = f"--- Reporte de Auditoría '{report_title}' ---\n\n"
+            report_msg += f"Mostrando {len(entries)} entradas\n"
+            report_msg += "----------------------------------------\n"
+
+            if not entries:
+                report_msg += "\n(No hay entradas que coincidan con el filtro)"
+            else:
+                for entry in entries:
+                    time = entry.get('timestamp', 'N/A')
+                    peticion = entry.get('peticion', 'N/A')
+                    user = entry.get('usuario', '???')
+                    nodo = entry.get('nodo', 'N/A')
+                    resp = entry.get('respuesta', 'N/A')
+                    
+                    report_msg += f"\n[{time}] @{user} (Nodo: {nodo})\n"
+                    report_msg += f"  PETICIÓN: {peticion}\n"
+                    report_msg += f"  RESPUESTA: {resp}\n"
+
+            self.visualizer.log(f"OK: Reporte CSV generado ({len(entries)} entradas).")
+            self.show_report_dialog("Reporte de Auditoría (audit.csv)", report_msg)
+
+        except Fault as e:
+            self.visualizer.log(f"ERROR: {e.faultString}")
+            messagebox.showerror("Error de Servidor", e.faultString)
+        except Exception as e:
+            self.visualizer.log(f"ERROR: {str(e)}")
             messagebox.showerror("Error", str(e))
 
 # --- El Lanzador ---

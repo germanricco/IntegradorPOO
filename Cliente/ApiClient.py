@@ -271,6 +271,30 @@ class APIClient:
             return {"success": True, "data": r}
         except Fault as e:
             return {"success": False, "error": e.faultString}
+
+    # --- NUEVO MÉTODO ---
+    def admin_get_log_report(self, filter_user=None, filter_response=None):
+        """
+        Obtiene el log de auditoría CSV.
+        - filter_user (str, opcional): Filtra por un nombre de usuario.
+        - filter_response (str, opcional): Filtra si la respuesta contiene este texto.
+        """
+        try:
+            # 1. Construir el payload base
+            payload = {"token": self.token}
+            
+            # 2. Añadir los filtros opcionales
+            if filter_user:
+                payload["filter_user"] = filter_user
+            if filter_response:
+                payload["filter_response"] = filter_response
+
+            # 3. Llamar al nuevo método RPC admin.getLogReport
+            r = self.api.__getattr__("admin.getLogReport")(payload)
+            
+            return {"success": True, "data": r}
+        except Fault as e:
+            return {"success": False, "error": e.faultString}
         
     # ===== Utilidades =====
     def get_available_methods(self):

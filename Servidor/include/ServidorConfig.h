@@ -18,7 +18,7 @@ struct ServidorConfig {
     // === Configuracion de logging ===
     std::string archivoLog = "servidor.log";
     bool logEnConsola = true;
-
+    std::string archivoAuditLog = "audit.csv";
     // === Configuracion del robot ===
     std::string puertoSerial = "/dev/ttyUSB0";
     int baudrate = 115200;

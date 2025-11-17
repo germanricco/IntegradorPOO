@@ -36,10 +36,11 @@ class ConsoleUI:
             print("MOVER ROBOT: <move> <x> <y> <z> <vel>                                # (G1)     ")
             print("SUBIR ARCHIVO: <upload> <local_file>                                            ")
             print("EJECUTAR: <run> <remote_file>                                                   ")
-            print("LISTAR ARCHIVOS: <list>                                              # Lista sus archivos (admin ve todos)")
+            print("LISTAR ARCHIVOS: <list> (o <ls>)                                     # Lista sus archivos (admin ve todos)")
             print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
-            print("OBTENER REPORTE DE COMANDOS: <report> [user=<user>] [error=true|false]          ")
+            print("REPORTE (RAM): <report> [user=<user>] [error=true|false]             # Reporte en vivo (CommandHistory)")
+            print("REPORTE (CSV): <logreport> [user=<user>] [response=<texto>]          # Reporte persistente (audit.csv)")
             print("======================================================================================================================")   
 
         elif self.client.priv == "op":      
@@ -328,7 +329,7 @@ class ConsoleUI:
                     else:
                         print(f"Error del servidor: {result['error']}")
 
-            elif cmd == "list":
+            elif cmd == "list" or cmd == "ls":
                 if not self.client.has_operator_privileges():
                     print("Error: Permiso denegado (se requiere 'op' o 'admin')")
                 elif len(args) != 0:
@@ -376,14 +377,15 @@ class ConsoleUI:
                     if result["success"]:
                         print("Respuesta del servidor:", result["data"])
                     else:
-                        print(f"Error: {result['error']}")
+                        print(f"Error del servidor: {result['error']}")
             
+            # --- MODIFICADO ---
             elif cmd == "report":
                 if not self.client.has_operator_privileges():
                     print("Error: Permiso denegado (se requiere 'op' o 'admin')")
-                    return True # <-- CORREGIDO
+                    return True
                 
-                # --- NUEVA LÓGICA DE PARSEO DE FILTROS ---
+                # --- LÓGICA DE PARSEO DE FILTROS ---
                 filter_user = None
                 filter_error = None
                 
@@ -409,11 +411,11 @@ class ConsoleUI:
                     except Exception as e:
                         print(f"Error en argumentos de filtro: {e}")
                         print("Uso: report [user=<nombre>] [error=true|false]")
-                        return True # <-- CORREGIDO
+                        return True
                 else:
                     if len(args) != 0:
                         print("Uso: report (los operadores no pueden usar filtros)")
-                        return True # <-- CORREGIDO
+                        return True
                     print("Solicitando reporte de comandos...")
                 # --- FIN LÓGICA DE PARSEO ---
 
@@ -454,6 +456,72 @@ class ConsoleUI:
 
                             if details != "N/A":
                                  print(f"    > {details}")
+                    
+                    print("==========================================================")
+                                            
+                except Exception as e:
+                    print(f"Error: {e}")
+
+            # --- NUEVO COMANDO ---
+            elif cmd == "logreport":
+                if not self.client.is_admin():
+                    print("Error: Permiso denegado (solo admin)")
+                    return True
+
+                # --- LÓGICA DE PARSEO DE FILTROS ---
+                filter_user = None
+                filter_response = None
+                
+                try:
+                    for arg in args:
+                        if arg.startswith("user="):
+                            filter_user = arg.split("=", 1)[1]
+                        elif arg.startswith("response="):
+                            filter_response = arg.split("=", 1)[1]
+                    
+                    log_msg = "Solicitando reporte de auditoría (CSV)..."
+                    if filter_user: log_msg += f" [Filtro Usuario: {filter_user}]"
+                    if filter_response: log_msg += f" [Filtro Respuesta: {filter_response}]"
+                    print(log_msg)
+
+                except Exception as e:
+                    print(f"Error en argumentos de filtro: {e}")
+                    print("Uso: logreport [user=<nombre>] [response=<texto>]")
+                    return True
+
+                try:
+                    # 1. Llamar al nuevo método de ApiClient
+                    result = self.client.admin_get_log_report(filter_user, filter_response)
+
+                    if not result["success"]:
+                         raise Exception(result["error"])
+
+                    # 2. Obtener los datos
+                    r = result["data"] 
+                    entries = r.get('log_entries', [])
+
+                    # 3. Imprimir el reporte CSV
+                    print("==========================================================")
+                    print(f"--- Reporte de Auditoría (audit.csv) ---")
+                    print(f"Mostrando {len(entries)} entradas")
+                    print("----------------------------------------------------------")
+
+                    if not entries:
+                        print("(No hay entradas que coincidan con el filtro)")
+                    else:
+                        # Imprimir cabecera
+                        headers = ["timestamp", "peticion", "usuario", "nodo", "respuesta"]
+                        # Pre-calcular anchos de columna
+                        rows = []
+                        for entry in entries:
+                            rows.append([
+                                entry.get('timestamp', 'N/A'),
+                                entry.get('peticion', 'N/A'),
+                                entry.get('usuario', 'N/A'),
+                                entry.get('nodo', 'N/A'),
+                                entry.get('respuesta', 'N/A')
+                            ])
+                        self.print_table(rows, headers)
                     
                     print("==========================================================")
                                             

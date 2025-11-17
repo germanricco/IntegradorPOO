@@ -49,7 +49,11 @@ CORE_SRCS := \
 EXTRA_SRCS := $(wildcard $(SRC_DIR)/ServiciosRobot/*.cpp) \
               $(wildcard $(SRC_DIR)/services/*.cpp) \
               $(wildcard $(SRC_DIR)/storage/*.cpp) \
-              $(wildcard $(SRC_DIR)/db/*.cpp)
+              $(wildcard $(SRC_DIR)/db/*.cpp) \
+			  $(wildcard $(SRC_DIR)/ServiciosAdmin/*.cpp)
+
+# Archivo que creamos directamente en src/
+EXTRA_SRCS += $(SRC_DIR)/AuditLogReader.cpp
 
 # Combinar todas las fuentes
 ALL_CORE_SRCS := $(CORE_SRCS) $(EXTRA_SRCS)

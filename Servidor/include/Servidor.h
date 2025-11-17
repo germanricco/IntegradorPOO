@@ -23,6 +23,8 @@
 #include "user/UserChangePassword.h"
 #include "user/UserRegister.h"
 
+#include "ServiciosAdmin/AdminGetLogReportMethod.h"
+
 #include "services/AuthService.h"
 
 // DB + repo de usuarios
@@ -54,6 +56,7 @@
 #include "ArduinoService.h"
 #include "RobotService.h"
 #include "TrajectoryManager.h"
+#include "AuditLogReader.h"
 
 // Historial de comandos
 #include "CommandHistory.h"
@@ -100,6 +103,8 @@ class Servidor {
         
         std::shared_ptr<CommandHistory> commandHistory_;
 
+        std::unique_ptr<AuditLogReader> auditLogReader_;
+
         // CAMBIOS GABI:Métodos RPC (se almacenan para mantenerlos vivos)
         std::unique_ptr<auth::AuthLogin>              mAuthLogin_;
         std::unique_ptr<auth::AuthLogout>             mAuthLogout_;
@@ -109,6 +114,9 @@ class Servidor {
         std::unique_ptr<userrpc::UserUpdate>          mUserUpdate_;
         std::unique_ptr<userrpc::UserChangePassword>  mUserChangePassword_;
         std::unique_ptr<userrpc::UserRegister>        mUserRegister_;
+
+        // --- Reporte de Admin (CSV) ---
+        std::unique_ptr<admin_service_methods::AdminGetLogReportMethod> mAdminGetLogReport_; 
 
         std::unique_ptr<robot_service_methods::RobotHomingMethod>      mRobotHoming_;
         std::unique_ptr<robot_service_methods::RobotMotorsMethod>      mRobotMotors_;

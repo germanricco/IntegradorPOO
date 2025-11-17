@@ -21,6 +21,14 @@ bool Servidor::inicializar(){
         commandHistory_ = std::make_shared<CommandHistory>(logger_);
         logger_.info("✅ Historial de Comandos inicializado");
 
+        // Instancia del lector de log CSV
+        // Le pasamos el nombre del archivo de auditoría desde la config
+        auditLogReader_ = std::make_unique<AuditLogReader>(
+            config_.archivoAuditLog, // (Usaremos este nombre de config)
+            logger_
+        );
+        logger_.info("✅ Lector de Log de Auditoría inicializado");
+
         // 1. Base de datos y autenticación
         if (!inicializarBaseDeDatos()) {
             logger_.warning("Base de datos no disponible - continuando sin funciones de autenticación");
@@ -181,7 +189,16 @@ void Servidor::registrarServiciosLogin() {
     mUserRegister_ = std::make_unique<userrpc::UserRegister>(
         servidorRpc_.get(), *sessionManager_, repo, logger_
     );
-
+    
+    // Registrar el método de reporte de log CSV (Reporte #3)
+    logger_.info("Registrando método AdminGetLogReport...");
+    mAdminGetLogReport_ = std::make_unique<admin_service_methods::AdminGetLogReportMethod>(
+        servidorRpc_.get(),
+        *sessionManager_,
+        logger_,
+        *auditLogReader_ // ¡Le pasamos el lector de CSV!
+    );
+    // ---------------------------------
   
     logger_.info("✅ Servicios de Login y Autenticacion registrados");
 }
