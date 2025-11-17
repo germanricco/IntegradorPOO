@@ -39,6 +39,7 @@ class ConsoleUI:
             print("LISTAR ARCHIVOS: <list>                                              # Lista sus archivos (admin ve todos)")
             print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
+            print("OBTENER REPORTE DE COMANDOS: <report>                                           ")
             print("======================================================================================================================")   
 
         elif self.client.priv == "op":      
@@ -56,6 +57,7 @@ class ConsoleUI:
             print("LISTAR ARCHIVOS: <list> (o <ls>)                                     # Lista sus archivos de trayectoria")
             print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
+            print("OBTENER REPORTE DE COMANDOS: <report>                                           ")
             print("======================================================================================================================")  
         print("CERRAR PROGRAMA: <quit>       # Cerrar el programa "  )
         print("==================================================================================================================")  
@@ -375,6 +377,51 @@ class ConsoleUI:
                         print("Respuesta del servidor:", result["data"])
                     else:
                         print(f"Error: {result['error']}")
+            elif cmd == "report":
+                if not self.client.has_operator_privileges():
+                    print("Error: Permiso denegado (se requiere 'op' o 'admin')")
+                elif len(args) != 0:
+                    print("Uso: report")
+                else:
+                    print("Solicitando reporte de comandos...")
+                    try:
+                        # 1. Llamar al método limpio de ApiClient
+                        result = self.client.robot_get_report()
+
+                        if not result["success"]:
+                             raise Exception(result["error"])
+
+                        # 2. Obtener los datos
+                        r = result["data"] 
+                        total_cmds = r.get('total_comandos', 0)
+                        total_errs = r.get('total_errores', 0)
+                        entries = r.get('entries', [])
+
+                        # 3. Imprimir el reporte (¡ESTA ES LA PARTE QUE FALTABA!)
+                        print("==========================================================")
+                        print(f"--- Reporte de Comandos para '{self.client.user}' ---")
+                        print(f"Total de Comandos: {total_cmds}")
+                        print(f"Total de Errores: {total_errs}")
+                        print("----------------------------------------------------------")
+
+                        if not entries:
+                            print("(No hay comandos en el historial)")
+                        else:
+                            # Recorremos la lista de entradas y las imprimimos
+                            for entry in entries:
+                                status = "ERROR" if entry.get('error') else "OK   "
+                                details = entry.get('details', 'N/A')
+                                service = entry.get('service', 'N/A')
+                                time = entry.get('timestamp', 'N/A')
+                                
+                                print(f"[{time}] [{status}] {service}")
+                                if details != "N/A":
+                                     print(f"    > {details}")
+                        
+                        print("==========================================================")
+                                                
+                    except Exception as e:
+                        print(f"Error: {e}")
 
             elif cmd == "quit":
                 return False

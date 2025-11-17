@@ -8,15 +8,20 @@ namespace robot_service_methods {
 RobotConnectMethod::RobotConnectMethod(XmlRpc::XmlRpcServer* server,
                                        SessionManager& sm,
                                        PALogger& L,
-                                       RobotService& rs)
+                                       RobotService& rs,
+                                       CommandHistory& ch)
     : XmlRpc::XmlRpcServerMethod("robot.connect", server), // Nombre RPC
       sessions_(sm),
       logger_(L),
-      robotService_(rs) {}
+      robotService_(rs), 
+      history_(ch) {}
 
 // --- Execute ---
 void RobotConnectMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result) {
     const char* const METHOD_NAME = "robot.connect";
+    std::string user_for_history = "desconocido";
+    const std::string details = "N/A"; // No hay detalles para este comando
+
     try {
         // 1. Validar Parámetros (solo token)
         XmlRpc::XmlRpcValue args = rpc_norm(params);
@@ -28,9 +33,12 @@ void RobotConnectMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValu
         // 2. Validar Sesión y Permisos (¡SOLO ADMIN!)
         // Usamos guardAdmin, que ya loguea y lanza excepción si no es Admin
         const SessionView& session = guardAdmin(METHOD_NAME, sessions_, token, logger_);
+        user_for_history = session.user; // Guardamos el usuario real
         logger_.info(std::string("[") + METHOD_NAME + "] Solicitud de conexión por Admin: " + session.user);
 
         // 3. Llamar a la Lógica de Negocio (RobotService)
+        history_.addEntry(session.user, METHOD_NAME, details, false);
+
         // El método conectarRobot() de RobotService devuelve un booleano.
         // Lo llamamos con 3 reintentos como en pruebita_server.
         bool exito = robotService_.conectarRobot(3);
@@ -49,9 +57,11 @@ void RobotConnectMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValu
     } catch (const XmlRpc::XmlRpcException& e) {
         throw;
     } catch (const std::runtime_error& e) {
+        history_.addEntry(user_for_history, METHOD_NAME, e.what(), true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error de runtime: " + std::string(e.what()));
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: " + std::string(e.what()));
     } catch (...) {
+        history_.addEntry(user_for_history, METHOD_NAME, "Error inesperado", true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error inesperado.");
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: Ocurrió un error inesperado en " + std::string(METHOD_NAME));
     }

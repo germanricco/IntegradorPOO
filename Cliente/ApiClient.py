@@ -246,7 +246,20 @@ class APIClient:
             return {"success": True, "files": r["files"]}
         except Fault as e:
             return {"success": False, "error": e.faultString}
-
+    
+    def robot_get_report(self):
+        """Obtiene el historial de comandos del usuario."""
+        try:
+            # Llama al método RPC que implementamos en el servidor
+            r = self.api.__getattr__("robot.getReport")({
+                "token": self.token
+            })
+            # El servidor C++ devuelve {ok: bool, total_comandos: int, ...}
+            # Lo envolvemos en el formato estándar de nuestro cliente
+            return {"success": True, "data": r}
+        except Fault as e:
+            return {"success": False, "error": e.faultString}
+        
     # ===== Utilidades =====
     def get_available_methods(self):
         """Obtiene lista de métodos RPC disponibles"""

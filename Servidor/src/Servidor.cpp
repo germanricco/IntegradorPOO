@@ -196,19 +196,19 @@ void Servidor::registrarMetodosRobot() {
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotMode_ = std::make_unique<robot_service_methods::RobotModeMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotConnect_ = std::make_unique<robot_service_methods::RobotConnectMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotDisconnect_ = std::make_unique<robot_service_methods::RobotDisconnectMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotGripper_ = std::make_unique<robot_service_methods::RobotGripperMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotStatus_ = std::make_unique<robot_service_methods::RobotStatusMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotMove_ = std::make_unique<robot_service_methods::RobotMoveMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_

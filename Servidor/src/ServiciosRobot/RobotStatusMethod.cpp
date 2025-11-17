@@ -8,15 +8,20 @@ namespace robot_service_methods {
 RobotStatusMethod::RobotStatusMethod(XmlRpc::XmlRpcServer* server,
                                            SessionManager& sm,
                                            PALogger& L,
-                                           RobotService& rs)
+                                           RobotService& rs,
+                                           CommandHistory& ch)
     : XmlRpc::XmlRpcServerMethod("robot.getStatus", server), // Nombre RPC
       sessions_(sm),
       logger_(L),
-      robotService_(rs) {}
+      robotService_(rs), 
+      history_(ch) {}
 
 // --- Execute ---
 void RobotStatusMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result) {
     const char* const METHOD_NAME = "robot.getStatus";
+    std::string user_for_history = "desconocido";
+    std::string details_for_history = "N/A";
+
     try {
         // 1. Validar Parámetros (solo token)
         XmlRpc::XmlRpcValue args = rpc_norm(params);
@@ -27,6 +32,9 @@ void RobotStatusMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue
 
         // 2. Validar Sesión y Permisos (Op o Admin)
         const SessionView& session = guardSession(METHOD_NAME, sessions_, token, logger_);
+        user_for_history = session.user; // Guardamos usuario real
+
+
         if (session.privilegio != "admin" && session.privilegio != "op") {
             logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - Se requiere Op o Admin. Usuario: " + session.user);
             throw XmlRpc::XmlRpcException("FORBIDDEN: privilegios insuficientes (se requiere Op o Admin)");
@@ -50,9 +58,11 @@ void RobotStatusMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue
     } catch (const XmlRpc::XmlRpcException& e) {
         throw;
     } catch (const std::runtime_error& e) {
+        history_.addEntry(user_for_history, METHOD_NAME, e.what(), true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error de runtime: " + std::string(e.what()));
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: " + std::string(e.what()));
     } catch (...) {
+        history_.addEntry(user_for_history, METHOD_NAME, "Error inesperado", true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error inesperado.");
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: Ocurrió un error inesperado en " + std::string(METHOD_NAME));
     }
