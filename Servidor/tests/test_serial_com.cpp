@@ -1,5 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "lib/xmlrpc/doctest.h"
+#include "doctest.h"
 #include "hardware/SerialCom.h"
 #include <iostream>
 
@@ -16,7 +16,7 @@ TEST_SUITE("SerialCom Unit Tests") {
     TEST_CASE("Default Constructor Values") {
         SerialCom serial;
         
-        CHECK(serial.getPort() == "/dev/ttyACM0");
+        CHECK(serial.getPort() == "/dev/ttyUSB0");
         CHECK(serial.getBaudrate() == 19200);
         CHECK_FALSE(serial.isDeviceConnected());
     }

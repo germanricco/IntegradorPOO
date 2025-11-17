@@ -58,3 +58,303 @@
 [2025-11-04 13:38:03] [INFO] === FIN TESTS ROBOTSERVICE ===
 [2025-11-04 13:38:03] [INFO] Desconectando robot...
 [2025-11-04 13:38:03] [INFO] Robot desconectado
+[2025-11-17 03:59:30] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-11-17 03:59:30] [INFO] Inicializando servicios...
+[2025-11-17 03:59:30] [INFO] RobotService Inicializado
+[2025-11-17 03:59:30] [INFO] Conectando al Arduino...
+[2025-11-17 03:59:32] [INFO] ❌ NO SE PUDO ESTABLECER CONEXIÓN GLOBAL
+[2025-11-17 04:00:04] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-11-17 04:00:04] [INFO] Inicializando servicios...
+[2025-11-17 04:00:04] [INFO] RobotService Inicializado
+[2025-11-17 04:00:04] [INFO] Conectando al Arduino...
+[2025-11-17 04:00:08] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-11-17 04:00:08] [INFO] Robot conectado y configurado en modo absoluto
+[2025-11-17 04:00:08] [INFO] ✅ CONEXIÓN GLOBAL ESTABLECIDA
+[2025-11-17 04:00:08] [INFO] Activando Motores...
+[2025-11-17 04:00:08] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:00:08] [INFO] ✅ Conexión verificada exitosamente
+[2025-11-17 04:00:08] [INFO] 🧪 TEST: Comando G28 - Homing
+[2025-11-17 04:00:12] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:00:12] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:00:12] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:00:12] [INFO] Respuesta 'G1 X100.00 Y50.00 Z50.00 F100
+': 
+[2025-11-17 04:00:12] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:00:14] [INFO] Respuesta 'G1 X105.00 Y55.00 Z45.00 F50
+': 
+[2025-11-17 04:00:14] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:00:15] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:00:15] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:00:17] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:00:17] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:00:17] [INFO] Respuesta 'M18':  MOTORS DISABLED
+[2025-11-17 04:00:17] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:00:17] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:00:17] [INFO] 🧪 TEST: Comando M114 - Estado del Robot
+[2025-11-17 04:00:18] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:00:18] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:00:18] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-11-17 04:00:18] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:00:18] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-11-17 04:00:18] [INFO] 
+🧪 TEST: Secuencia Completa de Operación
+[2025-11-17 04:00:18] [INFO] 🔧 INICIANDO SECUENCIA COMPLETA
+
+[2025-11-17 04:00:21] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:00:21] [INFO] ✅ Paso 1/7 - Homing completado
+[2025-11-17 04:00:21] [INFO] ✅ Paso 2/7 - Motores activados
+[2025-11-17 04:00:22] [INFO] Respuesta 'G1 X100.00 Y100.00 Z100.00 F200
+': 
+[2025-11-17 04:00:22] [INFO] ✅ Paso 3/7 - Movimiento a posición inicial
+[2025-11-17 04:00:23] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:00:23] [INFO] ✅ Paso 4/7 - Efector activado
+[2025-11-17 04:00:24] [INFO] Respuesta 'G1 X100.00 Y100.00 Z30.00 F100
+': 
+[2025-11-17 04:00:24] [INFO] ✅ Paso 5/7 - Movimiento con efector activado
+[2025-11-17 04:00:25] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:00:25] [INFO] ✅ Paso 6/7 - Efector desactivado
+[2025-11-17 04:00:26] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:00:26] [INFO] ✅ Paso 7/7 - Estado final obtenido
+[2025-11-17 04:00:26] [INFO] 🎉 SECUENCIA COMPLETA FINALIZADA EXITOSAMENTE
+[2025-11-17 04:00:26] [INFO] === FIN TESTS ROBOTSERVICE ===
+[2025-11-17 04:00:26] [INFO] Desconectando robot...
+[2025-11-17 04:00:26] [INFO] Robot desconectado
+[2025-11-17 04:32:48] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-11-17 04:32:48] [INFO] Inicializando servicios...
+[2025-11-17 04:32:48] [INFO] RobotService Inicializado
+[2025-11-17 04:32:48] [INFO] Conectando al Arduino...
+[2025-11-17 04:32:53] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-11-17 04:32:53] [INFO] Robot conectado y configurado en modo absoluto
+[2025-11-17 04:32:53] [INFO] ✅ CONEXIÓN GLOBAL ESTABLECIDA
+[2025-11-17 04:32:53] [INFO] Activando Motores...
+[2025-11-17 04:32:53] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:32:53] [INFO] ✅ Conexión verificada exitosamente
+[2025-11-17 04:32:53] [INFO] 🧪 TEST: Comando G28 - Homing
+[2025-11-17 04:32:56] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:32:57] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:32:57] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:32:57] [INFO] Respuesta 'G1 X100.00 Y50.00 Z50.00 F100
+': 
+[2025-11-17 04:32:57] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:32:59] [INFO] Respuesta 'G1 X105.00 Y55.00 Z45.00 F50
+': 
+[2025-11-17 04:32:59] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:33:00] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:33:00] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:33:01] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:33:01] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:33:02] [INFO] Respuesta 'M18':  MOTORS DISABLED
+[2025-11-17 04:33:02] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:33:02] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:33:02] [INFO] 🧪 TEST: Comando M114 - Estado del Robot
+[2025-11-17 04:33:02] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:33:02] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:33:03] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-11-17 04:33:03] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:33:03] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-11-17 04:33:03] [INFO] 
+🧪 TEST: Secuencia Completa de Operación
+[2025-11-17 04:33:03] [INFO] 🔧 INICIANDO SECUENCIA COMPLETA
+
+[2025-11-17 04:33:06] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:33:06] [INFO] ✅ Paso 1/7 - Homing completado
+[2025-11-17 04:33:06] [INFO] ✅ Paso 2/7 - Motores activados
+[2025-11-17 04:33:06] [INFO] Respuesta 'G1 X100.00 Y100.00 Z100.00 F200
+': 
+[2025-11-17 04:33:06] [INFO] ✅ Paso 3/7 - Movimiento a posición inicial
+[2025-11-17 04:33:08] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:33:08] [INFO] ✅ Paso 4/7 - Efector activado
+[2025-11-17 04:33:08] [INFO] Respuesta 'G1 X100.00 Y100.00 Z30.00 F100
+': 
+[2025-11-17 04:33:08] [INFO] ✅ Paso 5/7 - Movimiento con efector activado
+[2025-11-17 04:33:10] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:33:10] [INFO] ✅ Paso 6/7 - Efector desactivado
+[2025-11-17 04:33:10] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:33:10] [INFO] ✅ Paso 7/7 - Estado final obtenido
+[2025-11-17 04:33:10] [INFO] 🎉 SECUENCIA COMPLETA FINALIZADA EXITOSAMENTE
+[2025-11-17 04:33:10] [INFO] === FIN TESTS ROBOTSERVICE ===
+[2025-11-17 04:33:10] [INFO] Desconectando robot...
+[2025-11-17 04:33:10] [INFO] Robot desconectado
+[2025-11-17 04:42:11] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-11-17 04:42:11] [INFO] Inicializando servicios...
+[2025-11-17 04:42:11] [INFO] RobotService Inicializado
+[2025-11-17 04:42:11] [INFO] Conectando al Arduino...
+[2025-11-17 04:42:16] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-11-17 04:42:16] [INFO] Robot conectado y configurado en modo absoluto
+[2025-11-17 04:42:16] [INFO] ✅ CONEXIÓN GLOBAL ESTABLECIDA
+[2025-11-17 04:42:16] [INFO] Activando Motores...
+[2025-11-17 04:42:17] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:42:17] [INFO] ✅ Conexión verificada exitosamente
+[2025-11-17 04:42:17] [INFO] 🧪 TEST: Comando G28 - Homing
+[2025-11-17 04:42:20] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:42:20] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:42:20] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:42:21] [INFO] Respuesta 'G1 X100.00 Y50.00 Z50.00 F100
+': 
+[2025-11-17 04:42:21] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:42:22] [INFO] Respuesta 'G1 X105.00 Y55.00 Z45.00 F50
+': 
+[2025-11-17 04:42:22] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:42:23] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:42:23] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:42:25] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:42:25] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:42:25] [INFO] Respuesta 'M18':  MOTORS DISABLED
+[2025-11-17 04:42:25] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:42:25] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:42:25] [INFO] 🧪 TEST: Comando M114 - Estado del Robot
+[2025-11-17 04:42:26] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:42:26] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:42:26] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-11-17 04:42:26] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:42:26] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-11-17 04:42:26] [INFO] 
+🧪 TEST: Secuencia Completa de Operación
+[2025-11-17 04:42:26] [INFO] 🔧 INICIANDO SECUENCIA COMPLETA
+
+[2025-11-17 04:42:30] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:42:30] [INFO] ✅ Paso 1/7 - Homing completado
+[2025-11-17 04:42:31] [INFO] ✅ Paso 2/7 - Motores activados
+[2025-11-17 04:42:31] [INFO] Respuesta 'G1 X100.00 Y100.00 Z100.00 F200
+': 
+[2025-11-17 04:42:31] [INFO] ✅ Paso 3/7 - Movimiento a posición inicial
+[2025-11-17 04:42:33] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:42:33] [INFO] ✅ Paso 4/7 - Efector activado
+[2025-11-17 04:42:33] [INFO] Respuesta 'G1 X100.00 Y100.00 Z30.00 F100
+': 
+[2025-11-17 04:42:33] [INFO] ✅ Paso 5/7 - Movimiento con efector activado
+[2025-11-17 04:42:35] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:42:35] [INFO] ✅ Paso 6/7 - Efector desactivado
+[2025-11-17 04:42:35] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:42:35] [INFO] ✅ Paso 7/7 - Estado final obtenido
+[2025-11-17 04:42:35] [INFO] 🎉 SECUENCIA COMPLETA FINALIZADA EXITOSAMENTE
+[2025-11-17 04:42:35] [INFO] === FIN TESTS ROBOTSERVICE ===
+[2025-11-17 04:42:35] [INFO] Desconectando robot...
+[2025-11-17 04:42:35] [INFO] Robot desconectado
+[2025-11-17 04:46:50] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-11-17 04:46:50] [INFO] Inicializando servicios...
+[2025-11-17 04:46:50] [INFO] RobotService Inicializado
+[2025-11-17 04:46:50] [INFO] Conectando al Arduino...
+[2025-11-17 04:46:55] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-11-17 04:46:55] [INFO] Robot conectado y configurado en modo absoluto
+[2025-11-17 04:46:55] [INFO] ✅ CONEXIÓN GLOBAL ESTABLECIDA
+[2025-11-17 04:46:55] [INFO] Activando Motores...
+[2025-11-17 04:46:55] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:46:55] [INFO] ✅ Conexión verificada exitosamente
+[2025-11-17 04:46:55] [INFO] 🧪 TEST: Comando G28 - Homing
+[2025-11-17 04:46:58] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:46:59] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:46:59] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:46:59] [INFO] Respuesta 'G1 X100.00 Y50.00 Z50.00 F100
+': 
+[2025-11-17 04:46:59] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:47:00] [INFO] Respuesta 'G1 X105.00 Y55.00 Z45.00 F50
+': 
+[2025-11-17 04:47:00] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:47:02] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:47:02] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:47:03] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:47:03] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:47:03] [INFO] Respuesta 'M18':  MOTORS DISABLED
+[2025-11-17 04:47:03] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:47:04] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:47:04] [INFO] 🧪 TEST: Comando M114 - Estado del Robot
+[2025-11-17 04:47:04] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:47:04] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:47:04] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-11-17 04:47:04] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:47:05] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-11-17 04:47:05] [INFO] 
+🧪 TEST: Secuencia Completa de Operación
+[2025-11-17 04:47:05] [INFO] 🔧 INICIANDO SECUENCIA COMPLETA
+
+[2025-11-17 04:47:08] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:47:08] [INFO] ✅ Paso 1/7 - Homing completado
+[2025-11-17 04:47:09] [INFO] ✅ Paso 2/7 - Motores activados
+[2025-11-17 04:47:10] [INFO] Respuesta 'G1 X0.00 Y150.00 Z150.00 F100
+': 
+[2025-11-17 04:47:10] [INFO] ✅ Paso 3/7 - Movimiento a posición inicial
+[2025-11-17 04:47:11] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:47:11] [INFO] ✅ Paso 4/7 - Efector activado
+[2025-11-17 04:47:11] [INFO] Respuesta 'G1 X0.00 Y150.00 Z120.00 F100
+': 
+[2025-11-17 04:47:11] [INFO] ✅ Paso 5/7 - Movimiento con efector activado
+[2025-11-17 04:47:13] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:47:13] [INFO] ✅ Paso 6/7 - Efector desactivado
+[2025-11-17 04:47:13] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:47:13] [INFO] ✅ Paso 7/7 - Estado final obtenido
+[2025-11-17 04:47:13] [INFO] 🎉 SECUENCIA COMPLETA FINALIZADA EXITOSAMENTE
+[2025-11-17 04:47:13] [INFO] === FIN TESTS ROBOTSERVICE ===
+[2025-11-17 04:47:13] [INFO] Desconectando robot...
+[2025-11-17 04:47:13] [INFO] Robot desconectado
+[2025-11-17 04:50:00] [INFO] === INICIO TESTS ROBOTSERVICE ===
+[2025-11-17 04:50:00] [INFO] Inicializando servicios...
+[2025-11-17 04:50:00] [INFO] RobotService Inicializado
+[2025-11-17 04:50:00] [INFO] Conectando al Arduino...
+[2025-11-17 04:50:04] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE |  |  MOTORS DISABLED |  FAN DISABLED
+[2025-11-17 04:50:04] [INFO] Robot conectado y configurado en modo absoluto
+[2025-11-17 04:50:04] [INFO] ✅ CONEXIÓN GLOBAL ESTABLECIDA
+[2025-11-17 04:50:04] [INFO] Activando Motores...
+[2025-11-17 04:50:04] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:50:04] [INFO] ✅ Conexión verificada exitosamente
+[2025-11-17 04:50:04] [INFO] 🧪 TEST: Comando G28 - Homing
+[2025-11-17 04:50:07] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:50:08] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:50:08] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:50:08] [INFO] Respuesta 'G1 X100.00 Y50.00 Z50.00 F100
+': 
+[2025-11-17 04:50:08] [INFO] 🧪 TEST: Comando G1 - Movimiento
+[2025-11-17 04:50:10] [INFO] Respuesta 'G1 X105.00 Y55.00 Z45.00 F50
+': 
+[2025-11-17 04:50:10] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:50:11] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:50:11] [INFO] 🧪 TEST: Comandos M3/M5 - Efector Final
+[2025-11-17 04:50:12] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:50:12] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:50:13] [INFO] Respuesta 'M18':  MOTORS DISABLED
+[2025-11-17 04:50:13] [INFO] 🧪 TEST: Comandos M17/M18 - Control de Motores
+[2025-11-17 04:50:13] [INFO] Respuesta 'M17':  MOTORS ENABLED
+[2025-11-17 04:50:13] [INFO] 🧪 TEST: Comando M114 - Estado del Robot
+[2025-11-17 04:50:13] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:50:13] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:50:14] [INFO] Respuesta 'G91
+':  RELATIVE MODE ON
+[2025-11-17 04:50:14] [INFO] 🧪 TEST: Comandos G90/G91 - Modos Coordenadas
+[2025-11-17 04:50:14] [INFO] Respuesta 'G90
+':  ABSOLUTE MODE ON
+[2025-11-17 04:50:14] [INFO] 
+🧪 TEST: Secuencia Completa de Operación
+[2025-11-17 04:50:14] [INFO] 🔧 INICIANDO SECUENCIA COMPLETA
+
+[2025-11-17 04:50:17] [INFO] Respuesta 'G28':  HOMING COMPLETE
+[2025-11-17 04:50:17] [INFO] ✅ Paso 1/7 - Homing completado
+[2025-11-17 04:50:18] [INFO] ✅ Paso 2/7 - Motores activados
+[2025-11-17 04:50:19] [INFO] Respuesta 'G1 X0.00 Y170.00 Z120.00 F50
+': 
+[2025-11-17 04:50:19] [INFO] ✅ Paso 3/7 - Movimiento a posición inicial
+[2025-11-17 04:50:20] [INFO] Respuesta 'M3':  GRIPPER ON
+[2025-11-17 04:50:20] [INFO] ✅ Paso 4/7 - Efector activado
+[2025-11-17 04:50:21] [INFO] Respuesta 'G1 X0.00 Y170.00 Z100.00 F50
+': 
+[2025-11-17 04:50:21] [INFO] ✅ Paso 5/7 - Movimiento con efector activado
+[2025-11-17 04:50:22] [INFO] Respuesta 'M5':  GRIPPER OFF
+[2025-11-17 04:50:22] [INFO] ✅ Paso 6/7 - Efector desactivado
+[2025-11-17 04:50:22] [INFO] Respuesta 'M114':  ABSOLUTE MODE |  MOTORS ENABLED |  FAN ENABLED
+[2025-11-17 04:50:22] [INFO] ✅ Paso 7/7 - Estado final obtenido
+[2025-11-17 04:50:22] [INFO] 🎉 SECUENCIA COMPLETA FINALIZADA EXITOSAMENTE
+[2025-11-17 04:50:22] [INFO] === FIN TESTS ROBOTSERVICE ===
+[2025-11-17 04:50:22] [INFO] Desconectando robot...
+[2025-11-17 04:50:22] [INFO] Robot desconectado

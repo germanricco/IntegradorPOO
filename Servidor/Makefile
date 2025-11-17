@@ -27,7 +27,6 @@ CORE_SRCS := \
   $(SRC_DIR)/ServiciosAdmin/ServiciosBasicos.cpp \
   $(SRC_DIR)/session/SessionManager.cpp \
   $(SRC_DIR)/session/CurrentUser.cpp \
-  $(SRC_DIR)/user/UserEntity.cpp \
   $(SRC_DIR)/user/UsersRepoCsv.cpp \
   $(SRC_DIR)/auth/AuthLogin.cpp \
   $(SRC_DIR)/auth/AuthMe.cpp \
@@ -56,7 +55,7 @@ EXTRA_SRCS := $(wildcard $(SRC_DIR)/ServiciosRobot/*.cpp) \
 # Combinar todas las fuentes
 ALL_CORE_SRCS := $(CORE_SRCS) $(EXTRA_SRCS)
 
-# Generar objetos manteniendo estructura de directorios
+# Generar objetos mantenien estructura de directorios
 CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(CORE_SRCS))
 EXTRA_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(EXTRA_SRCS))
 ALL_CORE_OBJS := $(CORE_OBJS) $(EXTRA_OBJS)
@@ -107,23 +106,23 @@ tests: $(TEST_SERIAL_BIN) $(TEST_ARDUINO_BIN) $(TEST_FILE_BIN) $(TEST_ROBOT_BIN)
 # COMPILACIÓN DE TESTS INDIVIDUALES
 # =============================================
 
-$(TEST_SERIAL_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_serial_com.o
+$(TEST_SERIAL_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_serial_com.o
 	@echo "🧪 Enlazando test de SerialCom..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-$(TEST_ARDUINO_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_arduino_service.o
+$(TEST_ARDUINO_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_arduino_service.o
 	@echo "🤖 Enlazando test de ArduinoService..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-$(TEST_FILE_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_file.o
+$(TEST_FILE_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_file.o
 	@echo "📁 Enlazando test de Archivos..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-$(TEST_ROBOT_BIN): $(CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_robot_service.o
+$(TEST_ROBOT_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_robot_service.o
 	@echo "🤖 Enlazando test de RobotService..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-$(TEST_TRAJECTORY_BIN): $(OBJ_DIR)/TrajectoryManager.o $(OBJ_DIR)/File.o $(OBJ_DIR)/session/CurrentUser.o $(OBJ_DIR)/test_trajectory_manager.o
+$(TEST_TRAJECTORY_BIN): $(ALL_CORE_OBJS) $(XMLRPC_OBJS) $(OBJ_DIR)/test_trajectory_manager.o
 	@echo "📝 Enlazando test de TrajectoryManager..."
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 

@@ -1,9 +1,10 @@
 // --- Servidor/tests/test_trajectory_manager.cpp ---
 
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "lib/xmlrpc/doctest.h"
+#include "doctest.h"
 #include "robot_model/TrajectoryManager.h"
 #include "utils/File.h"  // Necesario para leer/verificar
+#include "../include/session/CurrentUser.h"
 #include <filesystem>
 #include <vector>
 #include <string>
@@ -30,7 +31,7 @@ void limpiarDirectorioTest() {
 // --- TEST CASE PRINCIPAL ---
 // ===========================================
 TEST_CASE("TrajectoryManager: Flujo completo de grabación") {
-    
+    CurrentUser::set(1);
     limpiarDirectorioTest();
     
     // 1. CREACIÓN
@@ -82,7 +83,7 @@ TEST_CASE("TrajectoryManager: Flujo completo de grabación") {
 }
 
 TEST_CASE("TrajectoryManager: Casos Borde") {
-    
+    CurrentUser::set(1);
     limpiarDirectorioTest();
     TrajectoryManager manager(DIRECTORIO_PRUEBAS);
 
@@ -98,7 +99,7 @@ TEST_CASE("TrajectoryManager: Casos Borde") {
     
     // Verificamos que sigue grabando la *primera*
     CHECK(manager.estaGrabando());
-    CHECK(manager.getTrayectoriaActual().rfind("prueba_doble", 0) != std::string::npos);
+    CHECK(manager.getTrayectoriaActual().rfind("prueba_doble") != std::string::npos);
 
     manager.finalizarGrabacion();
 }

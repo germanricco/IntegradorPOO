@@ -1,6 +1,6 @@
 // test_robot_service.cpp - Tests actualizados
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "lib/xmlrpc/doctest.h"
+#include "doctest.h"
 #include "robot_model/RobotService.h"
 #include "utils/PALogger.h"
 #include "hardware/ArduinoService.h"
@@ -15,7 +15,7 @@ struct TestConfig {
     static const std::string LOG_FILENAME;
 };
 
-const std::string TestConfig::TEST_PORT = "/dev/ttyACM0";
+const std::string TestConfig::TEST_PORT = "/dev/ttyUSB0";
 const int TestConfig::TEST_BAUDRATE = 115200;
 const std::string TestConfig::LOG_FILENAME = "log_test_robot_service.log";
 
@@ -159,7 +159,7 @@ TEST_SUITE("RobotService Integration Tests") {
         }
         
         SUBCASE("Movimiento con velocidad por defecto") {
-            std::string respuesta = robotService->mover(105.0, 55.0, 45.0);
+            std::string respuesta = robotService->mover(105.0, 55.0, 45.0, 50);
             CHECK_FALSE(respuesta.empty());
             bool tieneError = (respuesta.find("ERROR:") == 0);
             CHECK_FALSE(tieneError);
@@ -278,15 +278,23 @@ TEST_SUITE("RobotService Integration Tests") {
         
         // 1. Homing
         std::string respuesta = robotService->homing();
+        CHECK(respuesta.find("ERROR") == std::string::npos);
         logger->info("✅ Paso 1/7 - Homing completado");
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
         // 2. Activar motores (por si se desactivaron)
         respuesta = robotService->activarMotores();
         CHECK(respuesta.find("ERROR") == std::string::npos);
         logger->info("✅ Paso 2/7 - Motores activados");
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
         // 3. Movimiento a posición inicial
-        respuesta = robotService->mover(100, 100, 100, 200);
+        respuesta = robotService->mover(0, 170, 120, 50);
+        if (respuesta.find("ERROR") != std::string::npos) {
+            logger->error("Fallo en movimiento: " + respuesta);
+        }
         CHECK(respuesta.find("ERROR") == std::string::npos);
         logger->info("✅ Paso 3/7 - Movimiento a posición inicial");
         
@@ -296,7 +304,7 @@ TEST_SUITE("RobotService Integration Tests") {
         logger->info("✅ Paso 4/7 - Efector activado");
         
         // 5. Movimiento con efector activado
-        respuesta = robotService->mover(100, 100, 30, 100);
+        respuesta = robotService->mover(0, 170, 100, 50);
         CHECK(respuesta.find("ERROR") == std::string::npos);
         logger->info("✅ Paso 5/7 - Movimiento con efector activado");
         

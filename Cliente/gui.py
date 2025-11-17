@@ -135,9 +135,14 @@ class RobotApp:
         frame_cuenta.pack(fill="x", padx=10, pady=5)
         ttk.Button(frame_cuenta, text="Cambiar mi contraseña", command=self.changeMyPassword).pack(fill="x", padx=5, pady=3)
 
-        # --- Grupo: Comandos del robot ---
+        # --- Grupo: Comandos del robot (AHORA EN 2 COLUMNAS) ---
         frame_comandos = ttk.LabelFrame(self.frame_control, text="Comandos del robot")
         frame_comandos.pack(fill="x", padx=10, pady=5)
+        
+        # Configurar columnas para que se expandan equitativamente
+        frame_comandos.columnconfigure(0, weight=1)
+        frame_comandos.columnconfigure(1, weight=1)
+
         botones_comandos = [
             ("Homing (G28)", self.homing),
             ("Status (M114)", self.status),
@@ -145,23 +150,33 @@ class RobotApp:
             ("Gripper (M3/M5)", self.gripper),
             ("Mode (G90/G91)", self.mode),
             ("Move (G0)", self.move),
-            ("Reporte de Comandos (RAM)", self.get_report) # <-- CAMBIO DE NOMBRE
+            ("Reporte de Comandos (RAM)", self.get_report) 
         ]
-        for texto, funcion in botones_comandos:
-            ttk.Button(frame_comandos, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
 
-        # --- Grupo: Manejo de trayectorias
+        for i, (texto, funcion) in enumerate(botones_comandos):
+            btn = ttk.Button(frame_comandos, text=texto, command=funcion)
+            # i // 2 nos da la fila (0, 0, 1, 1...)
+            # i % 2 nos da la columna (0, 1, 0, 1...)
+            btn.grid(row=i // 2, column=i % 2, padx=5, pady=3, sticky="ew")
+
+        # --- Grupo: Manejo de trayectorias (AHORA EN 2 COLUMNAS) ---
         frame_trayectorias = tk.LabelFrame(self.frame_control, text="Gestión de trayectorias")
         frame_trayectorias.pack(fill="x", padx=10, pady=5)
+        
+        # Configurar columnas
+        frame_trayectorias.columnconfigure(0, weight=1)
+        frame_trayectorias.columnconfigure(1, weight=1)
+
         botones_trayectoria = [
             ("Subir Archivo (Upload)", self.upload),
             ("Listar y Ejecutar Archivo (Run)", self.show_file_selection_dialog),
             ("Iniciar Grabación (Rec Start)", self.rec_start),
             ("Detener Grabación (Rec Stop)", self.rec_stop),
         ]
-        for texto, funcion in botones_trayectoria:
-            ttk.Button(frame_trayectorias, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
-
+        
+        for i, (texto, funcion) in enumerate(botones_trayectoria):
+            btn = ttk.Button(frame_trayectorias, text=texto, command=funcion)
+            btn.grid(row=i // 2, column=i % 2, padx=5, pady=3, sticky="ew")
 
         # --- Grupo: Gestión de usuarios (solo admin) ---
         if self.cliente.is_admin():
@@ -172,12 +187,10 @@ class RobotApp:
                 ("Lista de usuarios", self.userList),
                 ("Cambiar contraseña de usuario", self.changeUserPassword),
                 ("Cambiar estado de usuario", self.updateUser),
-                # --- NUEVO BOTÓN ---
                 ("Ver Log de Auditoría (CSV)", self.get_audit_log_report),
             ]
             for texto, funcion in botones_usuarios:
                 ttk.Button(frame_usuarios, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
-
 
     def homing(self):
         """Se ejecuta al presionar el botón 'Homing'."""
@@ -215,9 +228,7 @@ class RobotApp:
             # Donde r es la respuesta del servidor
             status_info = r.get('data', {})
             # Busca la clave 'status' en el diccionario, si existe muestra su valor, sino N/A
-            mensaje = f"Estado: {status_info.get('status', 'N/A')}\n"
-            # Esta linea de abajo creo que la vamos a tener que sacar
-            mensaje += f"Posicion: {status_info.get('position', 'N/A')}\n"
+            mensaje = f"Estado: {status_info.get('status', 'N/A')}\n"           
             self.visualizer.log(mensaje)
 
             messagebox.showinfo("Robot Status", mensaje)

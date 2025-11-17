@@ -1,5 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include "lib/xmlrpc/doctest.h"
+#include "doctest.h"
 #include "hardware/ArduinoService.h"
 #include <iostream>
 #include <thread>
