@@ -9,19 +9,23 @@ namespace robot_service_methods {
 RobotMotorsMethod::RobotMotorsMethod(XmlRpc::XmlRpcServer* server,
                                            SessionManager& sm,
                                            PALogger& L,
-                                           RobotService& rs)
-    : XmlRpc::XmlRpcServerMethod("robot.setMotors", server), // <-- CAMBIO a "robot.setMotors"
+                                           RobotService& rs,
+                                           CommandHistory& ch)
+    : XmlRpc::XmlRpcServerMethod("robot.setMotors", server), 
       sessions_(sm),
       logger_(L),
-      robotService_(rs) {}
+      robotService_(rs), 
+      history_(ch) {}
 
 // --- Execute ---
 void RobotMotorsMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result) {
-    const char* const METHOD_NAME = "robot.setMotors"; // <-- CAMBIO
+    const char* const METHOD_NAME = "robot.setMotors";
+    std::string user_for_history = "desconocido";
+    std::string details_for_history = "N/A";
+
     try {
         // 1. Validar Parámetros (token + estado)
-        // -----------------------------------------------------------------
-        // <-- INICIO DE CAMBIOS MAYORES -->
+
         XmlRpc::XmlRpcValue args = rpc_norm(params);
         if (!args.hasMember("token") || !args.hasMember("estado")) {
             throw XmlRpc::XmlRpcException("BAD_REQUEST: Faltan parámetros (se requiere 'token' y 'estado')"); // <-- CAMBIO
@@ -31,12 +35,15 @@ void RobotMotorsMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue
         if (args["estado"].getType() != XmlRpc::XmlRpcValue::TypeBoolean) { // <-- CAMBIO
              throw XmlRpc::XmlRpcException("BAD_REQUEST: Parámetro 'estado' debe ser booleano"); // <-- CAMBIO
         }
-        bool estado = (bool)args["estado"]; // <-- CAMBIO (de 'activar' a 'estado')
-        // <-- FIN DE CAMBIOS MAYORES -->
-        // -----------------------------------------------------------------
+        bool estado = (bool)args["estado"]; 
+
+        details_for_history = estado ? "estado: ON" : "estado: OFF";
 
         // 2. Validar Sesión y Permisos (Op o Admin)
+        
         const SessionView& session = guardSession(METHOD_NAME, sessions_, token, logger_);
+        user_for_history = session.user; // Guardamos el usuario real
+
         if (session.privilegio != "admin" && session.privilegio != "op") {
             logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - Se requiere Op o Admin. Usuario: " + session.user);
             throw XmlRpc::XmlRpcException("FORBIDDEN: privilegios insuficientes (se requiere Op o Admin)");
@@ -44,6 +51,8 @@ void RobotMotorsMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue
         logger_.info(std::string("[") + METHOD_NAME + "] Solicitud de motores (" + (estado ? "ON" : "OFF") + ") por: " + session.user); // <-- CAMBIO
 
         // 3. Llamar a la Lógica de Negocio (RobotService)
+        
+        history_.addEntry(session.user, METHOD_NAME, details_for_history, false);
         std::string respuestaRobot;
         if (estado) { // <-- CAMBIO
             respuestaRobot = robotService_.activarMotores();
@@ -64,9 +73,11 @@ void RobotMotorsMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue
     } catch (const XmlRpc::XmlRpcException& e) {
         throw;
     } catch (const std::runtime_error& e) {
+        history_.addEntry(user_for_history, METHOD_NAME, e.what(), true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error de runtime: " + std::string(e.what()));
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: " + std::string(e.what()));
     } catch (...) {
+        history_.addEntry(user_for_history, METHOD_NAME, "Error inesperado", true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error inesperado.");
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: Ocurrió un error inesperado en " + std::string(METHOD_NAME));
     }

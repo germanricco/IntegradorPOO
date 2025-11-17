@@ -9,15 +9,19 @@ namespace robot_service_methods {
 RobotMoveMethod::RobotMoveMethod(XmlRpc::XmlRpcServer* server,
                                      SessionManager& sm,
                                      PALogger& L,
-                                     RobotService& rs)
+                                     RobotService& rs,
+                                     CommandHistory& ch)
     : XmlRpc::XmlRpcServerMethod("robot.move", server), // <-- CAMBIO
       sessions_(sm),
       logger_(L),
-      robotService_(rs) {}
+      robotService_(rs),
+      history_(ch) {}
 
 // --- Execute ---
 void RobotMoveMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result) {
-    const char* const METHOD_NAME = "robot.move"; // <-- CAMBIO
+    const char* const METHOD_NAME = "robot.move";
+    std::string user_for_history = "desconocido"; // Valor por defecto
+    std::string details_for_history = "N/A";     // Valor por defecto
     try {
         // 1. Validar Parámetros (token + coordenadas)
         // -----------------------------------------------------------------
@@ -27,7 +31,7 @@ void RobotMoveMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& 
             throw XmlRpc::XmlRpcException("BAD_REQUEST: Faltan parámetros (se requiere 'token', 'x', 'y', 'z')");
         }
         std::string token = std::string(args["token"]);
-
+        
         // Función auxiliar para extraer números (int o double)
         auto getDouble = [&](const char* key) -> double {
             XmlRpc::XmlRpcValue val = args[key];
@@ -50,9 +54,15 @@ void RobotMoveMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& 
             vel_val = getDouble("velocidad");
         }
 
+        std::stringstream ss;
+        ss << "X:" << x_val << " Y:" << y_val << " Z:" << z_val << " V:" << vel_val;
+        details_for_history = ss.str();
+
         // 2. Validar Sesión y Permisos (Op o Admin)
         // (Esta lógica es idéntica a Homing)
         const SessionView& session = guardSession(METHOD_NAME, sessions_, token, logger_);
+        user_for_history = session.user; // Guardamos el nombre de usuario real
+
         if (session.privilegio != "admin" && session.privilegio != "op") {
             logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - Se requiere Op o Admin. Usuario: " + session.user);
             throw XmlRpc::XmlRpcException("FORBIDDEN: privilegios insuficientes (se requiere Op o Admin)");
@@ -61,6 +71,10 @@ void RobotMoveMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& 
 
         // 3. Llamar a la Lógica de Negocio (RobotService)
         // <-- CAMBIO: Llamar a mover() con los parámetros -->
+        
+        // REGISTRAMOS LA ORDEN ANTES DE EJECUTARLA
+        history_.addEntry(session.user, METHOD_NAME, details_for_history, false);
+        
         std::string respuestaRobot = robotService_.mover(x_val, y_val, z_val, vel_val);
 
         // 4. Procesar Respuesta y Armar Resultado
@@ -77,9 +91,11 @@ void RobotMoveMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& 
     } catch (const XmlRpc::XmlRpcException& e) {
         throw;
     } catch (const std::runtime_error& e) {
+        history_.addEntry(user_for_history, METHOD_NAME, e.what(), true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error de runtime: " + std::string(e.what()));
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: " + std::string(e.what()));
     } catch (...) {
+        history_.addEntry(user_for_history, METHOD_NAME, "Error inesperado", true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error inesperado.");
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: Ocurrió un error inesperado en " + std::string(METHOD_NAME));
     }

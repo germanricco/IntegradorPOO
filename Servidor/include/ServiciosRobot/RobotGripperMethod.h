@@ -6,6 +6,7 @@
 #include "../PALogger.h"
 #include "../RobotService.h"
 #include "../common/AuthZ.h" // Contiene guardSession
+#include "../CommandHistory.h"
 
 namespace robot_service_methods {
 
@@ -13,13 +14,15 @@ class RobotGripperMethod : public XmlRpc::XmlRpcServerMethod {
 private:
     SessionManager& sessions_;
     PALogger&       logger_;
-    RobotService&   robotService_; // Referencia a la fachada del robot
+    RobotService&   robotService_;
+    CommandHistory& history_; // Referencia a la fachada del robot
 
 public:
     RobotGripperMethod(XmlRpc::XmlRpcServer* server,
                       SessionManager& sm,
                       PALogger& L,
-                      RobotService& rs);
+                      RobotService& rs,
+                      CommandHistory& ch );
 
     void execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result) override;
     std::string help() override;

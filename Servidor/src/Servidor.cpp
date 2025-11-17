@@ -17,6 +17,10 @@ bool Servidor::inicializar(){
     try {
         logger_.info("===== INICIALIZANDO SERVIDOR =====");
         
+        //instancia del historial
+        commandHistory_ = std::make_shared<CommandHistory>();
+        logger_.info("✅ Historial de Comandos inicializado");
+
         // 1. Base de datos y autenticación
         if (!inicializarBaseDeDatos()) {
             logger_.warning("Base de datos no disponible - continuando sin funciones de autenticación");
@@ -186,10 +190,10 @@ void Servidor::registrarMetodosRobot() {
     // REGISTRAMOS DIRECTAMENTE TUS MÉTODOS EXISTENTES DEL ROBOT
     
     mRobotHoming_ = std::make_unique<robot_service_methods::RobotHomingMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotMotors_ = std::make_unique<robot_service_methods::RobotMotorsMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotMode_ = std::make_unique<robot_service_methods::RobotModeMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_
@@ -201,13 +205,16 @@ void Servidor::registrarMetodosRobot() {
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_
     );
     mRobotGripper_ = std::make_unique<robot_service_methods::RobotGripperMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
     );
     mRobotStatus_ = std::make_unique<robot_service_methods::RobotStatusMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_
     );
     mRobotMove_ = std::make_unique<robot_service_methods::RobotMoveMethod>(
-        servidorRpc_.get(), *sessionManager_, logger_, *robotService_
+        servidorRpc_.get(), *sessionManager_, logger_, *robotService_, *commandHistory_
+    );
+    mRobotGetReport_ = std::make_unique<robot_service_methods::RobotGetReportMethod>(
+    servidorRpc_.get(), *sessionManager_, logger_, *commandHistory_
     );
     mRobotStartRecording_ = std::make_unique<robot_service_methods::RobotStartRecordingMethod>(
         servidorRpc_.get(), *sessionManager_, logger_, *robotService_

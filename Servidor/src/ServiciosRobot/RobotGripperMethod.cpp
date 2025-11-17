@@ -9,19 +9,23 @@ namespace robot_service_methods {
 RobotGripperMethod::RobotGripperMethod(XmlRpc::XmlRpcServer* server,
                                              SessionManager& sm,
                                              PALogger& L,
-                                             RobotService& rs)
+                                             RobotService& rs,
+                                             CommandHistory& ch)
     : XmlRpc::XmlRpcServerMethod("robot.setGripper", server), // <-- CAMBIO a "robot.setGripper"
       sessions_(sm),
       logger_(L),
-      robotService_(rs) {}
+      robotService_(rs), 
+      history_(ch) {}
 
 // --- Execute ---
 void RobotGripperMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValue& result) {
-    const char* const METHOD_NAME = "robot.setGripper"; // <-- CAMBIO
+    const char* const METHOD_NAME = "robot.setGripper";
+    std::string user_for_history = "desconocido";
+    std::string details_for_history = "N/A";
+
     try {
         // 1. Validar Parámetros (token + estado)
-        // -----------------------------------------------------------------
-        // <-- INICIO DE CAMBIOS MAYORES -->
+       
         XmlRpc::XmlRpcValue args = rpc_norm(params);
         if (!args.hasMember("token") || !args.hasMember("estado")) {
             throw XmlRpc::XmlRpcException("BAD_REQUEST: Faltan parámetros (se requiere 'token' y 'estado')"); // <-- CAMBIO
@@ -32,11 +36,13 @@ void RobotGripperMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValu
              throw XmlRpc::XmlRpcException("BAD_REQUEST: Parámetro 'estado' debe ser booleano"); // <-- CAMBIO
         }
         bool estado = (bool)args["estado"]; // <-- CAMBIO (de 'activar' a 'estado')
-        // <-- FIN DE CAMBIOS MAYORES -->
-        // -----------------------------------------------------------------
+  
+        details_for_history = estado ? "estado: ON" : "estado: OFF";
 
         // 2. Validar Sesión y Permisos (Op o Admin)
         const SessionView& session = guardSession(METHOD_NAME, sessions_, token, logger_);
+        user_for_history = session.user;
+
         if (session.privilegio != "admin" && session.privilegio != "op") {
             logger_.warning(std::string("[") + METHOD_NAME + "] FORBIDDEN - Se requiere Op o Admin. Usuario: " + session.user);
             throw XmlRpc::XmlRpcException("FORBIDDEN: privilegios insuficientes (se requiere Op o Admin)");
@@ -44,6 +50,8 @@ void RobotGripperMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValu
         logger_.info(std::string("[") + METHOD_NAME + "] Solicitud de gripper (" + (estado ? "ON" : "OFF") + ") por: " + session.user); // <-- CAMBIO
 
         // 3. Llamar a la Lógica de Negocio (RobotService)
+        history_.addEntry(session.user, METHOD_NAME, details_for_history, false);
+
         std::string respuestaRobot;
         if (estado) { // <-- CAMBIO
             respuestaRobot = robotService_.activarEfector();
@@ -64,9 +72,11 @@ void RobotGripperMethod::execute(XmlRpc::XmlRpcValue& params, XmlRpc::XmlRpcValu
     } catch (const XmlRpc::XmlRpcException& e) {
         throw;
     } catch (const std::runtime_error& e) {
+        history_.addEntry(user_for_history, METHOD_NAME, e.what(), true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error de runtime: " + std::string(e.what()));
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: " + std::string(e.what()));
     } catch (...) {
+        history_.addEntry(user_for_history, METHOD_NAME, "Error inesperado", true);
         logger_.error(std::string("[") + METHOD_NAME + "] Error inesperado.");
         throw XmlRpc::XmlRpcException("INTERNAL_ERROR: Ocurrió un error inesperado en " + std::string(METHOD_NAME));
     }

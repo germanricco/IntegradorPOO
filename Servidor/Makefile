@@ -42,6 +42,7 @@ CORE_SRCS := \
   $(SRC_DIR)/RobotService.cpp \
   $(SRC_DIR)/TrajectoryManager.cpp \
   $(SRC_DIR)/Servidor.cpp \
+  $(SRC_DIR)/CommandHistory.cpp
   #$(SRC_DIR)/auth/AuthWiring.cpp
 
 # Archivos adicionales necesarios

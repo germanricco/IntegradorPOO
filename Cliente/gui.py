@@ -145,6 +145,7 @@ class RobotApp:
             ("Gripper (M3/M5)", self.gripper),
             ("Mode (G90/G91)", self.mode),
             ("Move (G0)", self.move),
+            ("Obtener Reporte de Comandos", self.get_report)
         ]
         for texto, funcion in botones_comandos:
             ttk.Button(frame_comandos, text=texto, command=funcion).pack(fill="x", padx=5, pady=3)
@@ -334,6 +335,58 @@ class RobotApp:
             # (Aquí pondríamos el playsound('error.wav'))
         except Exception as e:
             messagebox.showerror("Error", str(e))
+    def get_report(self):
+        """
+        Llama al servicio robot.getReport y muestra los resultados.
+        """
+        if not self.cliente.has_operator_privileges():
+            messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
+            return
+
+        try:
+                        
+            # 1. Llamar a la API
+            # Usamos __getattr__ porque getReport no está "cableado" en ApiClient.py
+            r = self.cliente.api.__getattr__("robot.getReport")({"token": self.cliente.token})
+
+            if not r.get('ok'):
+                 raise Exception("El servidor devolvió un error")
+
+            # 2. Procesar la respuesta
+            total_cmds = r.get('total_comandos', 0)
+            total_errs = r.get('total_errores', 0)
+            entries = r.get('entries', [])
+
+            # 3. Formatear el mensaje para mostrar
+            report_msg = f"--- Reporte de Comandos para '{self.cliente.user}' ---\n\n"
+            report_msg += f"Total de Comandos: {total_cmds}\n"
+            report_msg += f"Total de Errores: {total_errs}\n"
+            report_msg += "----------------------------------------\n"
+
+            if not entries:
+                report_msg += "\n(No hay comandos en el historial)"
+            else:
+                # Mostramos solo los últimos 10 para que quepa en la ventana
+                for entry in entries[-10:]: 
+                    status = "ERROR" if entry.get('error') else "OK"
+                    details = entry.get('details', 'N/A')
+                    service = entry.get('service', 'N/A')
+                    time = entry.get('timestamp', 'N/A')
+                    
+                    report_msg += f"\n[{time}] [{status}] {service}\n"
+                    if details != "N/A":
+                         report_msg += f"    > {details}\n"
+
+            # 4. Mostrar en la consola y en un messagebox
+            self.visualizer.log(f"OK: Reporte generado ({total_cmds} comandos).")
+            messagebox.showinfo("Reporte de Comandos", report_msg)
+
+        except Fault as e:
+            self.visualizer.log(f"ERROR: {e.faultString}")
+            messagebox.showerror("Error de Servidor", e.faultString)
+        except Exception as e:
+            self.visualizer.log(f"ERROR: {str(e)}")
+            messagebox.showerror("Error", str(e))
 
     def upload(self):
         if not self.cliente.has_operator_privileges():
@@ -361,24 +414,6 @@ class RobotApp:
             messagebox.showerror("Error de Servidor", e.faultString)
         except Exception as e:
             messagebox.showerror("Error", str(e))
-
-    # def run(self):
-    #     if not self.cliente.has_operator_privileges():
-    #         messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
-    #         return
-        
-    #     try:
-    #         filename = simpledialog.askstring("Ejecutar archivo", "Ingrese el nombre del archivo gcode a ejecutar:")
-    #         if not filename:
-    #             return
-
-    #         r = self.cliente.robot_run_file(filename)
-    #         messagebox.showinfo("Ejecución de archivo", r.get('data', 'N/A').get('msg', 'OK'))
-
-    #     except Fault as e:
-    #         messagebox.showerror("Error de Servidor", e.faultString)
-    #     except Exception as e:
-    #         messagebox.showerror("Error", str(e))
 
     def rec_start(self):
         if not self.cliente.has_operator_privileges():

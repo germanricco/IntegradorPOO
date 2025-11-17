@@ -43,6 +43,7 @@
 #include "ServiciosRobot/RobotRunFileMethod.h"  
 #include "ServiciosRobot/RobotUploadFileMethod.h"
 #include "ServiciosRobot/RobotListFilesMethod.h"
+#include "ServiciosRobot/RobotGetReportMethod.h"
 
 // Libreria
 #include "XmlRpc.h"
@@ -53,6 +54,9 @@
 #include "ArduinoService.h"
 #include "RobotService.h"
 #include "TrajectoryManager.h"
+
+// Historial de comandos
+#include "CommandHistory.h"
 
 // Demo Simple
 #include "ServiciosBasicos.h"
@@ -94,6 +98,8 @@ class Servidor {
         std::shared_ptr<ArduinoService> arduinoService_;
         std::shared_ptr<RobotService> robotService_;
         
+        std::shared_ptr<CommandHistory> commandHistory_;
+
         // CAMBIOS GABI:Métodos RPC (se almacenan para mantenerlos vivos)
         std::unique_ptr<auth::AuthLogin>              mAuthLogin_;
         std::unique_ptr<auth::AuthLogout>             mAuthLogout_;
@@ -117,7 +123,9 @@ class Servidor {
         std::unique_ptr<robot_service_methods::RobotRunFileMethod> mRobotRunFile_;
         std::unique_ptr<robot_service_methods::RobotUploadFileMethod> mRobotUploadFile_; 
         std::unique_ptr<robot_service_methods::RobotListFilesMethod> mRobotListFiles_;
-        
+        std::unique_ptr<robot_service_methods::RobotGetReportMethod> mRobotGetReport_;
+
+
         //HASTA ACA LLEGAN LOS CAMBIOS
         
         // Estado
