@@ -247,15 +247,27 @@ class APIClient:
         except Fault as e:
             return {"success": False, "error": e.faultString}
     
-    def robot_get_report(self):
-        """Obtiene el historial de comandos del usuario."""
+    def robot_get_report(self, filter_user=None, filter_error=None):
+        """
+        Obtiene el historial de comandos.
+        - filter_user (str, opcional): Filtra por un nombre de usuario (solo Admin).
+        - filter_error (bool, opcional): True=solo errores, False=solo éxitos (solo Admin).
+        """
         try:
-            # Llama al método RPC que implementamos en el servidor
-            r = self.api.__getattr__("robot.getReport")({
-                "token": self.token
-            })
-            # El servidor C++ devuelve {ok: bool, total_comandos: int, ...}
-            # Lo envolvemos en el formato estándar de nuestro cliente
+            # 1. Construir el payload base
+            payload = {"token": self.token}
+            
+            # 2. Añadir los filtros opcionales si existen
+            if filter_user:
+                payload["filter_user"] = filter_user
+                
+            # Usamos "is not None" porque filter_error=False es un valor válido
+            if filter_error is not None:
+                payload["filter_error"] = filter_error
+
+            # 3. Llamar al método RPC con el payload dinámico
+            r = self.api.__getattr__("robot.getReport")(payload)
+            
             return {"success": True, "data": r}
         except Fault as e:
             return {"success": False, "error": e.faultString}

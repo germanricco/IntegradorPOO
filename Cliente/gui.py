@@ -337,49 +337,87 @@ class RobotApp:
             messagebox.showerror("Error", str(e))
     def get_report(self):
         """
-        Llama al servicio robot.getReport y muestra los resultados.
+        Llama al servicio robot.getReport.
+        Si es Admin, pregunta por filtros opcionales.
         """
         if not self.cliente.has_operator_privileges():
             messagebox.showerror("Permiso Denegado", "Se requiere ser Operador o Admin.")
             return
 
         try:
-                        
-            # 1. Llamar a la API
-            # Usamos __getattr__ porque getReport no está "cableado" en ApiClient.py
-            r = self.cliente.api.__getattr__("robot.getReport")({"token": self.cliente.token})
+            filter_user = None
+            filter_error = None
 
+            # 1. Preguntar por filtros SOLO si es Admin
+            if self.cliente.is_admin():
+                # Pregunta 1: Filtrar por usuario
+                filter_user = simpledialog.askstring("Filtro de Reporte (Admin)", 
+                                                     "Filtrar por usuario (dejar en blanco para ver todos):",
+                                                     parent=self.root)
+                
+                # Si presiona "Cancelar" en el primer diálogo, salimos
+                if filter_user is None:
+                    return 
+                if filter_user == "":
+                    filter_user = None # Convertir "" a None
+
+                # Pregunta 2: Filtrar por error
+                err_choice = messagebox.askyesnocancel("Filtro de Reporte (Admin)",
+                                                       "¿Filtrar por estado de error?\n\n"
+                                                       " - SÍ: Ver solo ERRORES.\n"
+                                                       " - NO: Ver solo ÉXITOS.\n"
+                                                       " - CANCELAR: Ver ambos.",
+                                                       parent=self.root)
+                filter_error = err_choice # Esto es (True, False, o None)
+            
+            # 2. Llamar a la API con los filtros
+            result = self.cliente.robot_get_report(filter_user, filter_error)
+
+            if not result.get("success"):
+                 raise Exception(result.get("error", "Error desconocido del cliente"))
+
+            # 3. Procesar la respuesta
+            r = result["data"]
             if not r.get('ok'):
                  raise Exception("El servidor devolvió un error")
 
-            # 2. Procesar la respuesta
             total_cmds = r.get('total_comandos', 0)
             total_errs = r.get('total_errores', 0)
             entries = r.get('entries', [])
 
-            # 3. Formatear el mensaje para mostrar
-            report_msg = f"--- Reporte de Comandos para '{self.cliente.user}' ---\n\n"
-            report_msg += f"Total de Comandos: {total_cmds}\n"
-            report_msg += f"Total de Errores: {total_errs}\n"
+            # 4. Formatear el mensaje para mostrar
+            report_title = self.cliente.user
+            if self.cliente.is_admin() and filter_user:
+                report_title = filter_user
+            elif self.cliente.is_admin() and not filter_user:
+                report_title = "TODOS LOS USUARIOS"
+
+            report_msg = f"--- Reporte de Comandos para '{report_title}' ---\n\n"
+            report_msg += f"Mostrando {len(entries)} de {total_cmds} comandos ({total_errs} errores)\n"
             report_msg += "----------------------------------------\n"
 
             if not entries:
-                report_msg += "\n(No hay comandos en el historial)"
+                report_msg += "\n(No hay comandos que coincidan con el filtro)"
             else:
-                # Mostramos solo los últimos 10 para que quepa en la ventana
-                for entry in entries[-10:]: 
+                for entry in entries[-15:]: # Mostrar últimos 15
                     status = "ERROR" if entry.get('error') else "OK"
                     details = entry.get('details', 'N/A')
                     service = entry.get('service', 'N/A')
                     time = entry.get('timestamp', 'N/A')
                     
-                    report_msg += f"\n[{time}] [{status}] {service}\n"
+                    if self.cliente.is_admin() and not filter_user:
+                        user = entry.get('username', '???')
+                        report_msg += f"\n[{time}] [{status}] @{user} -> {service}\n"
+                    else:
+                        report_msg += f"\n[{time}] [{status}] {service}\n"
+                        
                     if details != "N/A":
                          report_msg += f"    > {details}\n"
 
-            # 4. Mostrar en la consola y en un messagebox
-            self.visualizer.log(f"OK: Reporte generado ({total_cmds} comandos).")
-            messagebox.showinfo("Reporte de Comandos", report_msg)
+            # 5. Mostrar en la consola y en un messagebox
+            self.visualizer.log(f"OK: Reporte generado ({len(entries)} comandos).")
+            # Usar un Toplevel con Text para mostrar reportes largos
+            self.show_report_dialog("Reporte de Comandos", report_msg)
 
         except Fault as e:
             self.visualizer.log(f"ERROR: {e.faultString}")
@@ -387,6 +425,21 @@ class RobotApp:
         except Exception as e:
             self.visualizer.log(f"ERROR: {str(e)}")
             messagebox.showerror("Error", str(e))
+            
+    def show_report_dialog(self, title, content):
+        """Muestra un diálogo Toplevel con un widget de Texto (para copiar y pegar)"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title(title)
+        dialog.geometry("600x400")
+        dialog.transient(self.root)
+        dialog.grab_set()
+
+        text_widget = tk.Text(dialog, wrap="word", height=20, width=70)
+        text_widget.pack(padx=10, pady=10, fill="both", expand=True)
+        text_widget.insert("1.0", content)
+        text_widget.config(state="disabled") # Hacerlo de solo lectura
+
+        ttk.Button(dialog, text="Cerrar", command=dialog.destroy).pack(pady=5)
 
     def upload(self):
         if not self.cliente.has_operator_privileges():

@@ -18,7 +18,7 @@ bool Servidor::inicializar(){
         logger_.info("===== INICIALIZANDO SERVIDOR =====");
         
         //instancia del historial
-        commandHistory_ = std::make_shared<CommandHistory>();
+        commandHistory_ = std::make_shared<CommandHistory>(logger_);
         logger_.info("✅ Historial de Comandos inicializado");
 
         // 1. Base de datos y autenticación

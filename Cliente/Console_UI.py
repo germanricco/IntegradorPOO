@@ -39,7 +39,7 @@ class ConsoleUI:
             print("LISTAR ARCHIVOS: <list>                                              # Lista sus archivos (admin ve todos)")
             print("INICIO GRABADO DE TRAYECTORIA: <rec-start> <file>                               ")
             print("FIN GRABADO DE TRAYECTORIA: <rec-stop> <file>                                   ")
-            print("OBTENER REPORTE DE COMANDOS: <report>                                           ")
+            print("OBTENER REPORTE DE COMANDOS: <report> [user=<user>] [error=true|false]          ")
             print("======================================================================================================================")   
 
         elif self.client.priv == "op":      
@@ -377,51 +377,88 @@ class ConsoleUI:
                         print("Respuesta del servidor:", result["data"])
                     else:
                         print(f"Error: {result['error']}")
+            
             elif cmd == "report":
                 if not self.client.has_operator_privileges():
                     print("Error: Permiso denegado (se requiere 'op' o 'admin')")
-                elif len(args) != 0:
-                    print("Uso: report")
-                else:
-                    print("Solicitando reporte de comandos...")
+                    return True # <-- CORREGIDO
+                
+                # --- NUEVA LÓGICA DE PARSEO DE FILTROS ---
+                filter_user = None
+                filter_error = None
+                
+                if self.client.is_admin():
                     try:
-                        # 1. Llamar al método limpio de ApiClient
-                        result = self.client.robot_get_report()
-
-                        if not result["success"]:
-                             raise Exception(result["error"])
-
-                        # 2. Obtener los datos
-                        r = result["data"] 
-                        total_cmds = r.get('total_comandos', 0)
-                        total_errs = r.get('total_errores', 0)
-                        entries = r.get('entries', [])
-
-                        # 3. Imprimir el reporte (¡ESTA ES LA PARTE QUE FALTABA!)
-                        print("==========================================================")
-                        print(f"--- Reporte de Comandos para '{self.client.user}' ---")
-                        print(f"Total de Comandos: {total_cmds}")
-                        print(f"Total de Errores: {total_errs}")
-                        print("----------------------------------------------------------")
-
-                        if not entries:
-                            print("(No hay comandos en el historial)")
-                        else:
-                            # Recorremos la lista de entradas y las imprimimos
-                            for entry in entries:
-                                status = "ERROR" if entry.get('error') else "OK   "
-                                details = entry.get('details', 'N/A')
-                                service = entry.get('service', 'N/A')
-                                time = entry.get('timestamp', 'N/A')
-                                
-                                print(f"[{time}] [{status}] {service}")
-                                if details != "N/A":
-                                     print(f"    > {details}")
+                        for arg in args:
+                            if arg.startswith("user="):
+                                filter_user = arg.split("=", 1)[1]
+                            elif arg.startswith("error="):
+                                val = arg.split("=", 1)[1].lower()
+                                if val == "true":
+                                    filter_error = True
+                                elif val == "false":
+                                    filter_error = False
+                                else:
+                                    raise ValueError(f"Valor inválido para 'error': {val}")
                         
-                        print("==========================================================")
-                                                
+                        log_msg = "Solicitando reporte de comandos..."
+                        if filter_user: log_msg += f" [Filtro Usuario: {filter_user}]"
+                        if filter_error is not None: log_msg += f" [Filtro Error: {filter_error}]"
+                        print(log_msg)
+
                     except Exception as e:
-                        print(f"Error: {e}")
+                        print(f"Error en argumentos de filtro: {e}")
+                        print("Uso: report [user=<nombre>] [error=true|false]")
+                        return True # <-- CORREGIDO
+                else:
+                    if len(args) != 0:
+                        print("Uso: report (los operadores no pueden usar filtros)")
+                        return True # <-- CORREGIDO
+                    print("Solicitando reporte de comandos...")
+                # --- FIN LÓGICA DE PARSEO ---
+
+                try:
+                    # 1. Llamar al método de ApiClient con los filtros
+                    result = self.client.robot_get_report(filter_user, filter_error)
+
+                    if not result["success"]:
+                         raise Exception(result["error"])
+
+                    # 2. Obtener los datos (el resto es igual que antes)
+                    r = result["data"] 
+                    total_cmds = r.get('total_comandos', 0)
+                    total_errs = r.get('total_errores', 0)
+                    entries = r.get('entries', [])
+
+                    # 3. Imprimir el reporte
+                    print("==========================================================")
+                    user_report = filter_user if filter_user else self.client.user
+                    print(f"--- Reporte de Comandos para '{user_report}' ---")
+                    print(f"Mostrando {len(entries)} de {total_cmds} comandos ({total_errs} errores)")
+                    print("----------------------------------------------------------")
+
+                    if not entries:
+                        print("(No hay comandos que coincidan con el filtro)")
+                    else:
+                        for entry in entries:
+                            status = "ERROR" if entry.get('error') else "OK   "
+                            details = entry.get('details', 'N/A')
+                            service = entry.get('service', 'N/A')
+                            time = entry.get('timestamp', 'N/A')
+                            
+                            if self.client.is_admin() and not filter_user:
+                                user = entry.get('username', '???')
+                                print(f"[{time}] [{status}] @{user} -> {service}")
+                            else:
+                                print(f"[{time}] [{status}] {service}")
+
+                            if details != "N/A":
+                                 print(f"    > {details}")
+                    
+                    print("==========================================================")
+                                            
+                except Exception as e:
+                    print(f"Error: {e}")
 
             elif cmd == "quit":
                 return False

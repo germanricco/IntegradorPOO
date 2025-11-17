@@ -40,14 +40,20 @@ void CommandHistory::addEntry(const std::string& user, const std::string& servic
     new_entry.details = details;
     new_entry.was_error = is_error;
 
-    // 2. Bloquear el mutex antes de modificar el vector
-    // std::lock_guard bloquea automáticamente el mutex en esta línea.
+    // --- ¡NUESTRA FUSIÓN! ---
+    // 2. Llamar a PALogger para que guarde en el CSV
+    std::string resultado = is_error ? ("ERROR: " + details) : "OK";
+    // (Aún no tenemos el "nodo" (IP), así que lo dejamos default)
+    logger_.logRequest(user, service, resultado);
+    // --- FIN DE LA FUSIÓN ---
+
+    // 3. Bloquear el mutex
     std::lock_guard<std::mutex> lock(mtx_);
     
-    // 3. Modificar el vector (ahora estamos seguros, nadie más puede acceder)
+    // 4. Modificar el vector
     entries_.push_back(new_entry);
     
-    // 4. El mutex se desbloquea automáticamente aquí cuando 'lock' se destruye.
+    // 5. El mutex se desbloquea automáticamente
 }
 
 
